@@ -9,6 +9,7 @@ export default {
 			gray: colors.gray,
 			black: colors.black,
 			white: "#ffffff",
+			red: colors.red,
 		},
 	},
 	plugins: [require("@tailwindcss/forms")],

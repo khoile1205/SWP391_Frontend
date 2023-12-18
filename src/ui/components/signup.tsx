@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 let email = "nguyenchiemdu@gmail.com";
 let password = "123456Aa@";
 
-export default function Login() {
+export default function SignUp() {
 	const { error, login } = userStore();
 	const [show, updateVisiblePass] = useState(false);
 	const { t } = useTranslation();

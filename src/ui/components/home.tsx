@@ -8,7 +8,6 @@ import {
 } from "@heroicons/react/24/outline";
 import userStore from "@/zustand/user.store";
 import router from "@/routes";
-import { User } from "@/models/user.model";
 
 const navigation = [
 	{ name: "Home", href: "#", current: true },
@@ -25,12 +24,9 @@ function handleLogin() {
 	router.navigate("/login");
 }
 
-function handleLogout(updateUser: (user: User | null) => void) {
-	updateUser(null);
-}
-
 export default function Home() {
 	const { user, updateUser } = userStore();
+
 	return (
 		<Disclosure as="nav" className="bg-primary-800">
 			{({ open }) => (
@@ -141,7 +137,7 @@ export default function Home() {
 													{({ active }) => (
 														<a
 															href="#"
-															onClick={() => handleLogout(updateUser)}
+															onClick={() => updateUser(null)}
 															className={classNames(
 																active ? "bg-primary-100" : "",
 																"block px-4 py-2 text-sm text-primary-700"

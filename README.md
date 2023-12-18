@@ -67,4 +67,50 @@ In the project directory, you can run the following scripts:
 
 ---
 
+## VS Code configuration
+
+Create a .vscode/settings.json file containing the configuration:
+
+```json
+{
+	"files.associations": {
+		"*.css": "tailwindcss"
+	},
+	"typescript.format.enable": false,
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescriptreact]": {
+		"editor.formatOnSave": true
+	}
+}
+
+```
+
+## Debuggings
+Create a .vscode/launch.json file containing the following scripts:
+```json
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "chrome",
+			"request": "launch",
+			"name": "Launch Chrome against localhost",
+			"url": "http://localhost:3000",
+			"webRoot": "${workspaceFolder}/src"
+		}
+	]
+}
+
+```
+
+run 
+```bash
+npm run dev
+```
+
+Press F5 to start debugging
+
+
 That's it! You're all set to start working on the ReactJS project developed by the DevSlayer Team. Happy coding!
