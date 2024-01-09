@@ -1,6 +1,6 @@
 import { RouterProvider } from "react-router-dom";
-import router from "./routes/index.ts";
-import i18nInit from "./i18n/init-i18n.ts";
+import router from "./routes/index";
+import i18nInit from "./i18n/init-i18n";
 
 i18nInit();
 
