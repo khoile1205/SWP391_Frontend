@@ -6,9 +6,9 @@ i18nInit();
 
 function App() {
 	return (
-		<>
+		<div className="h-1000">
 			<RouterProvider router={router} />
-		</>
+		</div>
 	);
 }
 

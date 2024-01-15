@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
 class ApiService {
@@ -64,7 +65,7 @@ class ApiService {
 		return this.request("PUT", url, data, token);
 	}
 
-	async delete(url: string, token?: string, data?: unknown): Promise<Response> {
+	async delete(url: string, data?: unknown, token?: string): Promise<Response> {
 		return this.request("DELETE", url, data, token);
 	}
 }

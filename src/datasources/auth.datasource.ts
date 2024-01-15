@@ -1,12 +1,12 @@
-import LoginResonse from "@/usecases/auth.usecase/responses/login.resonse";
+import LoginResponse from "@/usecases/auth.usecase/responses/login.response";
 import apiService from "@/utils/apiService";
 
 abstract class AuthDataSource {
-	abstract login(email: string, password: string): Promise<LoginResonse>;
+	abstract login(email: string, password: string): Promise<LoginResponse>;
 }
 
 class AuthDataSourceImpl implements AuthDataSource {
-	async login(email: string, password: string): Promise<LoginResonse> {
+	async login(email: string, password: string): Promise<LoginResponse> {
 		const body = {
 			username: email,
 			password,
@@ -18,7 +18,7 @@ class AuthDataSourceImpl implements AuthDataSource {
 		const isSuccess = res.status == 200;
 		const message = res.statusText;
 
-		return new LoginResonse(isSuccess, accessToken, message);
+		return new LoginResponse(isSuccess, accessToken, message);
 	}
 }
 
