@@ -14,16 +14,22 @@ Before running this project, ensure that you have the following software install
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/devslayer-team/vite-reactjs-base
+   git clone https://github.com/khoile1205/SWP391_Frontend
    ```
 
 2. Navigate to the project directory:
 
    ```bash
-   cd vite-reactjs-base
+   cd SWP391_Frontend
    ```
 
-3. Install the dependencies:
+3. Initialize the environment
+
+   ```bash
+   cp .env.example .env
+   ```
+
+4. Install the dependencies:
 
    ```bash
    npm install
@@ -35,7 +41,7 @@ Before running this project, ensure that you have the following software install
    yarn install
    ```
 
-4. Start the development server:
+5. Start the development server:
 
    ```bash
    npm run dev

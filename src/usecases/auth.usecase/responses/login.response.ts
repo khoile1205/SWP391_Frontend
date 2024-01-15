@@ -1,4 +1,4 @@
-class LoginResonse {
+class LoginResponse {
 	constructor(
 		public readonly isSuccess: boolean,
 		public readonly token: string,
@@ -6,4 +6,4 @@ class LoginResonse {
 	) {}
 }
 
-export default LoginResonse;
+export default LoginResponse;
