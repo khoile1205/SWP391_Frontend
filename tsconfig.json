@@ -1,16 +1,16 @@
 {
 	"compilerOptions": {
-	  "target": "ES5",
+	  "target": "ES2020",
 	  "useDefineForClassFields": true,
 	  "lib": ["ES2020", "DOM", "DOM.Iterable"],
-	  "module": "ESNext",
+	  "module": "ES2020",
 	  "skipLibCheck": true,
 	  "allowJs": true,
 	  "esModuleInterop": true,
 	  "incremental": true,
   
 	  /* Bundler mode */
-	  "moduleResolution": "node",
+	  "moduleResolution": "Bundler",
 	  "resolveJsonModule": true,
 	  "isolatedModules": true,
 	  "noEmit": true,
@@ -26,7 +26,7 @@
 	  "noFallthroughCasesInSwitch": true,
 	  "noUnusedLocals": true
 	},
-	"include": ["src", "types"],
+	"include": ["src", "types", "src/ui/pages/login.page.tsx"],
 	"exclude": ["node_modules"],
 	"references": [{ "path": "./tsconfig.node.json" }]
   }

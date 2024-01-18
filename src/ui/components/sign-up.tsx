@@ -2,7 +2,7 @@ import { MailOutlined, UserOutlined } from "@ant-design/icons";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import Logo from "@/assets/Icon/Logo.svg";
-import { Checkbox, Col, Form, Input, Row, Select } from "antd";
+import { Checkbox, Col, Form, Input, Row, Select, Typography } from "antd";
 import { Formik, FormikHelpers } from "formik";
 import { signUpValidationSchema } from "@/utils/validation";
 
@@ -17,7 +17,7 @@ interface FormValues {
 	phoneNumber: string;
 }
 
-export default function SignUp() {
+export function SignUp() {
 	// const { error, login } = userStore();
 	const [show, updateVisiblePass] = useState(false);
 
@@ -61,7 +61,7 @@ export default function SignUp() {
 					<div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
 						<Form autoComplete="off" autoFocus onFinish={handleSubmit} layout="vertical">
 							<Row gutter={16}>
-								<Col span={12}>
+								<Col span={24} sm={{ span: 12 }}>
 									<Form.Item
 										hasFeedback
 										name="firstName"
@@ -88,7 +88,7 @@ export default function SignUp() {
 										/>
 									</Form.Item>
 								</Col>
-								<Col span={12}>
+								<Col span={24} sm={{ span: 12 }}>
 									<Form.Item
 										hasFeedback
 										name="lastName"
@@ -222,14 +222,14 @@ export default function SignUp() {
 								}
 							>
 								<Input
-									size="large"
-									prefix="+84"
+									// size="large"
+									prefix={<Typography className="text-base text-sm text-gray-500">+84</Typography>}
 									name="phoneNumber"
 									value={values.phoneNumber}
 									onChange={handleChange}
 									onBlur={handleBlur}
 									placeholder="Phone number"
-									className="w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+									className="w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
 								/>
 							</Form.Item>
 							<Form.Item
@@ -243,14 +243,14 @@ export default function SignUp() {
 								}
 							>
 								<Input
-									size="large"
+									// size="large"
 									name="address"
 									defaultValue={values.address}
 									onChange={handleChange}
 									onBlur={handleBlur}
 									// prefix={<AimOutlined className="site-form-item-icon me-2" />}
 									placeholder="Address"
-									className="w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+									className="w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
 								/>
 							</Form.Item>
 							<Form.Item
@@ -264,7 +264,6 @@ export default function SignUp() {
 								}
 							>
 								<Select
-									size="large"
 									placeholder="Select your gender"
 									onChange={(value) => setFieldValue("gender", value)}
 									onBlur={() => setFieldTouched("gender")}
@@ -307,7 +306,7 @@ export default function SignUp() {
 						<p className="mt-6 text-center text-sm text-gray-500">
 							Already have account ?{" "}
 							<a
-								href="/login"
+								href="/sign-in"
 								className="font-semibold leading-6 text-primary-600 hover:text-primary-500"
 							>
 								Sign in now

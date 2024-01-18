@@ -1,0 +1,43 @@
+import { Post } from "@/models/post.model";
+
+export const POSTS: Post[] = [
+	{
+		id: "post1",
+		userId: "user1",
+		title: "Delicious Pasta",
+		description: "A mouthwatering pasta recipe with homemade sauce.",
+		thumbnail: "pasta_thumbnail.jpg",
+		isPrivate: false,
+		price: 9.99,
+		rating: 4.5,
+		recipeId: "recipe1",
+		createdAt: new Date(),
+		updatedAt: new Date(),
+	},
+	{
+		id: "post2",
+		userId: "user2",
+		title: "Vegan Chocolate Cake",
+		description: "Indulge in the rich and moist vegan chocolate cake.",
+		thumbnail: "chocolate_cake_thumbnail.jpg",
+		isPrivate: true,
+		price: 12.99,
+		rating: 5.0,
+		recipeId: "recipe2",
+		createdAt: new Date(),
+		updatedAt: new Date(),
+	},
+	{
+		id: "post3",
+		userId: "user3",
+		title: "Vegan Chocolate Cake",
+		description: "Indulge in the rich and moist vegan chocolate cake.",
+		thumbnail: "chocolate_cake_thumbnail.jpg",
+		isPrivate: true,
+		price: 13.99,
+		rating: 5.0,
+		recipeId: "recipe3",
+		createdAt: new Date(),
+		updatedAt: new Date(),
+	},
+];
