@@ -1,7 +1,7 @@
 class LoginResponse {
 	constructor(
 		public readonly isSuccess: boolean,
-		public readonly token: string,
+		public readonly data: Record<string, any> | null,
 		public readonly message: string
 	) {}
 }

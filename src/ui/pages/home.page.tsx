@@ -1,5 +1,5 @@
 import { Typography } from "antd";
-import { CategoryCard, Header, PostCard } from "../components";
+import { CategoryCard, PostCard } from "../components";
 import { POSTS } from "@/assets/data/posts";
 import { CATEGORIES } from "@/assets/data/categories";
 

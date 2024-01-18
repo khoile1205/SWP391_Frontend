@@ -20,7 +20,9 @@ export function CategoryCard({ category }: CategoryCardProps) {
 				size={{ xs: 36, sm: 48, md: 60, lg: 96, xl: 120, xxl: 150 }}
 				src={category.imageURL}
 			/>
-			<Typography.Title level={5} className="mt-2">{category.name}</Typography.Title>
+			<Typography.Title level={5} className="mt-2">
+				{category.name}
+			</Typography.Title>
 		</a>
 	);
 }

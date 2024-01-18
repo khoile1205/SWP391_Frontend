@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Rate, Typography, Card } from "antd";
 import { Post } from "@/models/post.model";
 
-const { Meta } = Card;
-
 interface PostCardProps {
 	post: Post;
 }

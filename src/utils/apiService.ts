@@ -22,7 +22,7 @@ class ApiService {
 
 	private getHeaders(uploadfile: boolean, token?: string): Headers {
 		const headers = new Headers();
-		const bearerToken = Cookies.get("accessToken");
+		const bearerToken = Cookies.get("access_token");
 		if (!uploadfile) {
 			headers.append("Content-Type", "application/json");
 		}
@@ -50,7 +50,15 @@ class ApiService {
 	}
 
 	async get(url: string, token?: string): Promise<Response> {
-		return this.request("GET", url, null, token);
+		try {
+			return await fetch(this.getUrl(url), {
+				method: "GET",
+				headers: this.getHeaders(false, token),
+			});
+		} catch (error) {
+			console.error("Error:", error);
+			throw error;
+		}
 	}
 
 	async post(url: string, data: unknown, token?: string): Promise<Response> {

@@ -8,8 +8,9 @@ import {
 	MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import userStore from "@/zustand/user.store";
-import router from "@/routes";
 import Logo from "@/assets/Icon/Logo.svg";
+import { showToast } from "@/utils/notify";
+import AppString from "@/utils/app-string";
 
 const navigation = [
 	{ name: "Home", href: "#", current: true },
@@ -23,7 +24,16 @@ function classNames(...classes: unknown[]) {
 }
 
 export function Header() {
-	const { user, updateUser } = userStore();
+	const { user, logOut } = userStore();
+
+	const handleLogout = () => {
+		setTimeout(() => {
+			const isLogout = logOut();
+			if (isLogout) {
+				showToast("success", AppString.logoutSuccessMessage);
+			}
+		}, 1500);
+	};
 
 	return (
 		<Disclosure as="nav" className="">
@@ -111,7 +121,7 @@ export function Header() {
 												leaveFrom="transform opacity-100 scale-100"
 												leaveTo="transform opacity-0 scale-95"
 											>
-												<Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+												<Menu.Items className="z-100 absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 													<Menu.Item>
 														{({ active }) => (
 															<a
@@ -142,7 +152,7 @@ export function Header() {
 														{({ active }) => (
 															<a
 																href="#"
-																onClick={() => updateUser(null)}
+																onClick={handleLogout}
 																className={classNames(
 																	active ? "bg-gray-100" : "",
 																	"block px-4 py-2 text-sm text-gray-700"
