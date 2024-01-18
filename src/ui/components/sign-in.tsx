@@ -1,13 +1,16 @@
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Formik, FormikHelpers, Field } from "formik";
 import React from "react";
 import { Button, Checkbox, Form, Input, Typography } from "antd";
 import FacebookLogo from "@/assets/Icon/facebook-icon.svg";
 import GmailLogo from "@/assets/Icon/gmail-logo.svg";
 import { UserOutlined } from "@ant-design/icons";
-import Logo from "@/assets/Icon/Logo.svg";
 import * as Yup from "yup";
+import userStore from "@/zustand/user.store";
+import router from "@/routes";
+import { showToast } from "@/utils/notify";
+import AppString from "@/utils/app-string";
 
 interface SignInInformation {
 	username: string;
@@ -19,24 +22,37 @@ const loginSchema = Yup.object().shape({
 	password: Yup.string().required("Password is required"),
 });
 export default function SignIn() {
+	const { login, error, user } = userStore((state) => state);
 	const [show, updateVisiblePass] = useState(false);
+
+	useEffect(() => {
+		if (user) {
+			router.navigate("/");
+			setTimeout(() => {
+				showToast("warning", AppString.alreadyLoggedIn);
+			});
+		}
+	}, [user]);
 
 	const handleLogin = async (
 		values: SignInInformation,
 		{ setSubmitting }: FormikHelpers<SignInInformation>
 	) => {
-		console.log(values);
+		const isSuccess = await login(values.username, values.password, values.isRemember);
+		if (isSuccess) {
+			showToast("success", AppString.loginSuccessfully);
+			router.navigate("/");
+		} else {
+			showToast("error", error!.message);
+		}
 		setSubmitting(false);
 	};
 
 	return (
-		<div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-			<a href="/" className="sm:mx-auto sm:w-full sm:max-w-sm">
-				<img className="mx-auto h-10 w-auto" src={Logo} alt="Your Company" />
-				<h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-					Sign in to your account
-				</h2>
-			</a>
+		<div className="flex h-5/6 flex-1 flex-col  justify-center px-6 lg:px-8">
+			<h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+				Sign in to your account
+			</h2>
 			<Formik
 				initialValues={{
 					username: "",

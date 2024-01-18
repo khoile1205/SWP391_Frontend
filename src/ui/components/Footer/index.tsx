@@ -22,7 +22,9 @@ export function Footer() {
 				<Col span={12} xs={24} sm={24} md={12} lg={12} xl={12} className="mt-3 sm:mt-0">
 					<Row>
 						<Col span={8} xs={24} sm={24} md={8} lg={8} xl={8}>
-							<Typography.Title level={5} className="ms-4">About</Typography.Title>
+							<Typography.Title level={5} className="ms-4">
+								About
+							</Typography.Title>
 							<Menu
 								mode="vertical"
 								style={{
@@ -45,7 +47,9 @@ export function Footer() {
 							</Menu>
 						</Col>
 						<Col span={8} xs={24} sm={24} md={8} lg={8} xl={8}>
-							<Typography.Title className="ms-4" level={5}>Legal</Typography.Title>
+							<Typography.Title className="ms-4" level={5}>
+								Legal
+							</Typography.Title>
 							<Menu
 								mode="vertical"
 								style={{
@@ -68,9 +72,11 @@ export function Footer() {
 								</Menu.Item>
 							</Menu>
 						</Col>
-						
+
 						<Col span={8} xs={24} sm={24} md={8} lg={8} xl={8}>
-							<Typography.Title className="ms-4" level={5}>Follow</Typography.Title>
+							<Typography.Title className="ms-4" level={5}>
+								Follow
+							</Typography.Title>
 							<Menu
 								mode="vertical"
 								style={{
