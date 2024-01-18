@@ -1,5 +1,5 @@
-import { HomePage, LoginPage } from "@/ui/pages";
-import { SignUpPage } from "@/ui/pages/signup.page";
+import { HomePage, LoginPage, PostPage, SignUpPage } from "@/ui/pages";
+import { PostDetailPage } from "@/ui/pages/post.detail.page";
 import { createBrowserRouter } from "react-router-dom";
 
 const router = createBrowserRouter([
@@ -19,6 +19,16 @@ const router = createBrowserRouter([
 	{
 		path: "/sign-up",
 		element: SignUpPage(),
+	},
+	{
+		path: "/posts",
+		element: PostPage(),
+		children: [
+			{
+				path: ":id",
+				element: PostDetailPage(),
+			},
+		],
 	},
 ]);
 

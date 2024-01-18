@@ -1,0 +1,38 @@
+[
+    {
+        "id": "ingredient1",
+        "recipeId": "recipe1",
+        "name": "Pasta",
+        "preliminaryTipURL": [
+            "pasta_tip1.jpg",
+            "pasta_tip2.jpg"
+        ]
+    },
+    {
+        "id": "ingredient2",
+        "recipeId": "recipe1",
+        "name": "Tomato Sauce",
+        "preliminaryTipURL": [
+            "sauce_tip1.jpg",
+            "sauce_tip2.jpg"
+        ]
+    },
+    {
+        "id": "ingredient3",
+        "recipeId": "recipe2",
+        "name": "All-Purpose Flour",
+        "preliminaryTipURL": [
+            "flour_tip1.jpg",
+            "flour_tip2.jpg"
+        ]
+    },
+    {
+        "id": "ingredient4",
+        "recipeId": "recipe2",
+        "name": "Cocoa Powder",
+        "preliminaryTipURL": [
+            "cocoa_tip1.jpg",
+            "cocoa_tip2.jpg"
+        ]
+    }
+]
