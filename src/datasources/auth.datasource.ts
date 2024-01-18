@@ -2,23 +2,22 @@ import LoginResponse from "@/usecases/auth.usecase/responses/login.response";
 import apiService from "@/utils/apiService";
 
 abstract class AuthDataSource {
-	abstract login(email: string, password: string): Promise<LoginResponse>;
+	abstract login(username: string, password: string): Promise<LoginResponse>;
 }
 
 class AuthDataSourceImpl implements AuthDataSource {
-	async login(email: string, password: string): Promise<LoginResponse> {
-		const body = {
-			username: email,
-			password,
-		};
-
-		const res = await apiService.post("/auth/login", body);
+	async login(userName: string, password: string): Promise<LoginResponse> {
+		const body = { userName, password };
+		const res = await apiService.post("/api/auth/login", body);
+		const isSuccess = res.status === 200;
 		const resBody = await res.json();
-		const accessToken = resBody.access_token;
-		const isSuccess = res.status == 200;
-		const message = res.statusText;
-
-		return new LoginResponse(isSuccess, accessToken, message);
+		const message = resBody.message;
+		if (!isSuccess) {
+			return new LoginResponse(false, null, message);
+		}
+		const result = resBody.result;
+		const access_token = result.access_token;
+		return new LoginResponse(isSuccess, { access_token }, message);
 	}
 }
 

@@ -12,6 +12,7 @@ module.exports = {
 	rules: {
 		"prettier/prettier": "error",
 		"@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/no-non-null-assertion": "off",
 		"no-warning-comments": [
 			"warn",
 			{

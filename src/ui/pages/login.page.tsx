@@ -1,3 +1,4 @@
+import { withAuthRedirect } from "@/HOC/withAuthRedirect";
 import Login from "../components/sign-in";
 
 function LoginPage() {
@@ -8,4 +9,5 @@ function LoginPage() {
 	);
 }
 
-export { LoginPage };
+const LoginWithAuthRedirect = withAuthRedirect(LoginPage);
+export { LoginWithAuthRedirect, LoginPage };
