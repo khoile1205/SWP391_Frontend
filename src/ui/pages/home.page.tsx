@@ -3,9 +3,9 @@ import { CategoryCard, PostCard } from "../components";
 import { POSTS } from "@/assets/data/posts";
 import { CATEGORIES } from "@/assets/data/categories";
 
-function HomePage() {
+export function HomePage() {
 	return (
-		<>
+		<div className="mt-10">
 			<div className="">
 				<Typography.Title level={2}>Special Recipes</Typography.Title>
 				<div className="md:grid md:grid-cols-3 md:gap-4">
@@ -18,7 +18,7 @@ function HomePage() {
 			<div className="mt-3">
 				<Typography.Title level={2}>Special Recipes</Typography.Title>
 				<div className="md:grid md:grid-cols-3 md:gap-4">
-					{POSTS.slice(0, 3).map((post) => (
+					{POSTS.slice(3, 6).map((post) => (
 						<PostCard key={post.id} post={post} />
 					))}
 				</div>
@@ -34,8 +34,6 @@ function HomePage() {
 					))}
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }
-
-export { HomePage };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Rate, Typography, Card } from "antd";
 import { Post } from "@/models/post.model";
 
@@ -17,16 +17,7 @@ export const PostCard = ({ post }: PostCardProps) => {
 	return (
 		<>
 			<a href={`/posts/${post.id}`}>
-				<Card
-					loading={loading}
-					bordered={false}
-					cover={
-						<img
-							alt="example"
-							src="https://images.unsplash.com/photo-1575936123452-b67c3203c357?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-						/>
-					}
-				>
+				<Card loading={loading} bordered={false} cover={<img alt="example" src={post.thumbnail} />}>
 					{/* <Meta title="Card title" description="This is the description" /> */}
 					<Rate
 						disabled

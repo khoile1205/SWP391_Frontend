@@ -1,12 +1,11 @@
 import { Col, Divider, Image, Row, Typography, Menu } from "antd";
-import React from "react";
-import Logo from "@/assets/Icon/Logo.svg";
+import Logo from "@/assets/Icon/NestCooking.svg";
 import Link from "antd/es/typography/Link";
 import { FacebookOutlined, InstagramOutlined, YoutubeOutlined } from "@ant-design/icons";
 
 export function Footer() {
 	return (
-		<div className="container mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+		<div className="pt-2sm:px-6 container mx-auto max-w-7xl lg:px-8">
 			<Row className="py-[60px]">
 				<Col
 					span={12}

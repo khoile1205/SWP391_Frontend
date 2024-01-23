@@ -2,25 +2,26 @@ import { User } from "@/models/user.model";
 import { create } from "zustand";
 import { ErrorState } from "@/zustand/commons/error.state";
 import { authUseCase, userUseCase } from "@/usecases";
-import { AppConstant } from "@/utils/constant";
-import Cookies from "js-cookie";
+import Result from "./commons/result";
+import { SignInInformation, SignUpInformation, VerifyEmailInformation } from "@/types/auth";
 
 type UserStore = {
 	user: User | null;
 	error: ErrorState | null;
 	updateUser: (user: User | null) => void;
-	login: (username: string, password: string, isRemember: boolean) => Promise<boolean>;
-	// signup: (username: string, password: string) => Promise<Result>;
+	login: (data: SignInInformation) => Promise<Result>;
+	signUp: (data: SignUpInformation) => Promise<Result>;
 	getUserProfile(): Promise<User | null>;
 	logOut(): boolean;
+	verifyEmailConfirmation(data: VerifyEmailInformation): Promise<Result>;
 };
 
 const userStore = create<UserStore>()((set) => ({
 	user: null,
 	error: null,
 	updateUser: (user: User | null) => set(() => ({ user: user })),
-	login: async (username: string, password: string, isRemember: boolean) => {
-		const { message, data, isSuccess } = await authUseCase.login(username, password, isRemember);
+	login: async (signInInfo: SignInInformation) => {
+		const { message, data, isSuccess } = await authUseCase.login(signInInfo);
 
 		if (!isSuccess) {
 			set(() => ({
@@ -28,19 +29,22 @@ const userStore = create<UserStore>()((set) => ({
 					message,
 				},
 			}));
-			return false;
+			return Result.failed(message);
 		}
 
 		set(() => ({
 			user: data!.user,
 		}));
 
-		return true;
+		return Result.success(message);
 	},
-	// signup: async (email: string, password: string) => {
-	// 	const loginResponse = await authUseCase.login(email, password);
-	// 	return Result.failed(loginResponse.message);
-	// },
+	signUp: async (data: SignUpInformation) => {
+		const signUpResponse = await authUseCase.signUp(data);
+		if (signUpResponse.isSuccess) {
+			return Result.success(signUpResponse.message);
+		}
+		return Result.failed(signUpResponse.message);
+	},
 	getUserProfile: async () => {
 		const user = await userUseCase.getUserProfile();
 		set(() => ({
@@ -50,13 +54,29 @@ const userStore = create<UserStore>()((set) => ({
 		return user;
 	},
 	logOut: () => {
-		Cookies.remove(AppConstant.accessTokenKey);
+		const result = authUseCase.logOut();
 
-		set(() => ({
-			user: null,
-		}));
+		if (result)
+			set(() => ({
+				user: null,
+			}));
 
-		return true;
+		return result;
+	},
+	verifyEmailConfirmation: async (data: VerifyEmailInformation) => {
+		const encodedToken = encodeURIComponent(data.token);
+		const encodedEmail = encodeURIComponent(data.email);
+
+		const response = await authUseCase.verifyEmailConfirmation({
+			email: encodedEmail,
+			token: encodedToken,
+		});
+
+		if (response.isSuccess) {
+			return Result.success(response.message);
+		} else {
+			return Result.failed(response.message);
+		}
 	},
 }));
 

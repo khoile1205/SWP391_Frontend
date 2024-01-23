@@ -29,7 +29,7 @@ export function withAuthProvider(WrappedComponent: ComponentType) {
 					theme="light"
 					transition={Slide}
 				/>
-				<WrappedComponent {...props} />;
+				<WrappedComponent {...props} />
 			</>
 		);
 	};

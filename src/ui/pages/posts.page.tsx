@@ -1,5 +1,3 @@
-import React from "react";
-
-export function PostPage() {
+export default function PostPage() {
 	return <div>PostPage</div>;
 }
