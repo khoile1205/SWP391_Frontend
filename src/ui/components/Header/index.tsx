@@ -1,22 +1,19 @@
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
-import {
-	Bars3Icon,
-	BellIcon,
-	XMarkIcon,
-	ArrowRightOnRectangleIcon,
-	MagnifyingGlassIcon,
-} from "@heroicons/react/24/outline";
+import { Bars3Icon, BellIcon, XMarkIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import userStore from "@/zustand/user.store";
-import Logo from "@/assets/Icon/Logo.svg";
+import Logo from "@/assets/Icon/NestCooking.svg";
 import { showToast } from "@/utils/notify";
 import AppString from "@/utils/app-string";
+import { useLoadingStore } from "@/zustand/loading.store";
+import { LoginOutlined } from "@ant-design/icons";
 
 const navigation = [
-	{ name: "Home", href: "#", current: true },
-	{ name: "Team", href: "#", current: false },
-	{ name: "Projects", href: "#", current: false },
-	{ name: "Calendar", href: "#", current: false },
+	{ name: "Home", href: "/", current: true },
+	{ name: "About us", href: "#", current: false },
+	{ name: "Recipes", href: "/posts", current: false },
+	// { name: "Contact", href: "#", current: false },
+	{ name: "Booking", href: "#", current: false },
 ];
 
 function classNames(...classes: unknown[]) {
@@ -25,13 +22,15 @@ function classNames(...classes: unknown[]) {
 
 export function Header() {
 	const { user, logOut } = userStore();
-
+	const { setLoading } = useLoadingStore((state) => state);
 	const handleLogout = () => {
+		setLoading(true);
 		setTimeout(() => {
 			const isLogout = logOut();
 			if (isLogout) {
 				showToast("success", AppString.logoutSuccessMessage);
 			}
+			setLoading(false);
 		}, 1500);
 	};
 
@@ -41,7 +40,7 @@ export function Header() {
 				<>
 					<div className="sticky">
 						<div className="relative flex  h-20 items-center justify-between md:h-28">
-							<div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+							<div className="absolute inset-y-0 left-0 flex items-center lg:hidden">
 								{/* Mobile menu button*/}
 								<Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-primary-400 hover:bg-primary-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
 									<span className="absolute -inset-0.5" />
@@ -53,13 +52,14 @@ export function Header() {
 									)}
 								</Disclosure.Button>
 							</div>
-							<div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-between">
+							<div className="flex flex-1 items-center justify-center sm:justify-between">
 								<div className="flex flex-shrink-0 items-center">
 									<a href="/">
-										<img className="h-8 w-auto" src={Logo} alt="Your Company" />
+										{/* <Logo></Logo> */}
+										<img className="" src={Logo} alt="Your Company" />
 									</a>
 								</div>
-								<div className="hidden sm:ml-6 sm:block">
+								<div className="hidden lg:ml-6 lg:block">
 									<div className="flex justify-between space-x-20">
 										{navigation.map((item) => (
 											<a
@@ -67,7 +67,7 @@ export function Header() {
 												href={item.href}
 												className={classNames(
 													item.current ? "text-gray-500" : "hover:text-gray-500",
-													"text-medium rounded-md px-3 py-2 font-medium"
+													"text-medium rounded-md px-3 py-2 font-medium capitalize"
 												)}
 												aria-current={item.current ? "page" : undefined}
 											>
@@ -76,11 +76,11 @@ export function Header() {
 										))}
 									</div>
 								</div>
-								<div className="absolute inset-y-0 right-0 flex items-center justify-between space-x-2 pr-2 sm:static sm:inset-auto sm:ml-6 sm:space-x-10 sm:pr-0">
+								<div className="absolute inset-y-0 right-0 flex items-center justify-between space-x-2  sm:static sm:inset-auto sm:ml-6 sm:space-x-10 sm:pr-0">
 									<a
 										href="/search"
 										type="button"
-										className="text-medium relative flex hidden rounded-full p-1 hover:ring-offset-gray-700 sm:block"
+										className="text-medium relative flex rounded-full p-1 hover:ring-offset-gray-700"
 									>
 										<span className="absolute -inset-1.5" />
 										<span className="sr-only">Search recipes</span>
@@ -91,7 +91,7 @@ export function Header() {
 									</a>
 									<button
 										type="button"
-										className="text-medium relative flex rounded-full p-1 hover:ring-offset-gray-700"
+										className="text-medium relative hidden rounded-full p-1 hover:ring-offset-gray-700 lg:flex"
 									>
 										<span className="absolute -inset-1.5" />
 										<span className="sr-only">View notifications</span>
@@ -172,8 +172,8 @@ export function Header() {
 											className="text-medium relative me-3 flex rounded-full p-1 hover:ring-offset-gray-700"
 										>
 											<span className="absolute -inset-1.5" />
-											<span className="sr-only">View notifications</span>
-											<ArrowRightOnRectangleIcon className="h-6 w-6" aria-hidden="true" />
+											<span className="sr-only">Sign in</span>
+											<LoginOutlined className="h-6 w-6" aria-hidden="true" />
 										</a>
 									)}
 								</div>
@@ -181,7 +181,7 @@ export function Header() {
 						</div>
 					</div>
 
-					<Disclosure.Panel className="sm:hidden">
+					<Disclosure.Panel className="">
 						<div className="space-y-1 px-2 pb-3 pt-2">
 							{navigation.map((item) => (
 								<Disclosure.Button
@@ -190,8 +190,8 @@ export function Header() {
 									href={item.href}
 									className={classNames(
 										item.current
-											? "bg-primary-900 text-white"
-											: "text-primary-300 hover:bg-primary-700 hover:text-white",
+											? "text-gray-500"
+											: "text-medium rounded-md px-3 py-2 font-medium capitalize text-black hover:bg-primary-700 hover:text-white",
 										"block rounded-md px-3 py-2 text-base font-medium"
 									)}
 									aria-current={item.current ? "page" : undefined}

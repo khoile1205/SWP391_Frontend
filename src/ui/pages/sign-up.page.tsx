@@ -1,63 +1,62 @@
-import { MailOutlined, UserOutlined } from "@ant-design/icons";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
-import Logo from "@/assets/Icon/Logo.svg";
-import { Checkbox, Col, Form, Input, Row, Select, Typography } from "antd";
-import { Formik, FormikHelpers } from "formik";
+import { SignUpInformation } from "@/types/auth";
+import { showToast } from "@/utils/notify";
 import { signUpValidationSchema } from "@/utils/validation";
+import { useLoadingStore } from "@/zustand/loading.store";
+import userStore from "@/zustand/user.store";
+import { UserOutlined, MailOutlined } from "@ant-design/icons";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { Row, Col, Input, Checkbox, Form } from "antd";
+import { FormikHelpers, Formik } from "formik";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-interface FormValues {
-	username: string;
-	email: string;
-	firstName: string;
-	lastName: string;
-	gender: string;
-	address: string;
-	password: string;
-	phoneNumber: string;
-}
-
-export function SignUp() {
-	// const { error, login } = userStore();
+export default function SignUpPage() {
+	const { signUp } = userStore((state) => state);
+	const { setLoading } = useLoadingStore((state) => state);
 	const [show, updateVisiblePass] = useState(false);
+	const navigate = useNavigate();
+	const handleSignUp = async (
+		values: SignUpInformation,
+		{ setSubmitting }: FormikHelpers<SignUpInformation>
+	) => {
+		try {
+			setLoading(true);
 
-	const handleSignUp = async (values: FormValues, { setSubmitting }: FormikHelpers<FormValues>) => {
-		console.log(values);
-		setSubmitting(false);
+			const result = await signUp(values);
+
+			if (!result.isSuccess) {
+				showToast("error", result.message!);
+			} else {
+				showToast("success", result.message!);
+				setTimeout(() => {
+					navigate("/sign-in");
+				}, 1000);
+			}
+		} catch (error) {
+			showToast("error", (error as Error).message);
+		} finally {
+			setLoading(false);
+			setSubmitting(false);
+		}
 	};
 
 	return (
 		<div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-			<a href="/" className="sm:mx-auto sm:w-full sm:max-w-sm">
-				<img className="mx-auto h-10 w-auto" src={Logo} alt="Your Company" />
-				<h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-					Sign up to your account
-				</h2>
-			</a>
+			<h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+				Sign up to your account
+			</h2>
 			<Formik
 				initialValues={{
 					username: "",
 					email: "",
 					firstName: "",
 					lastName: "",
-					gender: "",
-					address: "",
 					password: "",
-					phoneNumber: "",
 				}}
 				onSubmit={handleSignUp}
 				validationSchema={signUpValidationSchema}
 			>
-				{({
-					setFieldValue,
-					setFieldTouched,
-					values,
-					errors,
-					handleChange,
-					handleBlur,
-					handleSubmit,
-					touched,
-				}) => (
+				{({ values, errors, handleChange, handleBlur, handleSubmit, touched }) => (
 					<div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
 						<Form autoComplete="off" autoFocus onFinish={handleSubmit} layout="vertical">
 							<Row gutter={16}>
@@ -116,6 +115,28 @@ export function SignUp() {
 									</Form.Item>
 								</Col>
 							</Row>
+							<Form.Item
+								hasFeedback
+								name="email"
+								className="mt-2"
+								label="Email"
+								required
+								validateStatus={errors.email ? "error" : "success"}
+								help={errors.email && touched.email && <div className=" my-3">{errors.email}</div>}
+							>
+								<Input
+									id="email"
+									name="email"
+									type="text"
+									defaultValue={values.email}
+									onChange={handleChange}
+									onBlur={handleBlur}
+									required
+									className="w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+									prefix={<MailOutlined className="site-form-item-icon me-2" />}
+									placeholder="Email"
+								/>
+							</Form.Item>
 							<Form.Item
 								hasFeedback
 								name="username"
@@ -188,93 +209,7 @@ export function SignUp() {
 									}
 								/>
 							</Form.Item>
-							<Form.Item
-								hasFeedback
-								name="email"
-								className="mt-2"
-								label="Email"
-								required
-								validateStatus={errors.email ? "error" : "success"}
-								help={errors.email && touched.email && <div className=" my-3">{errors.email}</div>}
-							>
-								<Input
-									id="email"
-									name="email"
-									type="text"
-									defaultValue={values.email}
-									onChange={handleChange}
-									onBlur={handleBlur}
-									required
-									className="w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-									prefix={<MailOutlined className="site-form-item-icon me-2" />}
-									placeholder="Email"
-								/>
-							</Form.Item>
-							<Form.Item
-								hasFeedback
-								name="phoneNumber"
-								label="Phone Number"
-								required
-								validateStatus={errors.phoneNumber ? "error" : "success"}
-								help={
-									errors.phoneNumber &&
-									touched.phoneNumber && <div className="my-3">{errors.phoneNumber}</div>
-								}
-							>
-								<Input
-									// size="large"
-									prefix={<Typography className="text-base text-sm text-gray-500">+84</Typography>}
-									name="phoneNumber"
-									value={values.phoneNumber}
-									onChange={handleChange}
-									onBlur={handleBlur}
-									placeholder="Phone number"
-									className="w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-								/>
-							</Form.Item>
-							<Form.Item
-								hasFeedback
-								name="address"
-								label="Address"
-								required
-								validateStatus={errors.address ? "error" : "success"}
-								help={
-									errors.address && touched.address && <div className=" my-3">{errors.address}</div>
-								}
-							>
-								<Input
-									// size="large"
-									name="address"
-									defaultValue={values.address}
-									onChange={handleChange}
-									onBlur={handleBlur}
-									// prefix={<AimOutlined className="site-form-item-icon me-2" />}
-									placeholder="Address"
-									className="w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-								/>
-							</Form.Item>
-							<Form.Item
-								hasFeedback
-								name="gender"
-								label="Gender"
-								required
-								validateStatus={errors.gender ? "error" : "success"}
-								help={
-									errors.gender && touched.gender && <div className=" my-3">{errors.gender}</div>
-								}
-							>
-								<Select
-									placeholder="Select your gender"
-									onChange={(value) => setFieldValue("gender", value)}
-									onBlur={() => setFieldTouched("gender")}
-									value={values.gender}
-									options={[
-										{ value: "female", label: "Female" },
-										{ value: "male", label: "Male" },
-										{ value: "other", label: "Other" },
-									]}
-								/>
-							</Form.Item>
+
 							<Form.Item
 								hasFeedback
 								name="agreement"
@@ -296,7 +231,7 @@ export function SignUp() {
 							<Form.Item className="text-center">
 								<button
 									type="submit"
-									className="flex w-full justify-center rounded-md bg-primary-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+									className="mt-2 flex w-full justify-center rounded-md bg-primary-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
 								>
 									Sign up
 								</button>

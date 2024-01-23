@@ -1,5 +1,9 @@
-import React from "react";
+import { useParams } from "react-router-dom";
 
-export const PostDetailPage = () => {
-	return <div>1265754</div>;
+const PostDetailPage = () => {
+	const { id } = useParams();
+
+	return <div>{id}</div>;
 };
+
+export default PostDetailPage;
