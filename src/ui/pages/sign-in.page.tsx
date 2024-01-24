@@ -56,9 +56,9 @@ export default function SignInPage() {
 				onSubmit={handleLogin}
 				validationSchema={loginSchema}
 			>
-				{({ values, errors, handleChange, handleBlur, touched }) => (
+				{({ values, errors, handleChange, handleBlur, handleSubmit, touched }) => (
 					<div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-						<Form autoComplete="off" autoFocus className="space-y-3" onFinish={handleLogin}>
+						<Form autoComplete="off" autoFocus className="space-y-3" onFinish={handleSubmit}>
 							<Form.Provider>
 								<Form.Item
 									name="username"

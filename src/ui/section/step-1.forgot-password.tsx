@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Formik, Field } from "formik";
 import { Form, Input } from "antd";
-import { KeyOutlined, UserOutlined } from "@ant-design/icons";
 import Logo from "@/assets/Icon/Logo.svg";
 import * as Yup from "yup";
 import { showToast } from "@/utils/notify";
 import AppString from "@/utils/app-string";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { UserOutlined } from "@ant-design/icons";
 
 const checkUsernameOrEmailExists = async (value: string, field: "username" | "email") => {
 	// Simulate an API call to check existence
@@ -53,13 +52,10 @@ const step2Schema = Yup.object().shape({
 		.required("Please confirm your new password"),
 });
 
-export default function ForgotPassword() {
-	const [showNewPassword, updateVisibleNewPassword] = useState(false);
-	const [showConfirmPassword, updateVisibleConfirmPassword] = useState(false);
-
+export default function Step1Forgotpassword() {
 	const [step, setStep] = useState(1);
 
-	const handleStep1 = async (values: Step1FormValues) => {
+	const handleValidateEmail = async (values: Step1FormValues) => {
 		console.log("Step 1 - Username: ", values.username, " Email: ", values.email);
 
 		// Show notification
@@ -68,7 +64,7 @@ export default function ForgotPassword() {
 		setStep(2);
 	};
 
-	const handleStep2 = async (values: Step2FormValues) => {
+	const handleSendEmail = async (values: Step2FormValues) => {
 		console.log("Step 2 - New Password: ", values.newPassword);
 
 		if (values.newPassword === values.confirmNewPassword) {
@@ -98,20 +94,12 @@ export default function ForgotPassword() {
 					newPassword: "",
 					confirmNewPassword: "",
 				}}
-				onSubmit={step === 1 ? handleStep1 : handleStep2}
+				onSubmit={step === 1 ? handleValidateEmail : handleSendEmail}
 				validationSchema={step === 1 ? step1Schema : step2Schema}
 				validateOnBlur={false}
 				validateOnChange={true}
 			>
-				{({
-					setFieldTouched,
-					validateField,
-					values,
-					errors,
-					handleChange,
-					handleSubmit,
-					touched,
-				}) => (
+				{({ setFieldTouched, validateField, values, handleChange, handleSubmit }) => (
 					<div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
 						<Form autoComplete="off" autoFocus className="space-y-3" onFinish={handleSubmit}>
 							{step === 1 ? (
@@ -135,96 +123,7 @@ export default function ForgotPassword() {
 									</Form.Item>
 								</>
 							) : (
-								<>
-									<Form.Item
-										name="newPassword"
-										className="mt-2"
-										validateStatus={errors.newPassword ? "error" : "success"}
-										help={
-											errors.newPassword &&
-											touched.newPassword && <div className="my-3">{errors.newPassword}</div>
-										}
-									>
-										<Input
-											id="newPassword"
-											name="newPassword"
-											type={showNewPassword ? "text" : "password"}
-											defaultValue={values.newPassword}
-											onChange={handleChange}
-											onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
-												setFieldTouched(e.target.name);
-												validateField(e.target.name);
-											}}
-											className="w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-											prefix={<KeyOutlined className="site-form-item-icon me-2" />}
-											suffix={
-												touched.confirmNewPassword && (
-													<div className="mr-2">
-														{!showNewPassword ? (
-															<EyeIcon
-																className="h-6 w-6 cursor-pointer text-gray-400"
-																aria-hidden="true"
-																onClick={() => updateVisibleNewPassword(!showNewPassword)}
-															/>
-														) : (
-															<EyeSlashIcon
-																className="h-6 w-6 cursor-pointer text-gray-400"
-																aria-hidden="true"
-																onClick={() => updateVisibleNewPassword(!showNewPassword)}
-															/>
-														)}
-													</div>
-												)
-											}
-											placeholder="New Password"
-										/>
-									</Form.Item>
-									<Form.Item
-										name="confirmNewPassword"
-										className="mt-2"
-										validateStatus={errors.confirmNewPassword ? "error" : "success"}
-										help={
-											errors.confirmNewPassword &&
-											touched.confirmNewPassword && (
-												<div className="my-3">{errors.confirmNewPassword}</div>
-											)
-										}
-									>
-										<Input
-											id="confirmNewPassword"
-											name="confirmNewPassword"
-											type={showConfirmPassword ? "text" : "password"}
-											defaultValue={values.confirmNewPassword}
-											onChange={handleChange}
-											onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
-												setFieldTouched(e.target.name);
-												validateField(e.target.name);
-											}}
-											className="w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-											prefix={<KeyOutlined className="site-form-item-icon me-2" />}
-											suffix={
-												touched.confirmNewPassword && (
-													<div className="mr-2">
-														{!showConfirmPassword ? (
-															<EyeIcon
-																className="h-6 w-6 cursor-pointer text-gray-400"
-																aria-hidden="true"
-																onClick={() => updateVisibleConfirmPassword(!showConfirmPassword)}
-															/>
-														) : (
-															<EyeSlashIcon
-																className="h-6 w-6 cursor-pointer text-gray-400"
-																aria-hidden="true"
-																onClick={() => updateVisibleConfirmPassword(!showConfirmPassword)}
-															/>
-														)}
-													</div>
-												)
-											}
-											placeholder="Confirm New Password"
-										/>
-									</Form.Item>
-								</>
+								<></>
 							)}
 							<button
 								type="submit"
