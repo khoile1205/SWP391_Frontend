@@ -3,7 +3,7 @@ import { showToast } from "@/utils/notify";
 import { loginSchema } from "@/utils/validation";
 import { useLoadingStore } from "@/zustand/loading.store";
 import userStore from "@/zustand/user.store";
-import { UserOutlined } from "@ant-design/icons";
+import { KeyOutlined, UserOutlined } from "@ant-design/icons";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { Input, Checkbox, Typography, Button, Form } from "antd";
 import { Formik, Field } from "formik";
@@ -56,9 +56,9 @@ export default function SignInPage() {
 				onSubmit={handleLogin}
 				validationSchema={loginSchema}
 			>
-				{({ values, errors, handleChange, handleBlur, touched }) => (
+				{({ values, errors, handleChange, handleBlur, handleSubmit, touched }) => (
 					<div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-						<Form autoComplete="off" autoFocus className="space-y-3" onFinish={handleLogin}>
+						<Form autoComplete="off" autoFocus className="space-y-3" onFinish={handleSubmit}>
 							<Form.Provider>
 								<Form.Item
 									name="username"
@@ -104,7 +104,7 @@ export default function SignInPage() {
 										required
 										placeholder="Password"
 										className="w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-										prefix={<UserOutlined className="site-form-item-icon me-2" />}
+										prefix={<KeyOutlined className="site-form-item-icon me-2" />}
 										suffix={
 											touched.password && (
 												<div className="mr-2">
@@ -129,7 +129,10 @@ export default function SignInPage() {
 							</Form.Provider>
 
 							<div className="mt-2 text-end text-sm">
-								<a href="#" className="font-semibold text-primary-600 hover:text-primary-500">
+								<a
+									href="/forgot-password"
+									className="font-semibold text-primary-600 hover:text-primary-500"
+								>
 									Forgot password?
 								</a>
 							</div>
