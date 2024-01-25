@@ -10,7 +10,9 @@ export default class AppString {
 		"Sorry, your email has not been verified. Please try again later.";
 	static readonly sendMailResetPasswordMessage =
 		"A confirmation email has been sent to your email address. Please check your inbox.";
+	static readonly sendMailResetPasswordErrorMessage =
+		"A confirmation email has been sent to your email address. Please check your inbox.";
 	static readonly resetPasswordSuccessMessage = "Your password has been recovered successfully.";
 	static readonly resetPasswordErrorMessage =
-		"Passwords do not match. Please make sure your passwords match.";
+		"Sorry, but you are not allowed to reset your password. Please try again later.";
 }

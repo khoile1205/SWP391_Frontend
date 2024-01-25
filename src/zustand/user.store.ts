@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { ErrorState } from "@/zustand/commons/error.state";
 import { authUseCase, userUseCase } from "@/usecases";
 import Result from "./commons/result";
-import { SignInInformation, SignUpInformation, VerifyEmailInformation } from "@/types/auth";
+import { SignInInformation, SignUpInformation } from "@/types/auth";
 
 type UserStore = {
 	user: User | null;
@@ -13,7 +13,6 @@ type UserStore = {
 	signUp: (data: SignUpInformation) => Promise<Result>;
 	getUserProfile(): Promise<User | null>;
 	logOut(): boolean;
-	verifyEmailConfirmation(data: VerifyEmailInformation): Promise<Result>;
 };
 
 const userStore = create<UserStore>()((set) => ({
@@ -62,21 +61,6 @@ const userStore = create<UserStore>()((set) => ({
 			}));
 
 		return result;
-	},
-	verifyEmailConfirmation: async (data: VerifyEmailInformation) => {
-		const encodedToken = encodeURIComponent(data.token);
-		const encodedEmail = encodeURIComponent(data.email);
-
-		const response = await authUseCase.verifyEmailConfirmation({
-			email: encodedEmail,
-			token: encodedToken,
-		});
-
-		if (response.isSuccess) {
-			return Result.success(response.message);
-		} else {
-			return Result.failed(response.message);
-		}
 	},
 }));
 

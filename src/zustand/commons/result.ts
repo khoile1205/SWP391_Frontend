@@ -1,14 +1,16 @@
 class Result {
 	private _isSuccess: boolean;
 	public message?: string;
+	public data?: any;
 
-	private constructor(isSuccess: boolean, message?: string) {
+	private constructor(isSuccess: boolean, message?: string, data?: any) {
 		this._isSuccess = isSuccess;
 		this.message = message;
+		this.data = data;
 	}
 
-	static success(message?: string) {
-		return new Result(true, message);
+	static success(message?: string, data?: any) {
+		return new Result(true, message, data);
 	}
 
 	static failed(message: string) {

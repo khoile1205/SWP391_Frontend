@@ -1,4 +1,4 @@
-class LoginResponse {
+class Response {
 	constructor(
 		public readonly isSuccess: boolean,
 		public readonly data: Record<string, any> | null,
@@ -6,4 +6,4 @@ class LoginResponse {
 	) {}
 }
 
-export default LoginResponse;
+export default Response;
