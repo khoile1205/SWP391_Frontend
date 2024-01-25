@@ -130,10 +130,10 @@ export default function SignInPage() {
 
 							<div className="mt-2 text-end text-sm">
 								<a
-									href="/forgot-password"
+									href="/reset-password"
 									className="font-semibold text-primary-600 hover:text-primary-500"
 								>
-									Forgot password?
+									Reset password?
 								</a>
 							</div>
 							<div className="mt-2 text-center">

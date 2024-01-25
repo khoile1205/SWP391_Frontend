@@ -1,11 +1,11 @@
-import userStore from "@/zustand/user.store";
+import authStore from "@/zustand/auth.store";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 const useEmailVerification = () => {
 	const { search } = useLocation();
 	const [isVerified, setVerified] = useState<boolean>(false);
-	const { verifyEmailConfirmation } = userStore((state) => state);
+	const { verifyEmailConfirmation } = authStore((state) => state);
 
 	useEffect(() => {
 		const params = new URLSearchParams(search);

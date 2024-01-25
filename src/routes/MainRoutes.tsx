@@ -14,8 +14,8 @@ const PostDetailPage = Loadable(lazy(() => import("@/ui/pages/post.detail.page")
 // render - email verification
 const VerifyEmailPage = Loadable(lazy(() => import("@/ui/pages/verify-email.page")));
 
-// redner - forgot password
-const ForgotPasswordPage = Loadable(lazy(() => import("@/ui/pages/forgot.password.page")));
+// redner - reset password
+const ResetPasswordPage = Loadable(lazy(() => import("@/ui/pages/reset.password.page")));
 const ChangePasswordPage = Loadable(lazy(() => import("@/ui/pages/change.password.page")));
 
 const MainRoutes: RouteObject[] = [
@@ -27,8 +27,8 @@ const MainRoutes: RouteObject[] = [
 				element: <HomePage />,
 			},
 			{
-				path: "forgot-password",
-				element: <ForgotPasswordPage></ForgotPasswordPage>,
+				path: "reset-password",
+				element: <ResetPasswordPage></ResetPasswordPage>,
 			},
 			{
 				path: "change-password",

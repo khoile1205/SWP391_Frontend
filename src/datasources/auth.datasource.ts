@@ -1,32 +1,76 @@
-import { SignUpInformation, VerifyEmailInformation } from "@/types/auth";
-import LoginResponse from "@/usecases/auth.usecase/responses/login.response";
+import {
+	SignUpInformation,
+	VerifyEmailInformation,
+	IdentifierResetPassword,
+	ResetPasswordData,
+} from "@/types/auth";
+import Response from "@/usecases/auth.usecase/responses/response";
 import apiService from "@/utils/apiService";
 
 abstract class AuthDataSource {
-	abstract login(username: string, password: string): Promise<LoginResponse>;
-	abstract signUp(data: SignUpInformation): Promise<LoginResponse>;
-	abstract verifyEmailConfirmation(data: VerifyEmailInformation): Promise<LoginResponse>;
+	abstract login(username: string, password: string): Promise<Response>;
+	abstract signUp(data: SignUpInformation): Promise<Response>;
+	abstract verifyEmailConfirmation(data: VerifyEmailInformation): Promise<Response>;
+	abstract verifyIdentifierResetPassword(data: IdentifierResetPassword): Promise<Response>;
+	abstract sendEmailResetPassword(data: IdentifierResetPassword): Promise<Response>;
+	abstract resetPassword(data: ResetPasswordData): Promise<Response>;
+	abstract verifyEmailResetPassword(data: VerifyEmailInformation): Promise<Response>;
 }
 
 class AuthDataSourceImpl implements AuthDataSource {
-	async verifyEmailConfirmation(data: VerifyEmailInformation): Promise<LoginResponse> {
-		const res = await apiService.get(
-			`/api/auth/verify-email?token=${data.token}&email=${data.email}`
-		);
+	async verifyEmailResetPassword(data: VerifyEmailInformation): Promise<Response> {
+		const res = await apiService.post("/api/auth/reset-password/verify-token", data);
 		const isSuccess = res.status === 200;
 		const resBody = await res.json();
 		const message = resBody.message;
-		return new LoginResponse(isSuccess, null, message);
+
+		return new Response(isSuccess, null, message);
 	}
-	async signUp(data: SignUpInformation): Promise<LoginResponse> {
+	async resetPassword(data: ResetPasswordData): Promise<Response> {
+		console.log(data);
+		const res = await apiService.post("/api/auth/reset-password", data);
+		const isSuccess = res.status === 200;
+		const resBody = await res.json();
+		console.log(resBody);
+		const message = resBody.message;
+		return new Response(isSuccess, null, message);
+	}
+	async sendEmailResetPassword(data: IdentifierResetPassword): Promise<Response> {
+		const res = await apiService.post("/api/auth/reset-password/send-email", data);
+		const isSuccess = res.status === 200;
+		const resBody = await res.json();
+		const message = resBody.message;
+
+		return new Response(isSuccess, null, message);
+	}
+	async verifyIdentifierResetPassword(data: IdentifierResetPassword): Promise<Response> {
+		const res = await apiService.post("/api/auth/reset-password/verify-identifier", data);
+		const isSuccess = res.status === 200;
+		const resBody = await res.json();
+		const message = resBody.message;
+
+		if (!isSuccess) {
+			return new Response(false, null, message);
+		}
+
+		return new Response(isSuccess, resBody.result, message);
+	}
+	async verifyEmailConfirmation(data: VerifyEmailInformation): Promise<Response> {
+		const res = await apiService.post(`/api/auth/verify-email`, data);
+		const isSuccess = res.status === 200;
+		const resBody = await res.json();
+		const message = resBody.message;
+		return new Response(isSuccess, null, message);
+	}
+	async signUp(data: SignUpInformation): Promise<Response> {
 		const res = await apiService.post("/api/auth/register", data);
 		const isSuccess = res.status === 200;
 		const resBody = await res.json();
 		const message = resBody.message;
-		return new LoginResponse(isSuccess, null, message);
+		return new Response(isSuccess, null, message);
 	}
 
-	async login(userName: string, password: string): Promise<LoginResponse> {
+	async login(userName: string, password: string): Promise<Response> {
 		const body = { userName, password };
 		const res = await apiService.post("/api/auth/login", body);
 		const isSuccess = res.status === 200;
@@ -34,11 +78,11 @@ class AuthDataSourceImpl implements AuthDataSource {
 		const message = resBody.message;
 		console.log(resBody);
 		if (!isSuccess) {
-			return new LoginResponse(false, null, message);
+			return new Response(false, null, message);
 		}
 		const result = resBody.result;
 		const accessToken = result.accessToken;
-		return new LoginResponse(isSuccess, { accessToken }, message);
+		return new Response(isSuccess, { accessToken }, message);
 	}
 }
 
