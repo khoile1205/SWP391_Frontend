@@ -1,5 +1,6 @@
 import { Loadable } from "@/ui/components/Loadable";
 import { HomePage } from "@/ui/pages/home.page";
+import ViewCreatedReportsPage from "@/ui/pages/view.created.reports.page";
 import { lazy } from "react";
 import { RouteObject } from "react-router-dom";
 
@@ -47,6 +48,10 @@ const MainRoutes: RouteObject[] = [
 	{
 		path: "/verify-email",
 		element: <VerifyEmailPage></VerifyEmailPage>,
+	},
+	{
+		path: "/view-created-reports",
+		element: <ViewCreatedReportsPage></ViewCreatedReportsPage>,
 	},
 	{
 		path: "/posts",
