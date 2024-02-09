@@ -5,7 +5,7 @@ export default class AppString {
 	static readonly alreadyLoggedIn = "You are already logged in";
 	static readonly logoutSuccessMessage = "Logout successfully";
 	static readonly signUpSuccessMessage = "Sign up successfully";
-	static readonly accessDenied = "Access denied";
+	static readonly accessDenied = "Sorry, you are not allowed to access this page";
 	static readonly emailConfirmationError =
 		"Sorry, your email has not been verified. Please try again later.";
 	static readonly sendMailResetPasswordMessage =
@@ -15,4 +15,8 @@ export default class AppString {
 	static readonly resetPasswordSuccessMessage = "Your password has been recovered successfully.";
 	static readonly resetPasswordErrorMessage =
 		"Sorry, but you are not allowed to reset your password. Please try again later.";
+	static readonly authorizeRequiredErrorMessage = "You need to sign in to access this page";
+	static readonly passwordChangedSuccessMessage = "Password changed successfully";
+	static readonly passwordChangedErorrMessage =
+		"Sorry,your current password is incorrect. Please try again";
 }

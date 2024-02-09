@@ -2,11 +2,9 @@ import colors from "tailwindcss/colors";
 export default {
 	content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
 	theme: {
-		extend: {
-			fontFamily: {
-				playfair: ["Playfair Display", "serif"],
-				inter: ["Inter", "sans-serif"],
-			},
+		fontFamily: {
+			playfair: ["Playfair Display", "serif"],
+			inter: ["Inter", "sans-serif"],
 		},
 		colors: {
 			primary: colors.indigo,

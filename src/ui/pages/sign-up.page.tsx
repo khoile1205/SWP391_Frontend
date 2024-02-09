@@ -161,9 +161,6 @@ export default function SignUpPage() {
 									prefix={<UserOutlined className="site-form-item-icon me-2" />}
 									placeholder="Username"
 								/>
-								{errors.username && touched.username && (
-									<div className=" my-3">{errors.username}</div>
-								)}
 							</Form.Item>
 							<Form.Item
 								hasFeedback

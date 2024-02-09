@@ -11,15 +11,16 @@ i18nInit();
 
 function App() {
 	const { isLoading } = useLoadingStore((state) => state);
-
 	return (
 		<>
 			{isLoading && <Loading></Loading>}
 			<div className="container mx-auto max-w-7xl sm:px-6 lg:px-8">
 				<Header></Header>
-				<BrowserRouter>
-					<MainRoutes />
-				</BrowserRouter>
+				<div className="mt-2">
+					<BrowserRouter>
+						<MainRoutes />
+					</BrowserRouter>
+				</div>
 			</div>
 			<div
 				style={{
