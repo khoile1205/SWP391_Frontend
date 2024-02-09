@@ -27,11 +27,9 @@ class AuthDataSourceImpl implements AuthDataSource {
 		return new Response(isSuccess, null, message);
 	}
 	async resetPassword(data: ResetPasswordData): Promise<Response> {
-		console.log(data);
 		const res = await apiService.post("/api/auth/reset-password", data);
 		const isSuccess = res.status === 200;
 		const resBody = await res.json();
-		console.log(resBody);
 		const message = resBody.message;
 		return new Response(isSuccess, null, message);
 	}

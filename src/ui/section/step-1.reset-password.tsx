@@ -5,11 +5,11 @@ import { UserOutlined } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
 import { transformEmail } from "@/utils/string.extension";
 import authStore from "@/zustand/auth.store";
-import useLoadingCallback from "@/hooks/useLoadingCallback";
 import Link from "antd/es/typography/Link";
 import { useLoadingStore } from "@/zustand/loading.store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useLoadingCallback } from "@/hooks/useLoadingCallback";
 
 export default function Step1ResetPassword() {
 	const { verifyIdentifierResetPassword, sendEmailResetPassword } = authStore((state) => state);

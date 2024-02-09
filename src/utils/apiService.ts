@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import { AppConstant } from "./constant";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -22,7 +23,7 @@ class ApiService {
 
 	private getHeaders(uploadfile: boolean, token?: string): Headers {
 		const headers = new Headers();
-		const bearerToken = Cookies.get("access_token");
+		const bearerToken = Cookies.get(AppConstant.accessTokenKey);
 		if (!uploadfile) {
 			headers.append("Content-Type", "application/json");
 		}

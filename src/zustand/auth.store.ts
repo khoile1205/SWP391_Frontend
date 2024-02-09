@@ -3,6 +3,7 @@ import { ResetPasswordData, IdentifierResetPassword, VerifyEmailInformation } fr
 import { authUseCase } from "@/usecases";
 import Result from "./commons/result";
 import { mergeToken } from "@/utils/string.extension";
+import { handleUseCase } from "./commons/handle.usecase";
 
 type AuthStore = {
 	verifyIdentifierResetPassword: (data: IdentifierResetPassword) => Promise<Result>;
@@ -10,17 +11,6 @@ type AuthStore = {
 	sendEmailResetPassword: (data: IdentifierResetPassword) => Promise<Result>;
 	resetPassword: (data: ResetPasswordData) => Promise<Result>;
 	verifyEmailConfirmation: (data: VerifyEmailInformation) => Promise<Result>;
-};
-
-const handleUseCase = async (promise: Promise<any>, successMessage?: string) => {
-	try {
-		const response = await promise;
-		return response.isSuccess
-			? Result.success(successMessage || response.message, response.data)
-			: Result.failed(response.message);
-	} catch (error) {
-		return Result.failed((error as Error).message);
-	}
 };
 
 const authStore = create<AuthStore>(() => ({

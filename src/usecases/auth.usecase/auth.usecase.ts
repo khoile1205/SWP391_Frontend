@@ -63,7 +63,7 @@ class AuthUseCase implements IAuthUseCase {
 			return new Response(
 				true,
 				{
-					access_token: response.data!.access_token,
+					access_token: response.data!.accessToken,
 					user,
 				},
 				response.message

@@ -5,14 +5,13 @@ import userStore from "@/zustand/user.store";
 import Logo from "@/assets/Icon/NestCooking.svg";
 import { showToast } from "@/utils/notify";
 import AppString from "@/utils/app-string";
-import { useLoadingStore } from "@/zustand/loading.store";
 import { LoginOutlined } from "@ant-design/icons";
+import { useLoadingCallback } from "@/hooks/useLoadingCallback";
 
 const navigation = [
 	{ name: "Home", href: "/", current: true },
 	{ name: "About us", href: "#", current: false },
 	{ name: "Recipes", href: "/posts", current: false },
-	// { name: "Contact", href: "#", current: false },
 	{ name: "Booking", href: "#", current: false },
 ];
 
@@ -22,17 +21,12 @@ function classNames(...classes: unknown[]) {
 
 export function Header() {
 	const { user, logOut } = userStore();
-	const { setLoading } = useLoadingStore((state) => state);
-	const handleLogout = () => {
-		setLoading(true);
-		setTimeout(() => {
-			const isLogout = logOut();
-			if (isLogout) {
-				showToast("success", AppString.logoutSuccessMessage);
-			}
-			setLoading(false);
-		}, 1500);
-	};
+	const handleLogout = useLoadingCallback(async () => {
+		const isLogout = logOut();
+		if (isLogout) {
+			showToast("success", AppString.logoutSuccessMessage);
+		}
+	}, 500);
 
 	return (
 		<Disclosure as="nav" className="">
@@ -125,7 +119,7 @@ export function Header() {
 													<Menu.Item>
 														{({ active }) => (
 															<a
-																href="#"
+																href="/profile/"
 																className={classNames(
 																	active ? "bg-primary-100" : "",
 																	"block px-4 py-2 text-sm text-gray-700"
