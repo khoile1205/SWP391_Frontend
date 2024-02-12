@@ -6,6 +6,7 @@ import Result from "./commons/result";
 import { OAuth2SignInData, SignInInformation, SignUpInformation } from "@/types/auth";
 import { ChangePasswordType, UpdateUserInformationType } from "@/types/user";
 import { handleUseCase } from "./commons/handle.usecase";
+import Response from "@/usecases/auth.usecase/responses/response";
 
 type UserStore = {
 	user: User | null;
@@ -19,14 +20,15 @@ type UserStore = {
 	updateUserInformation(data: UpdateUserInformationType): Promise<Result>;
 	signInWithFacebook(data: OAuth2SignInData): Promise<Result>;
 	signInWithGoogle(data: OAuth2SignInData): Promise<Result>;
+	handleSignIn(signInMethod: () => Promise<Response>): Promise<Result>;
 };
 
-const userStore = create<UserStore>()((set) => ({
+const userStore = create<UserStore>()((set, get) => ({
 	user: null,
 	error: null,
 	updateUser: (user: User | null) => set(() => ({ user: user })),
-	login: async (signInInfo: SignInInformation) => {
-		const { message, data, isSuccess } = await authUseCase.login(signInInfo);
+	handleSignIn: async (signInMethod: () => Promise<Response>) => {
+		const { message = "", data, isSuccess } = await signInMethod();
 
 		if (!isSuccess) {
 			set(() => ({
@@ -42,6 +44,15 @@ const userStore = create<UserStore>()((set) => ({
 		}));
 
 		return Result.success(message);
+	},
+	login: async (signInInfo: SignInInformation) => {
+		return await get().handleSignIn(() => authUseCase.login(signInInfo));
+	},
+	signInWithFacebook: async (body: OAuth2SignInData) => {
+		return await get().handleSignIn(() => authUseCase.signInWithFacebook(body));
+	},
+	signInWithGoogle: async (body: OAuth2SignInData) => {
+		return await get().handleSignIn(() => authUseCase.signInWithGoogle(body));
 	},
 	signUp: async (data: SignUpInformation) => {
 		return handleUseCase(authUseCase.signUp(data));
@@ -76,44 +87,6 @@ const userStore = create<UserStore>()((set) => ({
 		}
 
 		return result;
-	},
-	signInWithFacebook: async (body: OAuth2SignInData) => {
-		const { message, data, isSuccess } = await authUseCase.signInWithFacebook(body);
-
-		console.log(data);
-		if (!isSuccess) {
-			set(() => ({
-				error: {
-					message,
-				},
-			}));
-			return Result.failed(message);
-		}
-
-		set(() => ({
-			user: data!.user,
-		}));
-
-		return Result.success(message);
-	},
-	signInWithGoogle: async (body: OAuth2SignInData) => {
-		const { message, data, isSuccess } = await authUseCase.signInWithGoogle(body);
-
-		console.log(data);
-		if (!isSuccess) {
-			set(() => ({
-				error: {
-					message,
-				},
-			}));
-			return Result.failed(message);
-		}
-
-		set(() => ({
-			user: data!.user,
-		}));
-
-		return Result.success(message);
 	},
 }));
 

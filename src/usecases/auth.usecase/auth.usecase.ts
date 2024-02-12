@@ -33,28 +33,7 @@ class AuthUseCase implements IAuthUseCase {
 	async signInWithGoogle(data: OAuth2SignInData): Promise<Response> {
 		try {
 			const response = await this.authDatasource.signInWithGoogle(data);
-
-			if (!response.isSuccess) {
-				return new Response(false, null, response.message);
-			}
-
-			const expiredTokenTime = 7 * 24 * 60 * 60 * 1000;
-
-			Cookies.set(AppConstant.accessTokenKey, response.data!.accessToken, {
-				expires: expiredTokenTime,
-				sameSite: "strict",
-			});
-
-			const user = await this.userDatasource.getUserProfile();
-
-			return new Response(
-				true,
-				{
-					access_token: response.data!.accessToken,
-					user,
-				},
-				response.message
-			);
+			return this.handleSignIn(response);
 		} catch (error) {
 			const message = error instanceof Error ? error.message : `${error}`;
 			return new Response(false, null, message);
@@ -63,28 +42,7 @@ class AuthUseCase implements IAuthUseCase {
 	async signInWithFacebook(data: OAuth2SignInData): Promise<Response> {
 		try {
 			const response = await this.authDatasource.signInWithFacebook(data);
-
-			if (!response.isSuccess) {
-				return new Response(false, null, response.message);
-			}
-
-			const expiredTokenTime = 7 * 24 * 60 * 60 * 1000;
-
-			Cookies.set(AppConstant.accessTokenKey, response.data!.accessToken, {
-				expires: expiredTokenTime,
-				sameSite: "strict",
-			});
-
-			const user = await this.userDatasource.getUserProfile();
-
-			return new Response(
-				true,
-				{
-					access_token: response.data!.accessToken,
-					user,
-				},
-				response.message
-			);
+			return this.handleSignIn(response);
 		} catch (error) {
 			const message = error instanceof Error ? error.message : `${error}`;
 			return new Response(false, null, message);
@@ -109,28 +67,7 @@ class AuthUseCase implements IAuthUseCase {
 	async login(data: SignInInformation): Promise<Response> {
 		try {
 			const response = await this.authDatasource.login(data.username, data.password);
-
-			if (!response.isSuccess) {
-				return new Response(false, null, response.message);
-			}
-
-			const expiredTokenTime = data.isRemember ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
-
-			Cookies.set(AppConstant.accessTokenKey, response.data!.accessToken, {
-				expires: expiredTokenTime,
-				sameSite: "strict",
-			});
-
-			const user = await this.userDatasource.getUserProfile();
-
-			return new Response(
-				true,
-				{
-					access_token: response.data!.accessToken,
-					user,
-				},
-				response.message
-			);
+			return this.handleSignIn(response, data.isRemember);
 		} catch (error) {
 			const message = error instanceof Error ? error.message : `${error}`;
 			return new Response(false, null, message);
@@ -144,6 +81,29 @@ class AuthUseCase implements IAuthUseCase {
 		Cookies.remove(AppConstant.accessTokenKey);
 
 		return true;
+	}
+	private async handleSignIn(response: Response, remember = false): Promise<Response> {
+		if (!response.isSuccess) {
+			return new Response(false, null, response.message);
+		}
+
+		const expiredTokenTime = remember ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+
+		Cookies.set(AppConstant.accessTokenKey, response.data!.accessToken, {
+			expires: expiredTokenTime,
+			sameSite: "strict",
+		});
+
+		const user = await this.userDatasource.getUserProfile();
+
+		return new Response(
+			true,
+			{
+				access_token: response.data!.accessToken,
+				user,
+			},
+			response.message
+		);
 	}
 }
 
