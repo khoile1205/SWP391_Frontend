@@ -3,6 +3,7 @@ import {
 	VerifyEmailInformation,
 	IdentifierResetPassword,
 	ResetPasswordData,
+	OAuth2SignInData,
 } from "@/types/auth";
 import Response from "@/usecases/auth.usecase/responses/response";
 import apiService from "@/utils/apiService";
@@ -15,9 +16,41 @@ abstract class AuthDataSource {
 	abstract sendEmailResetPassword(data: IdentifierResetPassword): Promise<Response>;
 	abstract resetPassword(data: ResetPasswordData): Promise<Response>;
 	abstract verifyEmailResetPassword(data: VerifyEmailInformation): Promise<Response>;
+	abstract signInWithFacebook(data: OAuth2SignInData): Promise<Response>;
+	abstract signInWithGoogle(data: OAuth2SignInData): Promise<Response>;
 }
 
 class AuthDataSourceImpl implements AuthDataSource {
+	async signInWithFacebook(data: OAuth2SignInData): Promise<Response> {
+		const res = await apiService.post("/api/auth/sign-in-facebook", data);
+
+		const isSuccess = res.status === 200;
+		const resBody = await res.json();
+		const message = resBody.message;
+
+		if (!isSuccess) {
+			return new Response(false, null, message);
+		}
+
+		const result = resBody.result;
+		const accessToken = result.accessToken;
+
+		return new Response(true, { accessToken }, message);
+	}
+	async signInWithGoogle(data: OAuth2SignInData): Promise<Response> {
+		const res = await apiService.post("/api/auth/sign-in-google", data);
+
+		const isSuccess = res.status === 200;
+		const resBody = await res.json();
+		const message = resBody.message;
+
+		if (!isSuccess) {
+			return new Response(false, null, message);
+		}
+		const result = resBody.result;
+		const accessToken = result.accessToken;
+		return new Response(isSuccess, { accessToken }, message);
+	}
 	async verifyEmailResetPassword(data: VerifyEmailInformation): Promise<Response> {
 		const res = await apiService.post("/api/auth/reset-password/verify-token", data);
 		const isSuccess = res.status === 200;

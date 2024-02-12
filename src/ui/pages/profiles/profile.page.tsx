@@ -69,7 +69,6 @@ export default function ProfilePage() {
 							</Typography.Title>
 							{isEdit ? (
 								<button
-									// type="submit"
 									className="px-10 py-2 font-inter text-lg uppercase text-white"
 									style={{
 										backgroundColor: AppColor.deepOrangeColor,

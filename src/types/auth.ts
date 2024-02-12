@@ -30,3 +30,7 @@ export interface ResetPasswordData {
 export type AuthGuards = {
 	children: ReactElement | null;
 };
+
+export type OAuth2SignInData = {
+	accessToken: string;
+};
