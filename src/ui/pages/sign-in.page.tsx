@@ -25,11 +25,11 @@ export default function SignInPage() {
 	const { setLoading } = useLoadingStore((state) => state);
 	const navigate = useNavigate();
 
-	const handleLogin = async (values: SignInInformation) => {
+	const handleLoginCommon = async (loginMethod: () => Promise<any>) => {
 		try {
 			setLoading(true);
 
-			const result = await login(values);
+			const result = await loginMethod();
 
 			if (result.isSuccess) {
 				showToast("success", AppString.loginSuccessfully);
@@ -42,43 +42,19 @@ export default function SignInPage() {
 		} finally {
 			setLoading(false);
 		}
+	};
+	const handleLogin = async (values: SignInInformation) => {
+		await handleLoginCommon(() => login(values));
 	};
 
 	const handleLoginWithFacebook = async (response: SuccessResponse) => {
-		try {
-			setLoading(true);
-
-			const result = await signInWithFacebook({ accessToken: response.accessToken });
-			if (result.isSuccess) {
-				showToast("success", AppString.loginSuccessfully);
-				navigate("/");
-			} else {
-				showToast("error", result.message!);
-			}
-		} catch (error) {
-			showToast("error", (error as Error).message);
-		} finally {
-			setLoading(false);
-		}
+		await handleLoginCommon(() => signInWithFacebook({ accessToken: response.accessToken }));
 	};
 	const handleLoginWithGoogle = useGoogleLogin({
 		onSuccess: async (tokenResponse) => {
-			try {
-				setLoading(true);
-				const result = await signInWithGoogle({ accessToken: tokenResponse.access_token });
-				if (result.isSuccess) {
-					showToast("success", AppString.loginSuccessfully);
-					navigate("/");
-				} else {
-					showToast("error", result.message!);
-				}
-			} catch (error) {
-				showToast("error", (error as Error).message);
-			} finally {
-				setLoading(false);
-			}
+			await handleLoginCommon(() => signInWithGoogle({ accessToken: tokenResponse.access_token }));
 		},
-		scope: "email profile", // Add the desired scope here
+		scope: "email profile",
 	});
 	return (
 		<div className="flex h-screen flex-1 flex-col  justify-center px-6 lg:px-8">
@@ -202,7 +178,7 @@ export default function SignInPage() {
 							</Button>
 
 							<FacebookLogin
-								appId="960599328730939"
+								appId={import.meta.env.VITE_APP_FACEBOOK_APP_ID}
 								autoLoad={false}
 								onSuccess={async (response) => handleLoginWithFacebook(response)}
 								onFail={() => showToast("error", AppString.loginFailure)}
