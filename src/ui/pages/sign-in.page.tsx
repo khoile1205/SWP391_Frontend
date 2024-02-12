@@ -11,6 +11,8 @@ import { useNavigate } from "react-router-dom";
 import FacebookLogo from "@/assets/Icon/facebook-icon.svg";
 import GmailLogo from "@/assets/Icon/gmail-logo.svg";
 import { useState } from "react";
+import FacebookLogin, { SuccessResponse } from "@greatsumini/react-facebook-login";
+import { useGoogleLogin } from "@react-oauth/google";
 
 interface SignInInformation {
 	username: string;
@@ -18,7 +20,7 @@ interface SignInInformation {
 	isRemember: boolean;
 }
 export default function SignInPage() {
-	const { login } = userStore((state) => state);
+	const { login, signInWithFacebook, signInWithGoogle } = userStore((state) => state);
 	const [show, updateVisiblePass] = useState(false);
 	const { setLoading } = useLoadingStore((state) => state);
 	const navigate = useNavigate();
@@ -42,6 +44,42 @@ export default function SignInPage() {
 		}
 	};
 
+	const handleLoginWithFacebook = async (response: SuccessResponse) => {
+		try {
+			setLoading(true);
+
+			const result = await signInWithFacebook({ accessToken: response.accessToken });
+			if (result.isSuccess) {
+				showToast("success", AppString.loginSuccessfully);
+				navigate("/");
+			} else {
+				showToast("error", result.message!);
+			}
+		} catch (error) {
+			showToast("error", (error as Error).message);
+		} finally {
+			setLoading(false);
+		}
+	};
+	const handleLoginWithGoogle = useGoogleLogin({
+		onSuccess: async (tokenResponse) => {
+			try {
+				setLoading(true);
+				const result = await signInWithGoogle({ accessToken: tokenResponse.access_token });
+				if (result.isSuccess) {
+					showToast("success", AppString.loginSuccessfully);
+					navigate("/");
+				} else {
+					showToast("error", result.message!);
+				}
+			} catch (error) {
+				showToast("error", (error as Error).message);
+			} finally {
+				setLoading(false);
+			}
+		},
+		scope: "email profile", // Add the desired scope here
+	});
 	return (
 		<div className="flex h-screen flex-1 flex-col  justify-center px-6 lg:px-8">
 			<h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
@@ -155,14 +193,26 @@ export default function SignInPage() {
 							or login with
 						</Typography>
 						<div className="mt-4 flex justify-evenly">
-							<Button className="flex space-x-3 bg-gray-100">
+							<Button
+								className="flex space-x-3 bg-gray-100"
+								onClick={() => handleLoginWithGoogle()}
+							>
 								<img src={GmailLogo} alt="" className="h-6 w-6" />
 								<Typography>Gmail</Typography>
 							</Button>
-							<Button className="flex space-x-3 bg-gray-100">
-								<img src={FacebookLogo} alt="" className="h-6 w-6" />
-								<Typography>Facebook</Typography>
-							</Button>
+
+							<FacebookLogin
+								appId="960599328730939"
+								autoLoad={false}
+								onSuccess={async (response) => handleLoginWithFacebook(response)}
+								onFail={() => showToast("error", AppString.loginFailure)}
+								render={({ onClick }) => (
+									<Button className="flex space-x-3 bg-gray-100" onClick={onClick}>
+										<img src={FacebookLogo} alt="" className="h-6 w-6" />
+										<Typography>Facebook</Typography>
+									</Button>
+								)}
+							/>
 						</div>
 						<p className="mt-6 text-center text-sm text-gray-500">
 							Don't have an account ?{" "}

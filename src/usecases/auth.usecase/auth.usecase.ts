@@ -9,6 +9,7 @@ import {
 	VerifyEmailInformation,
 	IdentifierResetPassword,
 	ResetPasswordData,
+	OAuth2SignInData,
 } from "@/types/auth";
 
 abstract class IAuthUseCase {
@@ -20,6 +21,8 @@ abstract class IAuthUseCase {
 	abstract sendEmailResetPassword(data: IdentifierResetPassword): Promise<Response>;
 	abstract resetPassword(data: ResetPasswordData): Promise<Response>;
 	abstract verifyEmailResetPassword(data: VerifyEmailInformation): Promise<Response>;
+	abstract signInWithFacebook(data: OAuth2SignInData): Promise<Response>;
+	abstract signInWithGoogle(data: OAuth2SignInData): Promise<Response>;
 }
 
 class AuthUseCase implements IAuthUseCase {
@@ -27,6 +30,66 @@ class AuthUseCase implements IAuthUseCase {
 		private readonly authDatasource: AuthDataSource,
 		private readonly userDatasource: UserDatasource
 	) {}
+	async signInWithGoogle(data: OAuth2SignInData): Promise<Response> {
+		try {
+			const response = await this.authDatasource.signInWithGoogle(data);
+
+			if (!response.isSuccess) {
+				return new Response(false, null, response.message);
+			}
+
+			const expiredTokenTime = 7 * 24 * 60 * 60 * 1000;
+
+			Cookies.set(AppConstant.accessTokenKey, response.data!.accessToken, {
+				expires: expiredTokenTime,
+				sameSite: "strict",
+			});
+
+			const user = await this.userDatasource.getUserProfile();
+
+			return new Response(
+				true,
+				{
+					access_token: response.data!.accessToken,
+					user,
+				},
+				response.message
+			);
+		} catch (error) {
+			const message = error instanceof Error ? error.message : `${error}`;
+			return new Response(false, null, message);
+		}
+	}
+	async signInWithFacebook(data: OAuth2SignInData): Promise<Response> {
+		try {
+			const response = await this.authDatasource.signInWithFacebook(data);
+
+			if (!response.isSuccess) {
+				return new Response(false, null, response.message);
+			}
+
+			const expiredTokenTime = 7 * 24 * 60 * 60 * 1000;
+
+			Cookies.set(AppConstant.accessTokenKey, response.data!.accessToken, {
+				expires: expiredTokenTime,
+				sameSite: "strict",
+			});
+
+			const user = await this.userDatasource.getUserProfile();
+
+			return new Response(
+				true,
+				{
+					access_token: response.data!.accessToken,
+					user,
+				},
+				response.message
+			);
+		} catch (error) {
+			const message = error instanceof Error ? error.message : `${error}`;
+			return new Response(false, null, message);
+		}
+	}
 	async verifyEmailResetPassword(data: VerifyEmailInformation): Promise<Response> {
 		return await this.authDatasource.verifyEmailResetPassword(data);
 	}

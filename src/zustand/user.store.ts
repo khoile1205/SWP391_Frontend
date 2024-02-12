@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { ErrorState } from "@/zustand/commons/error.state";
 import { authUseCase, userUseCase } from "@/usecases";
 import Result from "./commons/result";
-import { SignInInformation, SignUpInformation } from "@/types/auth";
+import { OAuth2SignInData, SignInInformation, SignUpInformation } from "@/types/auth";
 import { ChangePasswordType, UpdateUserInformationType } from "@/types/user";
 import { handleUseCase } from "./commons/handle.usecase";
 
@@ -17,6 +17,8 @@ type UserStore = {
 	logOut(): boolean;
 	changePassword(data: ChangePasswordType): Promise<Result>;
 	updateUserInformation(data: UpdateUserInformationType): Promise<Result>;
+	signInWithFacebook(data: OAuth2SignInData): Promise<Result>;
+	signInWithGoogle(data: OAuth2SignInData): Promise<Result>;
 };
 
 const userStore = create<UserStore>()((set) => ({
@@ -74,6 +76,44 @@ const userStore = create<UserStore>()((set) => ({
 		}
 
 		return result;
+	},
+	signInWithFacebook: async (body: OAuth2SignInData) => {
+		const { message, data, isSuccess } = await authUseCase.signInWithFacebook(body);
+
+		console.log(data);
+		if (!isSuccess) {
+			set(() => ({
+				error: {
+					message,
+				},
+			}));
+			return Result.failed(message);
+		}
+
+		set(() => ({
+			user: data!.user,
+		}));
+
+		return Result.success(message);
+	},
+	signInWithGoogle: async (body: OAuth2SignInData) => {
+		const { message, data, isSuccess } = await authUseCase.signInWithGoogle(body);
+
+		console.log(data);
+		if (!isSuccess) {
+			set(() => ({
+				error: {
+					message,
+				},
+			}));
+			return Result.failed(message);
+		}
+
+		set(() => ({
+			user: data!.user,
+		}));
+
+		return Result.success(message);
 	},
 }));
 
