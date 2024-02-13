@@ -17,7 +17,7 @@ export const ProfileLayout: React.FC = () => {
 	};
 
 	return (
-		<Tabs activeKey={currentTab} onChange={handleChange}>
+		<Tabs activeKey={currentTab} className="px-4 sm:px-0" onChange={handleChange}>
 			<TabPane tab="Profile" key="">
 				<Outlet />
 			</TabPane>

@@ -5,11 +5,25 @@ import { showToast } from "@/utils/notify";
 import userStore from "@/zustand/user.store";
 import { LockOutlined, UserOutlined, WalletOutlined } from "@ant-design/icons";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import { Avatar, Col, Divider, Form, Input, Radio, Row, Typography } from "antd";
+import {
+	Avatar,
+	Button,
+	Col,
+	Divider,
+	Form,
+	Input,
+	Radio,
+	Row,
+	Typography,
+	Upload,
+	UploadFile,
+} from "antd";
 import { Formik } from "formik";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
+import { RcFile } from "antd/es/upload";
+import fileStore from "@/zustand/file.store";
 
 const updateUserValidationSchema = Yup.object().shape({
 	username: Yup.string().required("Username is required"),
@@ -18,17 +32,42 @@ const updateUserValidationSchema = Yup.object().shape({
 	isMale: Yup.boolean().required("Gender is required"),
 	address: Yup.string().required("Address is required"),
 });
+
+// const getBase64 = (img: RcFile, callback: (url: string) => void) => {
+// 	const reader = new FileReader();
+// 	reader.addEventListener("load", () => callback(reader.result as string));
+// 	reader.readAsDataURL(img);
+// };
+
+const handleBeforeUpload = (file: RcFile) => {
+	const isPNG =
+		file.type === "image/png" ||
+		file.type == "image/jpeg" ||
+		file.type === "image/jpg" ||
+		file.type === "image/webp";
+	if (!isPNG) {
+		showToast("error", "Please upload a image file");
+	}
+
+	const isAcceptedFileSize = file.size < 1024 * 1024 * 10;
+	if (!isAcceptedFileSize) {
+		showToast("error", "Please upload a image file less than 10MB");
+	}
+	return isPNG && isAcceptedFileSize;
+};
 export default function ProfilePage() {
 	//
 	const navigate = useNavigate();
+
+	// Zustand state
+	const { user, updateUserInformation } = userStore((state) => state);
+	const { uploadImage } = fileStore((state) => state);
 	// React state
 	const [isEdit, setIsEdit] = useState<boolean>(false);
 	const [isEditPhoneNumber, setIsEditPhoneNumber] = useState<boolean>(false);
 	const [isShowAccountBalance, setIsEditShowAccountBalance] = useState<boolean>(false);
-
-	// Zustand state
-	const { user, updateUserInformation } = userStore((state) => state);
-
+	const [avatarUrl, setAvatarUrl] = useState<string | null | undefined>(user?.avatarUrl);
+	const [isUploading, setIsUploading] = useState<boolean>(false);
 	// Hooks
 	const balanceDisplay = useMemo(() => {
 		return isShowAccountBalance ? "100000" : "******";
@@ -47,8 +86,20 @@ export default function ProfilePage() {
 		1000
 	);
 
+	const handleChangeAvatar = useMemo(() => {
+		const handleAvatarChange = async (file: UploadFile) => {
+			const response = await uploadImage(file.originFileObj as File, "avatar");
+			if (response.isSuccess) {
+				setAvatarUrl(response.data);
+				return response.data;
+			}
+			return null;
+		};
+
+		return handleAvatarChange;
+	}, [setAvatarUrl, uploadImage]);
 	return (
-		<div className="px-4 sm:px-0">
+		<div className="">
 			<Formik
 				onSubmit={handleUpdateUser}
 				initialValues={{
@@ -57,11 +108,20 @@ export default function ProfilePage() {
 					lastName: user?.lastName || "",
 					isMale: user?.isMale ?? true,
 					userName: user?.userName || "",
+					avatarUrl: user?.avatarUrl || "",
 				}}
 				validationSchema={updateUserValidationSchema}
 				enableReinitialize
 			>
-				{({ values, errors, handleChange, handleSubmit, touched, initialValues }) => (
+				{({
+					values,
+					errors,
+					handleChange,
+					handleSubmit,
+					touched,
+					initialValues,
+					setFieldValue,
+				}) => (
 					<>
 						<div className="flex items-center justify-between">
 							<Typography.Title className="!m-0 font-playfair" level={2}>
@@ -74,7 +134,6 @@ export default function ProfilePage() {
 										backgroundColor: AppColor.deepOrangeColor,
 										borderRadius: 4,
 									}}
-									// onClick={handleSubmit}
 									onClick={() => {
 										if (JSON.stringify(values) != JSON.stringify(initialValues)) {
 											handleUpdateUser(values);
@@ -98,11 +157,35 @@ export default function ProfilePage() {
 							)}
 						</div>
 						<Divider></Divider>
-						<div className="block space-x-8 text-center sm:flex sm:items-center ">
-							<Avatar rootClassName="w-24 h-24" src={user?.avatarUrl}></Avatar>
-							<div className="mt-3 flex items-center space-x-3 sm:mt-0 sm:space-x-8">
-								<button
-									className="text-md px-10 py-[4px] font-inter text-white"
+						<div className="flex flex-col items-center space-y-8 text-center sm:flex-row sm:space-x-8 sm:space-y-0">
+							<Avatar rootClassName="w-24 h-24" src={avatarUrl}></Avatar>
+							<Upload
+								action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+								name="avatarUrl"
+								beforeUpload={handleBeforeUpload}
+								onChange={async (info) => {
+									if (info.file.status == "uploading" && !isUploading) {
+										showToast("warning", "Uploading ...");
+										setIsUploading(true);
+										return;
+									}
+									if (info.file.status == "done") {
+										showToast("success", "Upload avatar successfully");
+										const avatarUrl = await handleChangeAvatar(info.file);
+										if (avatarUrl) setFieldValue("avatarUrl", avatarUrl);
+										setIsUploading(false);
+										return;
+									}
+
+									if (info.file.status == "error") {
+										showToast("error", "Upload avatar failed");
+										return;
+									}
+								}}
+								showUploadList={false}
+							>
+								<Button
+									className="text-md px-10 py-[4px] font-inter text-white hover:!border-white hover:!text-white"
 									style={{
 										backgroundColor: AppColor.deepOrangeColor,
 										borderRadius: 4,
@@ -110,17 +193,18 @@ export default function ProfilePage() {
 									onClick={() => setIsEdit(true)}
 								>
 									Change avatar
-								</button>
-								<button
-									className="text-md border px-8 py-[4px] font-inter"
-									style={{
-										borderRadius: 4,
-									}}
-									onClick={() => setIsEdit(true)}
-								>
-									Delete account
-								</button>
-							</div>
+								</Button>
+							</Upload>
+
+							<button
+								className="text-md border px-8 py-[4px] font-inter"
+								style={{
+									borderRadius: 4,
+								}}
+								onClick={() => setIsEdit(true)}
+							>
+								Delete account
+							</button>
 						</div>
 						<Divider></Divider>
 

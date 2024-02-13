@@ -77,6 +77,32 @@ class ApiService {
 	async delete(url: string, data?: unknown, token?: string): Promise<Response> {
 		return this.request("DELETE", url, data, token);
 	}
+
+	async uploadImages(
+		url: string,
+		imageFiles: File[],
+		imageFolder: string,
+		token?: string
+	): Promise<Response> {
+		try {
+			const formData = new FormData();
+
+			for (const imageFile of imageFiles) {
+				formData.append("file", imageFile);
+			}
+
+			formData.append("path", imageFolder);
+
+			return await fetch(this.getUrl(url), {
+				method: "POST",
+				headers: this.getHeaders(true, token),
+				body: formData,
+			});
+		} catch (error) {
+			console.error("Error:", error);
+			throw error;
+		}
+	}
 }
 
 const apiService = ApiService.getInstance();
