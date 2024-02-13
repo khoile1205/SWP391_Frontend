@@ -21,4 +21,5 @@ export type UpdateUserInformationType = {
 	lastName: string;
 	isMale: boolean;
 	address: string;
+	avatarUrl: string;
 };
