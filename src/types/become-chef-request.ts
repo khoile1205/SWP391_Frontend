@@ -11,3 +11,5 @@ export type CreatedBecomeChefRequestDTO = {
 	experience: string;
 	achievement: string;
 };
+
+export type UpdateBecomeChefRequestDTO = Partial<CreatedBecomeChefRequestDTO>;

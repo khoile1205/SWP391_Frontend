@@ -28,4 +28,6 @@ export default class AppString {
 	static readonly deleteFileErrorMessage = "Error deleting file. Please try again";
 	static readonly createdRequestSuccessMessage = "Request created successfully";
 	static readonly deleteRequestSuccessMessage = "Request deleted successfully";
+	static readonly getRequestSuccessMeesage = "Request retrieved successfully";
+	static readonly updateRequestSuccessMessage = "Request updated successfully";
 }

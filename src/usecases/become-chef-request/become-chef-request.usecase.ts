@@ -1,5 +1,8 @@
 import { IBecomeChefRequestDatasource } from "@/datasources/become-chef-request.datasource";
-import { CreatedBecomeChefRequestDTO } from "@/types/become-chef-request";
+import {
+	CreatedBecomeChefRequestDTO,
+	UpdateBecomeChefRequestDTO,
+} from "@/types/become-chef-request";
 import Response from "../auth.usecase/responses/response";
 
 export interface IBecomeChefRequestUseCase {
@@ -7,10 +10,17 @@ export interface IBecomeChefRequestUseCase {
 	getAllRequests(): Promise<Response>;
 	getRequestsByUserId(userId: string): Promise<Response>;
 	deleteRequestsById(chefRequestId: string): Promise<Response>;
+	updateRequestById(requestId: string, request: UpdateBecomeChefRequestDTO): Promise<Response>;
 }
 
 export class BecomeChefRequestUseCase implements IBecomeChefRequestUseCase {
 	constructor(private datasource: IBecomeChefRequestDatasource) {}
+	async updateRequestById(
+		requestId: string,
+		request: Partial<CreatedBecomeChefRequestDTO>
+	): Promise<Response> {
+		return await this.datasource.updateRequestById(requestId, request);
+	}
 	async deleteRequestsById(chefRequestId: string): Promise<Response> {
 		return await this.datasource.deleteRequestsById(chefRequestId);
 	}

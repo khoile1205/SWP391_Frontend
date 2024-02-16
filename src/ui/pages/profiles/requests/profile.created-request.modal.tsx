@@ -1,7 +1,9 @@
 import { useCategories } from "@/hooks/useCategories";
+import { BecomeChefRequest } from "@/models/become-chef-request.model";
 import AppColor from "@/utils/appColor";
 import { handleBeforeUploadFile } from "@/utils/file_exts";
 import { showToast } from "@/utils/notify";
+import { generateRandomString } from "@/utils/string.extension";
 import { becomeChefRequestStore } from "@/zustand/become-chef-request";
 import fileStore from "@/zustand/file.store";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
@@ -11,7 +13,7 @@ import Upload, { RcFile, UploadChangeParam } from "antd/es/upload";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useFormik } from "formik";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
 
 dayjs.extend(customParseFormat);
@@ -19,6 +21,7 @@ dayjs.extend(customParseFormat);
 interface CreateRequestModalProps {
 	open: boolean;
 	onClick: (status: boolean) => void;
+	request?: BecomeChefRequest;
 }
 const becomeChefRequestValidator = Yup.object().shape({
 	identityImageUrl: Yup.string().required("This field is required"),
@@ -38,27 +41,36 @@ const becomeChefRequestValidator = Yup.object().shape({
 
 const dateFormat = "DD-MM-YYYY";
 
-export default function CreateRequestModal({ open, onClick }: CreateRequestModalProps) {
-	const [identityImageUrl, setIdentityImageURL] = useState<string>("");
-	const [certificateImageUrls, setCertificateImageURLs] = useState<string[]>([]);
+const renderUploadedRequestImage = (imageUrls: string[] | undefined): UploadFile[] => {
+	if (!imageUrls) {
+		return [];
+	} else {
+		return imageUrls.map((imageUrl) => ({
+			uid: generateRandomString(10),
+			name: imageUrl,
+			status: "done",
+			url: imageUrl,
+		}));
+	}
+};
+export default function CreateRequestModal({ open, onClick, request }: CreateRequestModalProps) {
 	const [listCertificateImages, setListCertificateImages] = useState<UploadFile[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 
 	const { uploadImage } = fileStore((state) => state);
-	const { createBecomeChefRequest } = becomeChefRequestStore((state) => state);
-
+	const { createBecomeChefRequest, updateRequestById } = becomeChefRequestStore((state) => state);
 	const { categories } = useCategories();
 
 	const formik = useFormik({
 		initialValues: {
 			identityImageUrl: "",
-			certificateImageUrls: [],
+			certificateImageUrls: [""],
 			fullName: "",
 			phoneNumber: "",
 			email: "",
 			gender: "",
 			address: "",
-			dob: dayjs(Date.now(), dateFormat).toDate(),
+			dob: new Date(),
 			category: "",
 			achievement: "",
 			experience: "",
@@ -71,6 +83,26 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 		validateOnMount: true,
 	});
 
+	useEffect(() => {
+		// Update form values when the request prop changes
+		if (request) {
+			formik.setValues({
+				identityImageUrl: request.identityImageUrl,
+				certificateImageUrls: request.certificateImageUrls,
+				fullName: request.fullName,
+				phoneNumber: request.phoneNumber,
+				email: request.email,
+				gender: request.gender,
+				address: request.address,
+				dob: new Date(request.dob),
+				category: request.category,
+				achievement: request.achievement,
+				experience: request.experience,
+			});
+			setListCertificateImages(renderUploadedRequestImage(request.certificateImageUrls));
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [request]);
 	const handleChangeImage = async (
 		info: UploadChangeParam<UploadFile<any>>
 	): Promise<string | null> => {
@@ -84,11 +116,23 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 	};
 
 	const handleSubmitForm = async () => {
-		showToast("info", "Creating ...");
-		const response = await createBecomeChefRequest(formik.values);
+		let response: any = null;
+
+		if (request) {
+			showToast("info", "Updating ...");
+			response = await updateRequestById(request.requestChefId, formik.values);
+		} else {
+			showToast("info", "Creating ...");
+			response = await createBecomeChefRequest(formik.values);
+		}
 
 		setTimeout(() => {
-			showToast(response.isSuccess ? "success" : "error", response.message!);
+			if (response.isSuccess) {
+				showToast("success", response.message!);
+				window.location.reload();
+			} else {
+				showToast("error", response.message!);
+			}
 		}, 1000);
 	};
 	const UploadButton = React.memo(({ loading }: { loading?: boolean }) => (
@@ -147,14 +191,13 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 								setLoading(true);
 								const imageURL = await handleChangeImage(info);
 								if (imageURL !== null) {
-									setIdentityImageURL(imageURL);
 									formik.setFieldValue("identityImageUrl", imageURL);
 								}
 								setLoading(false);
 							}}
 						>
-							{identityImageUrl ? (
-								<img src={identityImageUrl} alt="avatar" style={{ width: "100%" }} />
+							{formik.values.identityImageUrl ? (
+								<img src={formik.values.identityImageUrl} alt="avatar" style={{ width: "100%" }} />
 							) : (
 								<UploadButton loading={loading}></UploadButton>
 							)}
@@ -200,18 +243,33 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 
 								if (info.file.status === "done") {
 									const imageURL = await handleChangeImage(info);
-									if (imageURL !== null) {
-										setCertificateImageURLs((prevState) => [...prevState, imageURL]);
+									if (imageURL != null) {
 										formik.setFieldValue("certificateImageUrls", [
-											...certificateImageUrls,
+											...formik.values.certificateImageUrls,
 											imageURL,
 										]);
+										info.file.url = imageURL;
+										showToast("success", "Upload image successfully");
 									}
 								}
+							}}
+							onRemove={(file) => {
+								// Handle removal from formik values
+								const updatedCertificateImageUrls = formik.values.certificateImageUrls.filter(
+									(url) => url !== file.url
+								);
+								formik.setFieldValue("certificateImageUrls", updatedCertificateImageUrls);
+
+								// Handle removal from fileList state
+								const updatedFileList = listCertificateImages.filter(
+									(listFile) => listFile.uid !== file.uid
+								);
+								setListCertificateImages(updatedFileList);
 							}}
 						>
 							<UploadButton></UploadButton>
 						</Upload>
+
 						{formik.errors.certificateImageUrls && formik.touched.certificateImageUrls && (
 							<div className="mt-1 text-red-500">
 								{formik.errors.certificateImageUrls as string}
@@ -298,13 +356,14 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 							>
 								<Select
 									size="small"
+									defaultValue={formik.values.gender}
 									onChange={(value) => {
 										formik.setFieldValue("gender", value);
 									}}
 									onBlur={formik.handleBlur}
 									options={[
-										{ value: "female", label: "Female" },
-										{ value: "male", label: "Male" },
+										{ value: "Female", label: "Female" },
+										{ value: "Male", label: "Male" },
 									]}
 								/>
 							</Form.Item>
@@ -361,6 +420,8 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 									onChange={(date) => {
 										formik.setFieldValue("dob", date);
 									}}
+									defaultValue={dayjs(formik.values.dob)}
+									format={dateFormat}
 									onBlur={formik.handleBlur}
 									size="small"
 									className="rounded-md border border-gray-300 text-gray-900 shadow-sm placeholder:text-gray-400 sm:text-sm sm:leading-6"

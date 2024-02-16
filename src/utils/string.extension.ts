@@ -10,4 +10,13 @@ const mergeToken = (token: string) => {
 	return token.split(" ").join("+");
 };
 
-export { transformEmail, mergeToken };
+function generateRandomString(length: number): string {
+	const characters: string[] =
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".split("");
+	return Array.from(
+		{ length },
+		() => characters[Math.floor(Math.random() * characters.length)]
+	).join("");
+}
+
+export { transformEmail, mergeToken, generateRandomString };
