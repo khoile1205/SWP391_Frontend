@@ -1,22 +1,32 @@
 import RBACRoutes from "@/HOCs/RBACRoutes";
 import { Roles } from "@/types/user";
 import { Loadable } from "@/ui/components/Loadable";
-import { ProfileLayout } from "@/ui/pages/profiles/profile.layout";
+import { MemoizedProfileLayout } from "@/ui/pages/profiles/profile.layout";
 import { lazy } from "react";
 import { RouteObject } from "react-router-dom";
 
 // Import loadable components
-const ProfilePage = Loadable(lazy(() => import("@/ui/pages/profiles/profile.page")));
-const ChangePasswordPage = Loadable(lazy(() => import("@/ui/pages/change.password.page")));
-const CreatedReportsPage = Loadable(lazy(() => import("@/ui/pages/view.created.reports.page")));
+const ProfilePage = Loadable(lazy(() => import("@/ui/pages/profiles/infomation/profile.page")));
+const ChangePasswordPage = Loadable(
+	lazy(() => import("@/ui/pages/profiles/change-password/profile.change.password.page"))
+);
+const ReportsPage = Loadable(lazy(() => import("@/ui/pages/profiles/reports/profile.reports")));
+const ProfileBecomeChefPage = Loadable(
+	lazy(() => import("@/ui/pages/profiles/requests/profile.become-chef.page"))
+);
+const TransactionHistoryPage = Loadable(
+	lazy(() => import("@/ui/pages/profiles/transaction/profile.transaction.history.page"))
+);
+const BookingHistoryPage = Loadable(
+	lazy(() => import("@/ui/pages/profiles/booking/profile.booking.history.page"))
+);
+const SchedulesPage = Loadable(
+	lazy(() => import("@/ui/pages/profiles/schedules/profile.schedules.page"))
+);
 const UserRoutes: RouteObject[] = [
 	{
 		path: "/profile",
-		element: (
-			<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
-				<ProfileLayout></ProfileLayout>
-			</RBACRoutes>
-		),
+		element: <MemoizedProfileLayout></MemoizedProfileLayout>,
 		children: [
 			{
 				path: "",
@@ -38,7 +48,39 @@ const UserRoutes: RouteObject[] = [
 				path: "reports",
 				element: (
 					<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
-						<CreatedReportsPage></CreatedReportsPage>
+						<ReportsPage></ReportsPage>
+					</RBACRoutes>
+				),
+			},
+			{
+				path: "requests",
+				element: (
+					<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN]}>
+						<ProfileBecomeChefPage></ProfileBecomeChefPage>
+					</RBACRoutes>
+				),
+			},
+			{
+				path: "transactions",
+				element: (
+					<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
+						<TransactionHistoryPage></TransactionHistoryPage>
+					</RBACRoutes>
+				),
+			},
+			{
+				path: "bookings",
+				element: (
+					<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
+						<BookingHistoryPage></BookingHistoryPage>
+					</RBACRoutes>
+				),
+			},
+			{
+				path: "schedules",
+				element: (
+					<RBACRoutes allowedRoles={[Roles.ADMIN, Roles.CHEF]}>
+						<SchedulesPage></SchedulesPage>
 					</RBACRoutes>
 				),
 			},

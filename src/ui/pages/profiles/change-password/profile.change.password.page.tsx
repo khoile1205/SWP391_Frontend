@@ -1,4 +1,4 @@
-import ChangePassword from "../components/change-password";
+import ChangePassword from "@/ui/components/change-password";
 
 export default function ChangePasswordPage() {
 	return (

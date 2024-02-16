@@ -1,9 +1,12 @@
 import { Typography } from "antd";
 import { CategoryCard, PostCard } from "../components";
 import { POSTS } from "@/assets/data/posts";
-import { CATEGORIES } from "@/assets/data/categories";
+import { useCategories } from "@/hooks/useCategories";
+import { useLoadingStore } from "@/zustand/loading.store";
 
 export function HomePage() {
+	const { categories } = useCategories();
+	const { isLoading } = useLoadingStore((state) => state);
 	return (
 		<div className="mt-10">
 			<div className="">
@@ -29,8 +32,8 @@ export function HomePage() {
 					Popular Categories
 				</Typography.Title>
 				<div className="grid grid-cols-3 justify-between space-x-3 text-center md:grid-cols-6">
-					{CATEGORIES.slice(0, 6).map((category) => (
-						<CategoryCard key={category.id} category={category} />
+					{categories.slice(0, 6).map((category) => (
+						<CategoryCard key={category.id} category={category} isLoading={isLoading} />
 					))}
 				</div>
 			</div>

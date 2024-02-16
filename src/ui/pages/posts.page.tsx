@@ -1,3 +1,3 @@
-export default function PostPage() {
+export default function RecipesPage() {
 	return <div>PostPage</div>;
 }

@@ -66,7 +66,7 @@ const renderReportTypeIcon = (type: Report["type"]) => {
 	}
 };
 
-export function ViewCreatedReports() {
+export default function ProfileSchedulesPage() {
 	const handleViewDetail = (id: number) => {
 		console.log("View details of report with ID:", id);
 	};
@@ -144,7 +144,7 @@ export function ViewCreatedReports() {
 			<Table
 				columns={columns}
 				dataSource={reports}
-				pagination={{ defaultPageSize: 5, showSizeChanger: false }}
+				// pagination={{ defaultPageSize: 5, showSizeChanger: false }}
 				bordered
 				className="rounded-lg shadow-md"
 				rowClassName={(_, index) => (index % 2 === 0 ? "even-row" : "odd-row")}

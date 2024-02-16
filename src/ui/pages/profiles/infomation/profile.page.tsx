@@ -33,12 +33,6 @@ const updateUserValidationSchema = Yup.object().shape({
 	address: Yup.string().required("Address is required"),
 });
 
-// const getBase64 = (img: RcFile, callback: (url: string) => void) => {
-// 	const reader = new FileReader();
-// 	reader.addEventListener("load", () => callback(reader.result as string));
-// 	reader.readAsDataURL(img);
-// };
-
 const handleBeforeUpload = (file: RcFile) => {
 	const isPNG =
 		file.type === "image/png" ||
@@ -55,6 +49,7 @@ const handleBeforeUpload = (file: RcFile) => {
 	}
 	return isPNG && isAcceptedFileSize;
 };
+
 export default function ProfilePage() {
 	//
 	const navigate = useNavigate();
@@ -68,6 +63,7 @@ export default function ProfilePage() {
 	const [isShowAccountBalance, setIsEditShowAccountBalance] = useState<boolean>(false);
 	const [avatarUrl, setAvatarUrl] = useState<string | null | undefined>(user?.avatarUrl);
 	const [isUploading, setIsUploading] = useState<boolean>(false);
+
 	// Hooks
 	const balanceDisplay = useMemo(() => {
 		return isShowAccountBalance ? "100000" : "******";

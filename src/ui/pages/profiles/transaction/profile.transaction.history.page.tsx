@@ -1,7 +1,7 @@
 import { Table, Pagination, Button, Input, Tooltip } from "antd";
 import { EyeOutlined, UserOutlined, BookOutlined, MessageOutlined } from "@ant-design/icons";
 
-interface Report {
+interface Transaction {
 	id: number;
 	title: string;
 	type: "user" | "recipe" | "comment";
@@ -9,38 +9,38 @@ interface Report {
 	createdAt: Date;
 }
 
-const reports: Report[] = [
+const reports: Transaction[] = [
 	{
 		id: 1,
-		title: "Test Report",
+		title: "Test Transaction",
 		type: "user",
 		status: "pending",
 		createdAt: new Date("2023-12-21T11:00:00"),
 	},
 	{
 		id: 2,
-		title: "Test Report",
+		title: "Test Transaction",
 		type: "recipe",
 		status: "reject",
 		createdAt: new Date("2023-12-21T11:00:00"),
 	},
 	{
 		id: 3,
-		title: "Test Report",
+		title: "Test Transaction",
 		type: "comment",
 		status: "accept",
 		createdAt: new Date("2023-12-21T11:00:00"),
 	},
 	{
 		id: 4,
-		title: "Test Report",
+		title: "Test Transaction",
 		type: "user",
 		status: "pending",
 		createdAt: new Date("2023-12-21T11:00:00"),
 	},
 ];
 
-const renderStatusColor = (status: Report["status"]): string => {
+const renderStatusColor = (status: Transaction["status"]): string => {
 	switch (status) {
 		case "pending":
 			return "orange";
@@ -53,7 +53,7 @@ const renderStatusColor = (status: Report["status"]): string => {
 	}
 };
 
-const renderReportTypeIcon = (type: Report["type"]) => {
+const renderTransactionTypeIcon = (type: Transaction["type"]) => {
 	switch (type) {
 		case "user":
 			return <UserOutlined />;
@@ -66,7 +66,7 @@ const renderReportTypeIcon = (type: Report["type"]) => {
 	}
 };
 
-export function ViewCreatedReports() {
+export default function ProfileTransactionHistory() {
 	const handleViewDetail = (id: number) => {
 		console.log("View details of report with ID:", id);
 	};
@@ -80,7 +80,7 @@ export function ViewCreatedReports() {
 		sorter?: (a: T, b: T) => number;
 	};
 
-	const columns: Column<Report>[] = [
+	const columns: Column<Transaction>[] = [
 		{
 			title: "ID",
 			dataIndex: "id",
@@ -91,21 +91,21 @@ export function ViewCreatedReports() {
 		{
 			title: "Title",
 			dataIndex: "title",
-			render: (_text: string, record: Report) => (
+			render: (_text: string, record: Transaction) => (
 				<Tooltip title={record.title}>{record.title}</Tooltip>
 			),
 		},
 		{
 			title: "Type",
 			dataIndex: "type",
-			render: (type: Report["type"]) => renderReportTypeIcon(type),
+			render: (type: Transaction["type"]) => renderTransactionTypeIcon(type),
 			align: "center",
 			sorter: (a, b) => a.type.localeCompare(b.type),
 		},
 		{
 			title: "Status",
 			dataIndex: "status",
-			render: (status: Report["status"]) => (
+			render: (status: Transaction["status"]) => (
 				<span style={{ color: renderStatusColor(status) }}>{status.toUpperCase()}</span>
 			),
 			align: "center",
@@ -121,7 +121,7 @@ export function ViewCreatedReports() {
 		{
 			title: "Actions",
 			align: "center",
-			render: (_text: any, record: Report) => (
+			render: (_text: any, record: Transaction) => (
 				<Button
 					type="text"
 					icon={<EyeOutlined style={{ fontSize: "16px", color: "#1890ff" }} />}
@@ -133,7 +133,7 @@ export function ViewCreatedReports() {
 
 	return (
 		<div className="flex flex-col items-center justify-center px-4 py-8 lg:px-8">
-			<h2 className="mb-4 text-2xl font-bold text-gray-900">View Reports</h2>
+			<h2 className="mb-4 text-2xl font-bold text-gray-900">View Transactions</h2>
 			<div className="mb-4">
 				<Input
 					type="text"
@@ -144,7 +144,7 @@ export function ViewCreatedReports() {
 			<Table
 				columns={columns}
 				dataSource={reports}
-				pagination={{ defaultPageSize: 5, showSizeChanger: false }}
+				// pagination={{ defaultPageSize: 5, showSizeChanger: false }}
 				bordered
 				className="rounded-lg shadow-md"
 				rowClassName={(_, index) => (index % 2 === 0 ? "even-row" : "odd-row")}
