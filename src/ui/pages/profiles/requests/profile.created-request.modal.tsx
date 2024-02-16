@@ -1,7 +1,10 @@
 import { useCategories } from "@/hooks/useCategories";
+import { BecomeChefRequest } from "@/models/become-chef-request.model";
 import AppColor from "@/utils/appColor";
 import { handleBeforeUploadFile } from "@/utils/file_exts";
 import { showToast } from "@/utils/notify";
+import { generateRandomString } from "@/utils/string.extension";
+import { becomeChefRequestStore } from "@/zustand/become-chef-request";
 import fileStore from "@/zustand/file.store";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import { Col, DatePicker, Form, Input, Modal, Row, Select, Typography, UploadFile } from "antd";
@@ -10,7 +13,7 @@ import Upload, { RcFile, UploadChangeParam } from "antd/es/upload";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useFormik } from "formik";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
 
 dayjs.extend(customParseFormat);
@@ -18,45 +21,58 @@ dayjs.extend(customParseFormat);
 interface CreateRequestModalProps {
 	open: boolean;
 	onClick: (status: boolean) => void;
+	request?: BecomeChefRequest;
 }
 const becomeChefRequestValidator = Yup.object().shape({
-	identityImageURL: Yup.string().required("This field is required"),
-	certificateImageURLs: Yup.array().required("This field is required"),
+	identityImageUrl: Yup.string().required("This field is required"),
+	certificateImageUrls: Yup.array().required("This field is required"),
 	fullName: Yup.string().required("This field is required"),
-	phoneNumber: Yup.string().required("This field is required"),
+	phoneNumber: Yup.string()
+		.matches(/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/, "Phone number is invalid")
+		.required("This field is required"),
 	email: Yup.string().email("Invalid email format").required("This field is required"),
 	gender: Yup.string().required("This field is required"),
 	address: Yup.string().required("This field is required"),
-	DOB: Yup.date().required("This field is required").typeError("Invalid date format"),
+	dob: Yup.date().required("This field is required").typeError("Invalid date format"),
 	category: Yup.string().required("This field is required"),
-	achivement: Yup.string().required("This field is required"),
+	achievement: Yup.string().required("This field is required"),
 	experience: Yup.string().required("This field is required"),
 });
 
 const dateFormat = "DD-MM-YYYY";
 
-export default function CreateRequestModal({ open, onClick }: CreateRequestModalProps) {
-	const [identityImageURL, setIdentityImageURL] = useState<string>("");
-	const [certificateImageURLs, setCertificateImageURLs] = useState<string[]>([]);
+const renderUploadedRequestImage = (imageUrls: string[] | undefined): UploadFile[] => {
+	if (!imageUrls) {
+		return [];
+	} else {
+		return imageUrls.map((imageUrl) => ({
+			uid: generateRandomString(10),
+			name: imageUrl,
+			status: "done",
+			url: imageUrl,
+		}));
+	}
+};
+export default function CreateRequestModal({ open, onClick, request }: CreateRequestModalProps) {
 	const [listCertificateImages, setListCertificateImages] = useState<UploadFile[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 
 	const { uploadImage } = fileStore((state) => state);
-
+	const { createBecomeChefRequest, updateRequestById } = becomeChefRequestStore((state) => state);
 	const { categories } = useCategories();
 
 	const formik = useFormik({
 		initialValues: {
-			identityImageURL: "",
-			certificateImageURLs: [],
+			identityImageUrl: "",
+			certificateImageUrls: [""],
 			fullName: "",
 			phoneNumber: "",
 			email: "",
 			gender: "",
 			address: "",
-			DOB: dayjs(Date.now(), dateFormat).toDate(),
+			dob: new Date(),
 			category: "",
-			achivement: "",
+			achievement: "",
 			experience: "",
 		},
 		onSubmit: () => {
@@ -67,6 +83,26 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 		validateOnMount: true,
 	});
 
+	useEffect(() => {
+		// Update form values when the request prop changes
+		if (request) {
+			formik.setValues({
+				identityImageUrl: request.identityImageUrl,
+				certificateImageUrls: request.certificateImageUrls,
+				fullName: request.fullName,
+				phoneNumber: request.phoneNumber,
+				email: request.email,
+				gender: request.gender,
+				address: request.address,
+				dob: new Date(request.dob),
+				category: request.category,
+				achievement: request.achievement,
+				experience: request.experience,
+			});
+			setListCertificateImages(renderUploadedRequestImage(request.certificateImageUrls));
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [request]);
 	const handleChangeImage = async (
 		info: UploadChangeParam<UploadFile<any>>
 	): Promise<string | null> => {
@@ -79,9 +115,25 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 		return null;
 	};
 
-	const handleSubmitForm = () => {
-		showToast("info", "Creating ...");
-		console.log({ ...formik.values });
+	const handleSubmitForm = async () => {
+		let response: any = null;
+
+		if (request) {
+			showToast("info", "Updating ...");
+			response = await updateRequestById(request.requestChefId, formik.values);
+		} else {
+			showToast("info", "Creating ...");
+			response = await createBecomeChefRequest(formik.values);
+		}
+
+		setTimeout(() => {
+			if (response.isSuccess) {
+				showToast("success", response.message!);
+				window.location.reload();
+			} else {
+				showToast("error", response.message!);
+			}
+		}, 1000);
 	};
 	const UploadButton = React.memo(({ loading }: { loading?: boolean }) => (
 		<div>
@@ -114,14 +166,14 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 				<Col span={5} xs={24} md={5}>
 					<Form.Item
 						hasFeedback
-						name="identityImageURL"
+						name="identityImageUrl"
 						className="mt-2"
 						required
-						validateStatus={formik.errors.identityImageURL ? "error" : "success"}
+						validateStatus={formik.errors.identityImageUrl ? "error" : "success"}
 						help={
-							formik.errors.identityImageURL &&
-							formik.touched.identityImageURL && (
-								<div className="mt-1 text-red-500">{formik.errors.identityImageURL as string}</div>
+							formik.errors.identityImageUrl &&
+							formik.touched.identityImageUrl && (
+								<div className="mt-1 text-red-500">{formik.errors.identityImageUrl as string}</div>
 							)
 						}
 					>
@@ -129,7 +181,7 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 							<Typography.Text style={{ color: "red" }}>*</Typography.Text> Identity Image
 						</Typography.Title>
 						<Upload
-							name="identityImageURL"
+							name="identityImageUrl"
 							listType="picture-card"
 							className="avatar-uploader mt-2 text-center"
 							showUploadList={false}
@@ -139,14 +191,13 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 								setLoading(true);
 								const imageURL = await handleChangeImage(info);
 								if (imageURL !== null) {
-									setIdentityImageURL(imageURL);
-									formik.setFieldValue("identityImageURL", imageURL);
+									formik.setFieldValue("identityImageUrl", imageURL);
 								}
 								setLoading(false);
 							}}
 						>
-							{identityImageURL ? (
-								<img src={identityImageURL} alt="avatar" style={{ width: "100%" }} />
+							{formik.values.identityImageUrl ? (
+								<img src={formik.values.identityImageUrl} alt="avatar" style={{ width: "100%" }} />
 							) : (
 								<UploadButton loading={loading}></UploadButton>
 							)}
@@ -155,15 +206,15 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 
 					<Form.Item
 						hasFeedback
-						name="certificateImageURLs"
+						name="certificateImageUrls"
 						className="mt-2"
 						required
-						validateStatus={formik.errors.certificateImageURLs ? "error" : "success"}
+						validateStatus={formik.errors.certificateImageUrls ? "error" : "success"}
 						help={
-							formik.errors.certificateImageURLs &&
-							formik.touched.certificateImageURLs && (
+							formik.errors.certificateImageUrls &&
+							formik.touched.certificateImageUrls && (
 								<div className="mt-1 text-red-500">
-									{formik.errors.certificateImageURLs as string}
+									{formik.errors.certificateImageUrls as string}
 								</div>
 							)
 						}
@@ -192,21 +243,36 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 
 								if (info.file.status === "done") {
 									const imageURL = await handleChangeImage(info);
-									if (imageURL !== null) {
-										setCertificateImageURLs((prevState) => [...prevState, imageURL]);
-										formik.setFieldValue("certificateImageURLs", [
-											...certificateImageURLs,
+									if (imageURL != null) {
+										formik.setFieldValue("certificateImageUrls", [
+											...formik.values.certificateImageUrls,
 											imageURL,
 										]);
+										info.file.url = imageURL;
+										showToast("success", "Upload image successfully");
 									}
 								}
+							}}
+							onRemove={(file) => {
+								// Handle removal from formik values
+								const updatedCertificateImageUrls = formik.values.certificateImageUrls.filter(
+									(url) => url !== file.url
+								);
+								formik.setFieldValue("certificateImageUrls", updatedCertificateImageUrls);
+
+								// Handle removal from fileList state
+								const updatedFileList = listCertificateImages.filter(
+									(listFile) => listFile.uid !== file.uid
+								);
+								setListCertificateImages(updatedFileList);
 							}}
 						>
 							<UploadButton></UploadButton>
 						</Upload>
-						{formik.errors.certificateImageURLs && formik.touched.certificateImageURLs && (
+
+						{formik.errors.certificateImageUrls && formik.touched.certificateImageUrls && (
 							<div className="mt-1 text-red-500">
-								{formik.errors.certificateImageURLs as string}
+								{formik.errors.certificateImageUrls as string}
 							</div>
 						)}
 					</Form.Item>
@@ -290,13 +356,14 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 							>
 								<Select
 									size="small"
+									defaultValue={formik.values.gender}
 									onChange={(value) => {
 										formik.setFieldValue("gender", value);
 									}}
 									onBlur={formik.handleBlur}
 									options={[
-										{ value: "female", label: "Female" },
-										{ value: "male", label: "Male" },
+										{ value: "Female", label: "Female" },
+										{ value: "Male", label: "Male" },
 									]}
 								/>
 							</Form.Item>
@@ -335,24 +402,26 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 						<Col span={11} xs={24} md={11}>
 							<Form.Item
 								hasFeedback
-								name="DOB"
+								name="dob"
 								className="mt-2"
 								label="Date of Birth"
 								required
-								validateStatus={formik.errors.DOB ? "error" : "success"}
+								validateStatus={formik.errors.dob ? "error" : "success"}
 								help={
-									formik.errors.DOB &&
-									formik.touched.DOB && (
-										<div className="mt-1 text-red-500">{formik.errors.DOB as string}</div>
+									formik.errors.dob &&
+									formik.touched.dob && (
+										<div className="mt-1 text-red-500">{formik.errors.dob as string}</div>
 									)
 								}
 							>
 								<DatePicker
-									name="DOB"
+									name="dob"
 									maxDate={dayjs(Date.now(), dateFormat)}
 									onChange={(date) => {
-										formik.setFieldValue("DOB", date);
+										formik.setFieldValue("dob", date);
 									}}
+									defaultValue={dayjs(formik.values.dob)}
+									format={dateFormat}
 									onBlur={formik.handleBlur}
 									size="small"
 									className="rounded-md border border-gray-300 text-gray-900 shadow-sm placeholder:text-gray-400 sm:text-sm sm:leading-6"
@@ -452,21 +521,21 @@ export default function CreateRequestModal({ open, onClick }: CreateRequestModal
 						<Col span={24}>
 							<Form.Item
 								hasFeedback
-								name="achivement"
+								name="achievement"
 								className="mt-2"
 								label="Achivement"
 								required
-								validateStatus={formik.errors.achivement ? "error" : "success"}
+								validateStatus={formik.errors.achievement ? "error" : "success"}
 								help={
-									formik.errors.achivement &&
-									formik.touched.achivement && (
-										<div className="mt-1 text-red-500">{formik.errors.achivement as string}</div>
+									formik.errors.achievement &&
+									formik.touched.achievement && (
+										<div className="mt-1 text-red-500">{formik.errors.achievement as string}</div>
 									)
 								}
 							>
 								<TextArea
 									rows={5}
-									defaultValue={formik.values.achivement}
+									defaultValue={formik.values.achievement}
 									showCount
 									maxLength={300}
 									onChange={formik.handleChange}

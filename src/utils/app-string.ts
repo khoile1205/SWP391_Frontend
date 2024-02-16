@@ -19,4 +19,15 @@ export default class AppString {
 	static readonly passwordChangedSuccessMessage = "Password changed successfully";
 	static readonly passwordChangedErorrMessage =
 		"Sorry,your current password is incorrect. Please try again";
+	static readonly getDataErrorMessage = "Error getting data. Please try again";
+	static readonly updateDataErrorMessage = "Error updating data. Please try again";
+	static readonly deleteDataErrorMessage = "Error deleting data. Please try again";
+	static readonly createDataErrorMessage = "Error creating data. Please try again";
+	static readonly uploadFileErrorMessage = "Error uploading file. Please try again";
+	static readonly uploadFileSuccessMessage = "File uploaded successfully";
+	static readonly deleteFileErrorMessage = "Error deleting file. Please try again";
+	static readonly createdRequestSuccessMessage = "Request created successfully";
+	static readonly deleteRequestSuccessMessage = "Request deleted successfully";
+	static readonly getRequestSuccessMeesage = "Request retrieved successfully";
+	static readonly updateRequestSuccessMessage = "Request updated successfully";
 }

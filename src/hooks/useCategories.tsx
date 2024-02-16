@@ -17,7 +17,8 @@ export const useCategories = () => {
 		};
 
 		fetchData();
-	}, [setLoading]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const memoizedCategories = useMemo(() => categories, [categories]);
 
