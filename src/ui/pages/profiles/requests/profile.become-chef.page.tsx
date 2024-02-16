@@ -1,14 +1,18 @@
-import { Col, Form, Image, Result, Row, Typography } from "antd";
+import { Button, Col, Form, Image, Modal, Result, Row, Typography } from "antd";
 import { useState } from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import TextArea from "antd/es/input/TextArea";
 import AppColor from "@/utils/appColor";
 import CreateRequestModal from "./profile.created-request.modal";
-import { CloseCircleOutlined } from "@ant-design/icons";
+import { CloseCircleOutlined, ExclamationCircleFilled } from "@ant-design/icons";
 import { ActionStatus } from "@/enums/status";
+import { becomeChefRequestStore } from "@/zustand/become-chef-request";
+import { showToast } from "@/utils/notify";
 
 dayjs.extend(customParseFormat);
+
+const { confirm } = Modal;
 
 const renderStatusOfRequest = (status: ActionStatus) => {
 	switch (status) {
@@ -23,12 +27,39 @@ const renderStatusOfRequest = (status: ActionStatus) => {
 		}
 	}
 };
+
+const showDeleteConfirm = (handleDeleteRequest: () => void) => {
+	confirm({
+		title: "Are you sure delete this task?",
+		icon: <ExclamationCircleFilled />,
+		content: "Some descriptions",
+		okText: "Yes",
+		okType: "danger",
+		cancelText: "No",
+		onOk() {
+			handleDeleteRequest();
+		},
+		onCancel() {
+			console.log("Cancel");
+		},
+	});
+};
+
 export default function ProfileBecomeChefPage() {
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const [isHaveRequest] = useState<boolean>(true);
+	const { deleteRequestById } = becomeChefRequestStore((state) => state);
+
+	const handleDeleleRequest = () => {
+		showToast("info", "Deleting the request...");
+		setTimeout(async () => {
+			const response = await deleteRequestById("6c574c58-af7c-4e61-9a3d-4ceae16ad23f");
+			showToast(response.isSuccess ? "success" : "error", response.message!);
+		}, 1000);
+	};
 	return (
 		<>
-			{isHaveRequest ? (
+			{!isHaveRequest ? (
 				<Result
 					icon={
 						<CloseCircleOutlined
@@ -56,7 +87,7 @@ export default function ProfileBecomeChefPage() {
 						Chef Application Form
 					</Typography.Title>
 					<div className="flex flex-col sm:flex-row">
-						<Col span={5} xs={24} md={5}>
+						<Col span={6} xs={24} md={6}>
 							<Typography.Title level={5}>
 								<Typography.Text style={{ color: "red" }}>*</Typography.Text> Identity Image
 							</Typography.Title>
@@ -79,7 +110,7 @@ export default function ProfileBecomeChefPage() {
 								))}
 							</div>
 						</Col>
-						<Col span={15} xs={24} md={{ span: 15, offset: 2 }}>
+						<Col span={16} xs={24} md={{ span: 16, offset: 2 }}>
 							<div className="mt-3 space-y-3">
 								<Row className="space-y-3 text-center sm:space-y-0">
 									<Col span={11} xs={24} md={11}>
@@ -185,6 +216,17 @@ export default function ProfileBecomeChefPage() {
 								</Row>
 							</div>
 						</Col>
+					</div>
+					<div className="text-end">
+						<Button
+							className="rounded-md text-white"
+							style={{
+								backgroundColor: AppColor.deepOrangeColor,
+							}}
+							onClick={() => showDeleteConfirm(handleDeleleRequest)}
+						>
+							Delete the request
+						</Button>
 					</div>
 				</div>
 			)}
