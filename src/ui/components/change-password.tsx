@@ -11,12 +11,6 @@ import userStore from "@/zustand/user.store";
 import { useLoadingStore } from "@/zustand/loading.store";
 import { useNavigate } from "react-router-dom";
 
-// interface ChangePasswordFormValues {
-// 	currentPassword: string;
-// 	newPassword: string;
-// 	confirmPassword: string;
-// }
-
 const changePasswordSchema = Yup.object().shape({
 	currentPassword: Yup.string().required("Current password is required"),
 	newPassword: Yup.string()

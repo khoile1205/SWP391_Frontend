@@ -1,8 +1,9 @@
 import { User } from "@/models/user.model";
 import { Roles } from "@/types/user";
+import ForbiddenPage from "@/ui/pages/forbidden.page";
 import userStore from "@/zustand/user.store";
 import { useEffect, useState } from "react";
-import { Navigate, RouteProps } from "react-router-dom";
+import { RouteProps } from "react-router-dom";
 
 type RBACRoutesProps = {
 	children: JSX.Element;
@@ -11,13 +12,14 @@ type RBACRoutesProps = {
 
 const RBACRoutes: React.FC<RBACRoutesProps> = ({ children, allowedRoles }) => {
 	const { user, loading } = useUserData();
+
 	const isAllowedToAccess = useAccessControl(allowedRoles, user);
 
 	if (loading) {
 		// You might want to render a loading spinner or placeholder here
 		return <p>Loading...</p>;
 	}
-	return isAllowedToAccess ? children : <Navigate to={user ? "/sign-in" : "/"} />;
+	return isAllowedToAccess ? children : <ForbiddenPage></ForbiddenPage>;
 };
 
 // Access control logic with dependency injection

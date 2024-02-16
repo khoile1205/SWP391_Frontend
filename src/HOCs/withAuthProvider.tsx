@@ -6,7 +6,6 @@ import { useUserAuthentication } from "@/hooks/useUserAuthentication";
 export function withAuthProvider(WrappedComponent: ComponentType) {
 	const AuthProvider: FunctionComponent = (props) => {
 		useUserAuthentication();
-
 		return (
 			<>
 				<ToastContainer

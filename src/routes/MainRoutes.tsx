@@ -1,6 +1,6 @@
+import ProtectedRoutes from "@/HOCs/ProtectedRoutes";
 import { Loadable } from "@/ui/components/Loadable";
 import { HomePage } from "@/ui/pages/home.page";
-import ViewCreatedReportsPage from "@/ui/pages/view.created.reports.page";
 import { lazy } from "react";
 import { RouteObject } from "react-router-dom";
 
@@ -17,7 +17,7 @@ const VerifyEmailPage = Loadable(lazy(() => import("@/ui/pages/verify-email.page
 
 // redner - reset password
 const ResetPasswordPage = Loadable(lazy(() => import("@/ui/pages/reset.password.page")));
-const ChangePasswordPage = Loadable(lazy(() => import("@/ui/pages/change.password.page")));
+const NotFoundPage = Loadable(lazy(() => import("@/ui/pages/not-found.page")));
 
 const MainRoutes: RouteObject[] = [
 	{
@@ -31,30 +31,34 @@ const MainRoutes: RouteObject[] = [
 				path: "reset-password",
 				element: <ResetPasswordPage></ResetPasswordPage>,
 			},
-			{
-				path: "change-password",
-				element: <ChangePasswordPage></ChangePasswordPage>,
-			},
 		],
 	},
 	{
 		path: "/sign-in",
-		element: <SignInPage></SignInPage>,
+		element: (
+			<ProtectedRoutes>
+				<SignInPage></SignInPage>
+			</ProtectedRoutes>
+		),
 	},
 	{
 		path: "/sign-up",
-		element: <SignUpPage></SignUpPage>,
+		element: (
+			<ProtectedRoutes>
+				<SignUpPage></SignUpPage>
+			</ProtectedRoutes>
+		),
 	},
 	{
 		path: "/verify-email",
-		element: <VerifyEmailPage></VerifyEmailPage>,
+		element: (
+			<ProtectedRoutes>
+				<VerifyEmailPage></VerifyEmailPage>
+			</ProtectedRoutes>
+		),
 	},
 	{
-		path: "/view-created-reports",
-		element: <ViewCreatedReportsPage></ViewCreatedReportsPage>,
-	},
-	{
-		path: "/posts",
+		path: "/recipes",
 		children: [
 			{
 				path: "",
@@ -65,6 +69,10 @@ const MainRoutes: RouteObject[] = [
 				element: <PostDetailPage></PostDetailPage>,
 			},
 		],
+	},
+	{
+		path: "*",
+		element: <NotFoundPage></NotFoundPage>,
 	},
 ];
 

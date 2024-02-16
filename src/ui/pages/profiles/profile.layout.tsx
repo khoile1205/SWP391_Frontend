@@ -1,34 +1,79 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { Tabs } from "antd";
 import { useNavigate, Outlet } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import { Roles } from "@/types/user";
+import userStore from "@/zustand/user.store";
 
 const { TabPane } = Tabs;
 
-export const ProfileLayout: React.FC = () => {
+const profileTabs = [
+	{
+		tab: "Profile",
+		key: "",
+		role: [Roles.USER, Roles.CHEF],
+	},
+	{
+		tab: "Change Password",
+		key: "change-password",
+		role: [Roles.USER, Roles.CHEF],
+	},
+	{
+		tab: "Reports",
+		key: "reports",
+		role: [Roles.USER, Roles.CHEF],
+	},
+	{
+		tab: "Transaction",
+		key: "transactions",
+		role: [Roles.USER, Roles.CHEF],
+	},
+	{
+		tab: "Booking",
+		key: "bookings",
+		role: [Roles.USER],
+	},
+	{
+		tab: "Become-Chef Request",
+		key: "requests",
+		role: [Roles.USER],
+	},
+	{
+		tab: "Schedules",
+		key: "schedules",
+		role: [Roles.CHEF],
+	},
+];
+
+const ProfileLayout: React.FC = () => {
+	const { user } = userStore((state) => state);
 	const navigate = useNavigate();
 	const location = useLocation();
 
 	const currentTab = location.pathname.split("/").pop();
 
 	// Handle tab change
-	const handleChange = (key: string) => {
-		navigate(`/profile/${key}`);
-	};
+	const handleChange = useCallback(
+		(key: string) => {
+			navigate(`/profile/${key}`);
+		},
+		[navigate]
+	);
+
+	const filteredTabs = useMemo(
+		() => profileTabs.filter((tab) => tab.role.includes(user?.role ?? Roles.USER)),
+		[user?.role]
+	);
 
 	return (
 		<Tabs activeKey={currentTab} className="px-4 sm:px-0" onChange={handleChange}>
-			<TabPane tab="Profile" key="">
-				<Outlet />
-			</TabPane>
-			<TabPane tab="Change Password" key="change-password">
-				<Outlet />
-				{/* Your ChangePasswordPage component goes here */}
-			</TabPane>
-			<TabPane tab="View Report" key="reports">
-				<Outlet />
-				{/* Your ViewReportPage component goes here */}
-			</TabPane>
+			{filteredTabs.map((tab) => (
+				<TabPane tab={tab.tab} key={tab.key}>
+					<Outlet></Outlet>
+				</TabPane>
+			))}
 		</Tabs>
 	);
 };
+
+export const MemoizedProfileLayout = React.memo(ProfileLayout);
