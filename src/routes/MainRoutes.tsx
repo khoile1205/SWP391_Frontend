@@ -19,6 +19,9 @@ const VerifyEmailPage = Loadable(lazy(() => import("@/ui/pages/verify-email.page
 const ResetPasswordPage = Loadable(lazy(() => import("@/ui/pages/reset.password.page")));
 const NotFoundPage = Loadable(lazy(() => import("@/ui/pages/not-found.page")));
 
+// redner - reset password
+const ViewDetailRecipePage = Loadable(lazy(() => import("@/ui/pages/view.detail.recipe.page")));
+
 const MainRoutes: RouteObject[] = [
 	{
 		path: "/",
@@ -56,6 +59,10 @@ const MainRoutes: RouteObject[] = [
 				<VerifyEmailPage></VerifyEmailPage>
 			</ProtectedRoutes>
 		),
+	},
+	{
+		path: "/view-detail-recipe",
+		element: <ViewDetailRecipePage></ViewDetailRecipePage>,
 	},
 	{
 		path: "/recipes",
