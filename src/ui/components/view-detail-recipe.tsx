@@ -14,7 +14,7 @@ import moment from "moment";
 import Pasta from "@/assets/Icon/pasta.jpg";
 import AppColor from "@/utils/appColor";
 import { CommentSection } from "../section/Comment";
-
+import { ShareRecipeModal } from ".";
 type CommentItem = {
 	author: string;
 	avatar: JSX.Element;
@@ -41,6 +41,7 @@ const RecipeDetailPage: React.FC = () => {
 	const [bookmarked, setBookmarked] = useState(false);
 	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 	const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>(Array(7).fill(false));
+	const [shareModalVisible, setShareModalVisible] = useState(false);
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -105,51 +106,35 @@ const RecipeDetailPage: React.FC = () => {
 				color: "#333",
 			}}
 		>
-			<Flex justify="space-between">
-				<Flex align="center" justify="space-between">
-					<div className="text-start">
-						<Typography.Title className={"mb-10 font-playfair !text-5xl"}>
-							Strawberry Cream Cheesecake
-						</Typography.Title>
-						<Flex align="center" className="mb-4">
-							<div className="mr-5 flex items-center">
-								<Col xs={12} md={7}>
-									<Avatar
-										size={"default"}
-										icon={<UserOutlined />}
-										style={{ marginRight: "10px" }}
-									/>
-									<Typography.Text strong className="me-5">
-										John Doe
-									</Typography.Text>
-									<Divider type="vertical" style={{ height: "20px", marginRight: "10px" }} />
-								</Col>
-								<Col xs={12} md={8}>
-									<CalendarOutlined className={"me-2 text-xl"} />
-									<Typography.Text strong className="me-5">
-										{moment(new Date()).format("ll")}
-									</Typography.Text>
-									<Divider type="vertical" style={{ height: "20px", marginRight: "10px" }} />
-								</Col>
-								<Col xs={7} md={4}>
-									<CommentOutlined className={"me-2 text-xl"} />
-									<Typography.Text strong className="me-5">
-										{comments.length}
-									</Typography.Text>
-									<Divider type="vertical" style={{ height: "20px", marginRight: "10px" }} />
-								</Col>
-								<Col xs={0} md={8}>
-									<Rate
-										disabled
-										allowHalf
-										defaultValue={4.5}
-										style={{ color: AppColor.deepOrangeColor }}
-									/>
-								</Col>
-							</div>
-						</Flex>
-						<Flex align="center" className="mb-4 flex sm:hidden">
-							<Col span={8} xs={24} md={8}>
+			<Flex align="center" justify="space-between">
+				<div className="text-start">
+					<Typography.Title className={"mb-10 font-playfair !text-5xl"}>
+						Strawberry Cream Cheesecake
+					</Typography.Title>
+					<Flex align="center" className="mb-4">
+						<div className="mr-5 flex items-center">
+							<Col xs={12} md={7}>
+								<Avatar size={"default"} icon={<UserOutlined />} style={{ marginRight: "10px" }} />
+								<Typography.Text strong className="me-5">
+									John Doe
+								</Typography.Text>
+								<Divider type="vertical" style={{ height: "20px", marginRight: "10px" }} />
+							</Col>
+							<Col xs={12} md={8}>
+								<CalendarOutlined className={"me-2 text-xl"} />
+								<Typography.Text strong className="me-5">
+									{moment(new Date()).format("ll")}
+								</Typography.Text>
+								<Divider type="vertical" style={{ height: "20px", marginRight: "10px" }} />
+							</Col>
+							<Col xs={7} md={4}>
+								<CommentOutlined className={"me-2 text-xl"} />
+								<Typography.Text strong className="me-5">
+									{comments.length}
+								</Typography.Text>
+								<Divider type="vertical" style={{ height: "20px", marginRight: "10px" }} />
+							</Col>
+							<Col xs={0} md={8}>
 								<Rate
 									disabled
 									allowHalf
@@ -157,16 +142,26 @@ const RecipeDetailPage: React.FC = () => {
 									style={{ color: AppColor.deepOrangeColor }}
 								/>
 							</Col>
-						</Flex>
-					</div>
-				</Flex>
-
+						</div>
+					</Flex>
+					<Flex align="center" className="mb-4 flex sm:hidden">
+						<Col span={8} xs={24} md={8}>
+							<Rate
+								disabled
+								allowHalf
+								defaultValue={4.5}
+								style={{ color: AppColor.deepOrangeColor }}
+							/>
+						</Col>
+					</Flex>
+				</div>
 				<div>
 					<Tooltip title="Share">
 						<Button
 							type="text"
 							icon={<ShareAltOutlined className="!text-xl" />}
 							style={{ marginRight: "10px" }}
+							onClick={() => setShareModalVisible(true)}
 						/>
 					</Tooltip>
 					<Tooltip title={bookmarked ? "Unbookmark" : "Bookmark"}>
@@ -175,7 +170,7 @@ const RecipeDetailPage: React.FC = () => {
 							icon={
 								<BookOutlined
 									className="!text-xl"
-									style={{ color: bookmarked ? AppColor.yellowColor : "#000" }}
+									style={{ fontSize: "36px", color: bookmarked ? "#1890ff" : "#000" }}
 								/>
 							}
 							onClick={handleBookmarkClick}
@@ -183,7 +178,6 @@ const RecipeDetailPage: React.FC = () => {
 					</Tooltip>
 				</div>
 			</Flex>
-
 			<Typography.Paragraph className="font-inter text-lg">
 				One thing I learned living in the Canarsie section of Brooklyn, NY was how to cook a good
 				Italian meal. Here is a recipe I created after having this dish in a restaurant. Enjoy!.
@@ -285,6 +279,11 @@ const RecipeDetailPage: React.FC = () => {
 			<Typography.Title level={1} className={"mb-10 font-playfair"}>
 				You might also like
 			</Typography.Title>
+
+			<ShareRecipeModal
+				shareModalVisible={shareModalVisible}
+				setShareModalVisible={setShareModalVisible}
+			/>
 		</div>
 	);
 };
