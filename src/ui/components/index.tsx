@@ -4,3 +4,4 @@ export * from "./CategoryCard";
 export * from "./Footer";
 export * from "./IconText";
 export * from "./SocialShareButton";
+export * from "./ShareRecipeModal";

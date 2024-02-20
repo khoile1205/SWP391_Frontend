@@ -1,17 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-	Avatar,
-	Divider,
-	Button,
-	List,
-	Tooltip,
-	message,
-	Rate,
-	Modal,
-	Typography,
-	Flex,
-	Col,
-} from "antd";
+import { Avatar, Divider, Button, List, Tooltip, message, Rate, Typography, Flex, Col } from "antd";
 import {
 	UserOutlined,
 	CalendarOutlined,
@@ -26,7 +14,7 @@ import moment from "moment";
 import Pasta from "@/assets/Icon/pasta.jpg";
 import AppColor from "@/utils/appColor";
 import { CommentSection } from "../section/Comment";
-import { SocialShareButton } from ".";
+import { ShareRecipeModal } from ".";
 type CommentItem = {
 	author: string;
 	avatar: JSX.Element;
@@ -292,23 +280,10 @@ const RecipeDetailPage: React.FC = () => {
 				You might also like
 			</Typography.Title>
 
-			<Modal
-				title="Share Recipe"
-				open={shareModalVisible}
-				onCancel={() => setShareModalVisible(false)}
-				footer={null}
-			>
-				<div className="flex space-x-8">
-					<SocialShareButton
-						platform="Facebook"
-						url={`${import.meta.env.VITE_URL}${window.location.pathname}`}
-					></SocialShareButton>
-					<SocialShareButton
-						platform="Twitter"
-						url={`${import.meta.env.VITE_URL}${window.location.pathname}`}
-					></SocialShareButton>
-				</div>
-			</Modal>
+			<ShareRecipeModal
+				shareModalVisible={shareModalVisible}
+				setShareModalVisible={setShareModalVisible}
+			/>
 		</div>
 	);
 };
