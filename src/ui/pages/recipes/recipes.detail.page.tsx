@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Avatar, Divider, Button, List, Tooltip, message, Rate, Typography, Flex, Col } from "antd";
 import {
 	UserOutlined,
@@ -13,8 +13,14 @@ import {
 import moment from "moment";
 import Pasta from "@/assets/Icon/pasta.jpg";
 import AppColor from "@/utils/appColor";
-import { CommentSection } from "../section/Comment";
-import { ShareRecipeModal } from ".";
+import { ShareRecipeModal } from "@/ui/components";
+import { CommentSection } from "@/ui/section";
+import { useGetRecipeById } from "@/hooks/useGetRecipeById";
+import { useParams } from "react-router-dom";
+import NotFound from "../not-found.page";
+import { recipeStore } from "@/zustand/recipe.store";
+import { showToast } from "@/utils/notify";
+import { useRecipeBookmark } from "@/hooks/useRecipeBookmark";
 type CommentItem = {
 	author: string;
 	avatar: JSX.Element;
@@ -23,26 +29,17 @@ type CommentItem = {
 	likes: number;
 	replying?: boolean;
 };
-
-interface RecipeDetail {
-	title: string;
-	username: string;
-	date: string;
-	commentCount: number;
-	introduction: string;
-	imageOrVideoUrl: string;
-	ingredients: string[];
-	instructions: string[];
-	prepTime: string;
-	servings: number;
-}
-const RecipeDetailPage: React.FC = () => {
+export default function RecipeDetailPage() {
+	// States
 	const [comments, setComments] = useState<CommentItem[]>([]);
-	const [bookmarked, setBookmarked] = useState(false);
 	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-	const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>(Array(7).fill(false));
 	const [shareModalVisible, setShareModalVisible] = useState(false);
+	const { saveFavoriteRecipe, removeFavoriteRecipe } = recipeStore((state) => state);
 
+	// Hooks
+	const { recipeId } = useParams();
+	const { recipe, checkedIngredients, setCheckedIngredients } = useGetRecipeById(recipeId);
+	const { bookmarked, setBookmarked } = useRecipeBookmark(recipeId);
 	useEffect(() => {
 		const handleResize = () => {
 			setIsMobile(window.innerWidth <= 768);
@@ -54,41 +51,34 @@ const RecipeDetailPage: React.FC = () => {
 	}, []);
 
 	useEffect(() => {
-		const recipeDetail: RecipeDetail = {
-			title: "Delicious Pasta",
-			username: "John Doe",
-			date: "February 7, 2024",
-			commentCount: 20, // Increased comment count for demonstration
-			introduction: "This pasta recipe is easy to make and full of flavor.",
-			imageOrVideoUrl: Pasta,
-			ingredients: ["Pasta", "Tomatoes", "Basil", "Olive Oil", "Garlic", "Salt", "Pepper"],
-			instructions: [
-				"Boil pasta until al dente",
-				"Sauté garlic in olive oil",
-				"Add chopped tomatoes and basil",
-				"Combine with cooked pasta",
-				"Season with salt and pepper",
-			],
-			prepTime: "20 minutes",
-			servings: 4,
-		};
-
-		const initialComments: CommentItem[] = Array.from(
-			{ length: recipeDetail.commentCount },
-			(_, index) => ({
-				author: "User " + (index + 1),
-				avatar: <Avatar icon={<UserOutlined />} size={32} />,
-				content: <p>This is a comment on the recipe.</p>,
-				datetime: moment().subtract(index, "days").toDate(),
-				likes: 0,
-			})
-		);
+		const initialComments: CommentItem[] = Array.from({ length: 21 }, (_, index) => ({
+			author: "User " + (index + 1),
+			avatar: <Avatar icon={<UserOutlined />} size={32} />,
+			content: <p>This is a comment on the recipe.</p>,
+			datetime: moment().subtract(index, "days").toDate(),
+			likes: 0,
+		}));
 		setComments(initialComments);
 	}, []);
 
-	const handleBookmarkClick = () => {
+	// Controller
+	const handleBookmarkClick = async () => {
 		setBookmarked(!bookmarked);
-		message.info(`Recipe ${bookmarked ? "unbookmarked" : "bookmarked"}`);
+		if (!bookmarked) {
+			const response = await saveFavoriteRecipe(recipeId!);
+			if (!response.isSuccess) {
+				message.error(response.message);
+				return;
+			}
+		} else {
+			// Remove from favorite
+			const response = await removeFavoriteRecipe(recipeId!);
+			if (!response.isSuccess) {
+				message.error(response.message);
+				return;
+			}
+		}
+		showToast("success", `Recipe ${bookmarked ? "unbookmarked" : "bookmarked"}`);
 	};
 
 	const handleIngredientToggle = (index: number) => {
@@ -97,7 +87,7 @@ const RecipeDetailPage: React.FC = () => {
 		setCheckedIngredients(newCheckedIngredients);
 	};
 
-	return (
+	return recipe ? (
 		<div
 			style={{
 				...(isMobile ? { maxWidth: "none" } : {}),
@@ -106,24 +96,24 @@ const RecipeDetailPage: React.FC = () => {
 				color: "#333",
 			}}
 		>
-			<Flex align="center" justify="space-between">
+			<Flex align="start" justify="space-between">
 				<div className="text-start">
 					<Typography.Title className={"mb-10 font-playfair !text-5xl"}>
-						Strawberry Cream Cheesecake
+						{recipe.title}
 					</Typography.Title>
 					<Flex align="center" className="mb-4">
 						<div className="mr-5 flex items-center">
 							<Col xs={12} md={7}>
 								<Avatar size={"default"} icon={<UserOutlined />} style={{ marginRight: "10px" }} />
-								<Typography.Text strong className="me-5">
-									John Doe
+								<Typography.Text strong className="me-5 truncate">
+									{recipe.user.firstName + " " + recipe.user.lastName}
 								</Typography.Text>
 								<Divider type="vertical" style={{ height: "20px", marginRight: "10px" }} />
 							</Col>
-							<Col xs={12} md={8}>
+							<Col xs={13} md={8}>
 								<CalendarOutlined className={"me-2 text-xl"} />
 								<Typography.Text strong className="me-5">
-									{moment(new Date()).format("ll")}
+									{moment(recipe.createdAt).format("ll")}
 								</Typography.Text>
 								<Divider type="vertical" style={{ height: "20px", marginRight: "10px" }} />
 							</Col>
@@ -138,7 +128,7 @@ const RecipeDetailPage: React.FC = () => {
 								<Rate
 									disabled
 									allowHalf
-									defaultValue={4.5}
+									defaultValue={recipe.ratings}
 									style={{ color: AppColor.deepOrangeColor }}
 								/>
 							</Col>
@@ -155,12 +145,11 @@ const RecipeDetailPage: React.FC = () => {
 						</Col>
 					</Flex>
 				</div>
-				<div>
+				<div className="space-y-3 sm:space-x-4">
 					<Tooltip title="Share">
 						<Button
 							type="text"
 							icon={<ShareAltOutlined className="!text-xl" />}
-							style={{ marginRight: "10px" }}
 							onClick={() => setShareModalVisible(true)}
 						/>
 					</Tooltip>
@@ -170,7 +159,10 @@ const RecipeDetailPage: React.FC = () => {
 							icon={
 								<BookOutlined
 									className="!text-xl"
-									style={{ fontSize: "36px", color: bookmarked ? "#1890ff" : "#000" }}
+									style={{
+										fontSize: "36px",
+										color: bookmarked ? AppColor.deepOrangeColor : "#000",
+									}}
 								/>
 							}
 							onClick={handleBookmarkClick}
@@ -179,11 +171,10 @@ const RecipeDetailPage: React.FC = () => {
 				</div>
 			</Flex>
 			<Typography.Paragraph className="font-inter text-lg">
-				One thing I learned living in the Canarsie section of Brooklyn, NY was how to cook a good
-				Italian meal. Here is a recipe I created after having this dish in a restaurant. Enjoy!.
+				{recipe.description}
 			</Typography.Paragraph>
 			<img
-				src={Pasta}
+				src={recipe.thumbnailUrl ?? Pasta}
 				alt="Recipe"
 				className="rounded-xl"
 				style={{
@@ -200,14 +191,14 @@ const RecipeDetailPage: React.FC = () => {
 							style={{ marginRight: "10px", fontSize: "24px", marginTop: "30px" }}
 						/>
 						<Typography.Text strong className="me-5">
-							Prep Time: 20 minutes
+							Prep Time: {recipe.cookingTime} minutes
 						</Typography.Text>
 						<Divider type="vertical" style={{ height: "20px", marginRight: "10px" }} />
 					</Col>
 					<Col span={10}>
 						<TeamOutlined style={{ marginRight: "10px", fontSize: "24px", marginTop: "30px" }} />
 						<Typography.Text strong className="me-5">
-							Servings: 4
+							Servings: {recipe.portion}
 						</Typography.Text>
 						<Divider type="vertical" style={{ height: "20px", marginRight: "10px" }} />
 					</Col>
@@ -220,27 +211,25 @@ const RecipeDetailPage: React.FC = () => {
 						Ingredients
 					</Typography.Title>
 					<ul className="space-y-5">
-						{["Pasta", "Tomatoes", "Basil", "Olive Oil", "Garlic", "Salt", "Pepper"].map(
-							(ingredient, index) => (
-								<List.Item className="ms-5 flex items-center" key={index}>
-									<div
-										className="me-5 flex h-6 w-6 items-center justify-center rounded-full hover:cursor-pointer"
-										style={{
-											border: `2px solid ${checkedIngredients[index] ? AppColor.deepOrangeColor : "black"}`,
-											background: checkedIngredients[index] ? "white" : "none",
-										}}
-										onClick={() => handleIngredientToggle(index)}
-									>
-										{checkedIngredients[index] && <CheckOutlined style={{ color: "orange" }} />}
-									</div>
-									<Typography.Text
-										className={`font-inter text-lg font-medium ${checkedIngredients[index] ? "text-gray-500 line-through" : "none"}`}
-									>
-										{ingredient}
-									</Typography.Text>
-								</List.Item>
-							)
-						)}
+						{recipe.ingredients.map((ingredient, index) => (
+							<List.Item className="ms-5 flex items-center" key={index}>
+								<div
+									className="me-5 flex h-6 w-6 items-center justify-center rounded-full hover:cursor-pointer"
+									style={{
+										border: `2px solid ${checkedIngredients[index] ? AppColor.deepOrangeColor : "black"}`,
+										background: checkedIngredients[index] ? "white" : "none",
+									}}
+									onClick={() => handleIngredientToggle(index)}
+								>
+									{checkedIngredients[index] && <CheckOutlined style={{ color: "orange" }} />}
+								</div>
+								<Typography.Text
+									className={`font-inter text-lg font-medium ${checkedIngredients[index] ? "text-gray-500 line-through" : "none"}`}
+								>
+									{ingredient.name + " " + ingredient.amount}
+								</Typography.Text>
+							</List.Item>
+						))}
 					</ul>
 				</div>
 				<div className="basis-3/5">
@@ -248,13 +237,7 @@ const RecipeDetailPage: React.FC = () => {
 						Instructions
 					</Typography.Title>
 					<ol style={{ paddingLeft: "20px", fontSize: "20px", fontFamily: "Arial, sans-serif" }}>
-						{[
-							"Boil pasta until al dente",
-							"Sauté garlic in olive oil",
-							"Add chopped tomatoes and basil",
-							"Combine with cooked pasta",
-							"Season with salt and pepper",
-						].map((step, index) => (
+						{recipe.instructors.map((instructor, index) => (
 							<li key={index} style={{ marginBottom: "25px" }}>
 								<Typography.Text
 									className={`text-md me-3 rounded-full px-2 py-1 font-inter font-medium text-white`}
@@ -263,7 +246,7 @@ const RecipeDetailPage: React.FC = () => {
 									{index + 1}
 								</Typography.Text>
 								<Typography.Text className={`font-inter text-lg font-medium`}>
-									{step}
+									{instructor.description}
 								</Typography.Text>
 							</li>
 						))}
@@ -283,9 +266,10 @@ const RecipeDetailPage: React.FC = () => {
 			<ShareRecipeModal
 				shareModalVisible={shareModalVisible}
 				setShareModalVisible={setShareModalVisible}
+				url={`${import.meta.env.VITE_URL}${window.location.pathname}`}
 			/>
 		</div>
+	) : (
+		<NotFound></NotFound>
 	);
-};
-
-export default RecipeDetailPage;
+}

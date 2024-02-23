@@ -23,3 +23,10 @@ export type UpdateUserInformationType = {
 	address: string;
 	avatarUrl: string;
 };
+
+export type ShortInfoUser = {
+	id: string;
+	firstName: string;
+	lastName: string;
+	avatarUrl: string;
+};

@@ -1,6 +1,7 @@
 import ProtectedRoutes from "@/HOCs/ProtectedRoutes";
 import { Loadable } from "@/ui/components/Loadable";
 import { HomePage } from "@/ui/pages/home.page";
+import CreateRecipePage from "@/ui/pages/recipes/recipes.create.page";
 import { lazy } from "react";
 import { RouteObject } from "react-router-dom";
 
@@ -9,8 +10,8 @@ const SignInPage = Loadable(lazy(() => import("@/ui/pages/sign-in.page")));
 const SignUpPage = Loadable(lazy(() => import("@/ui/pages/sign-up.page")));
 
 // render - Post loadable
-const PostPage = Loadable(lazy(() => import("@/ui/pages/posts.page")));
-const PostDetailPage = Loadable(lazy(() => import("@/ui/pages/post.detail.page")));
+const RecipePage = Loadable(lazy(() => import("@/ui/pages/recipes/recipes.page")));
+const RecipeDetailPage = Loadable(lazy(() => import("@/ui/pages/recipes/recipes.detail.page")));
 
 // render - email verification
 const VerifyEmailPage = Loadable(lazy(() => import("@/ui/pages/verify-email.page")));
@@ -18,9 +19,6 @@ const VerifyEmailPage = Loadable(lazy(() => import("@/ui/pages/verify-email.page
 // redner - reset password
 const ResetPasswordPage = Loadable(lazy(() => import("@/ui/pages/reset.password.page")));
 const NotFoundPage = Loadable(lazy(() => import("@/ui/pages/not-found.page")));
-
-// redner - reset password
-const ViewDetailRecipePage = Loadable(lazy(() => import("@/ui/pages/view.detail.recipe.page")));
 
 const MainRoutes: RouteObject[] = [
 	{
@@ -61,19 +59,19 @@ const MainRoutes: RouteObject[] = [
 		),
 	},
 	{
-		path: "/view-detail-recipe",
-		element: <ViewDetailRecipePage></ViewDetailRecipePage>,
-	},
-	{
-		path: "/recipes",
+		path: "recipes",
 		children: [
 			{
 				path: "",
-				element: <PostPage></PostPage>,
+				element: <RecipePage></RecipePage>,
 			},
 			{
-				path: ":id",
-				element: <PostDetailPage></PostDetailPage>,
+				path: "create",
+				element: <CreateRecipePage></CreateRecipePage>,
+			},
+			{
+				path: ":recipeId",
+				element: <RecipeDetailPage></RecipeDetailPage>,
 			},
 		],
 	},

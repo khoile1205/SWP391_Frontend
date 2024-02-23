@@ -30,4 +30,7 @@ export default class AppString {
 	static readonly deleteRequestSuccessMessage = "Request deleted successfully";
 	static readonly getRequestSuccessMeesage = "Request retrieved successfully";
 	static readonly updateRequestSuccessMessage = "Request updated successfully";
+	static readonly createRecipeSuccessMessage = "Recipe created successfully";
+	static readonly getRecipeSuccessMessage = "Recipe retrieved successfully";
+	static readonly updateRecipeSuccessMessage = "Recipe updated successfully";
 }

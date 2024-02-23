@@ -1,19 +1,19 @@
-import { useCategories } from "@/hooks/useCategories";
 import { BecomeChefRequest } from "@/models/become-chef-request.model";
+import { UploadButton } from "@/ui/components";
 import AppColor from "@/utils/appColor";
 import { handleBeforeUploadFile } from "@/utils/file_exts";
 import { showToast } from "@/utils/notify";
 import { generateRandomString } from "@/utils/string.extension";
 import { becomeChefRequestStore } from "@/zustand/become-chef-request";
+import { categoriesStore } from "@/zustand/category.store";
 import fileStore from "@/zustand/file.store";
-import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import { Col, DatePicker, Form, Input, Modal, Row, Select, Typography, UploadFile } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import Upload, { RcFile, UploadChangeParam } from "antd/es/upload";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import * as Yup from "yup";
 
 dayjs.extend(customParseFormat);
@@ -59,7 +59,7 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 
 	const { uploadImage } = fileStore((state) => state);
 	const { createBecomeChefRequest, updateRequestById } = becomeChefRequestStore((state) => state);
-	const { categories } = useCategories();
+	const { categories } = categoriesStore((state) => state);
 
 	const formik = useFormik({
 		initialValues: {
@@ -135,12 +135,6 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 			}
 		}, 1000);
 	};
-	const UploadButton = React.memo(({ loading }: { loading?: boolean }) => (
-		<div>
-			{loading ? <LoadingOutlined /> : <PlusOutlined />}
-			<div style={{ marginTop: 8 }}>Upload</div>
-		</div>
-	));
 	return (
 		<Modal
 			width={1000}

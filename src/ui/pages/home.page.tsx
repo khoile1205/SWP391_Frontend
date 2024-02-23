@@ -1,31 +1,37 @@
 import { Typography } from "antd";
-import { CategoryCard, PostCard } from "../components";
-import { POSTS } from "@/assets/data/posts";
-import { useCategories } from "@/hooks/useCategories";
 import { useLoadingStore } from "@/zustand/loading.store";
+import { CategoryCard, RecipeCard } from "../components";
+import { categoriesStore } from "@/zustand/category.store";
+import { useGetAllRecipes } from "@/hooks/useGetAllRecipes";
+import { pickRandomElements } from "@/utils/array_exts";
 
 export function HomePage() {
-	const { categories } = useCategories();
+	const { categories } = categoriesStore((state) => state);
 	const { isLoading } = useLoadingStore((state) => state);
+	const { recipes } = useGetAllRecipes();
 	return (
 		<div className="mt-10">
 			<div className="">
 				<Typography.Title level={2}>Special Recipes</Typography.Title>
 				<div className="md:grid md:grid-cols-3 md:gap-4">
-					{POSTS.slice(0, 3).map((post) => (
-						<PostCard key={post.id} post={post} />
+					{pickRandomElements(recipes, 3).map((recipe) => (
+						<RecipeCard key={recipe.id} recipe={recipe} />
 					))}
 				</div>
 			</div>
 
-			<div className="mt-3">
-				<Typography.Title level={2}>Special Recipes</Typography.Title>
-				<div className="md:grid md:grid-cols-3 md:gap-4">
-					{POSTS.slice(3, 6).map((post) => (
-						<PostCard key={post.id} post={post} />
-					))}
+			{/* {pickRandomElements(categories, 3).map((category) => (
+				<div className="mt-3">
+					<Typography.Title level={2} className="capitalize">
+						With {category.name}
+					</Typography.Title>
+					<div className="md:grid md:grid-cols-3 md:gap-4">
+						{RECIPES.slice(3, 6).map((recipe) => (
+							<RecipeCard key={recipe.id} recipe={recipe} />
+						))}
+					</div>
 				</div>
-			</div>
+			))} */}
 
 			<div className="mt-3">
 				<Typography.Title level={2} className="mb-3">

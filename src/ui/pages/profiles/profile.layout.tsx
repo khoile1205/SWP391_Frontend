@@ -14,6 +14,11 @@ const profileTabs = [
 		role: [Roles.USER, Roles.CHEF],
 	},
 	{
+		tab: "Recipes",
+		key: "recipes",
+		role: [Roles.USER, Roles.CHEF],
+	},
+	{
 		tab: "Change Password",
 		key: "change-password",
 		role: [Roles.USER, Roles.CHEF],
@@ -50,7 +55,7 @@ const ProfileLayout: React.FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 
-	const currentTab = location.pathname.split("/").pop();
+	const currentTab = location.pathname.split("/")[2];
 
 	// Handle tab change
 	const handleChange = useCallback(
@@ -66,7 +71,7 @@ const ProfileLayout: React.FC = () => {
 	);
 
 	return (
-		<Tabs activeKey={currentTab} className="px-4 sm:px-0" onChange={handleChange}>
+		<Tabs activeKey={currentTab} onChange={handleChange}>
 			{filteredTabs.map((tab) => (
 				<TabPane tab={tab.tab} key={tab.key}>
 					<Outlet></Outlet>
