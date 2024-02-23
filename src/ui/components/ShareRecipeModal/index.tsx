@@ -5,11 +5,13 @@ import { SocialShareButton } from "..";
 interface ShareRecipeModalProps {
 	shareModalVisible: boolean;
 	setShareModalVisible: (visible: boolean) => void;
+	url: string;
 }
 
 export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
 	shareModalVisible,
 	setShareModalVisible,
+	url,
 }) => {
 	return (
 		<Modal
@@ -19,14 +21,8 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
 			footer={null}
 		>
 			<div className="flex space-x-8">
-				<SocialShareButton
-					platform="Facebook"
-					url={`${import.meta.env.VITE_URL}${window.location.pathname}`}
-				></SocialShareButton>
-				<SocialShareButton
-					platform="Twitter"
-					url={`${import.meta.env.VITE_URL}${window.location.pathname}`}
-				></SocialShareButton>
+				<SocialShareButton platform="Facebook" url={url}></SocialShareButton>
+				<SocialShareButton platform="Twitter" url={url}></SocialShareButton>
 			</div>
 		</Modal>
 	);

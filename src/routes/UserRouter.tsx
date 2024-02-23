@@ -23,6 +23,9 @@ const BookingHistoryPage = Loadable(
 const SchedulesPage = Loadable(
 	lazy(() => import("@/ui/pages/profiles/schedules/profile.schedules.page"))
 );
+const CreateRecipePage = Loadable(lazy(() => import("@/ui/pages/recipes/recipes.create.page")));
+const RecipesPage = Loadable(lazy(() => import("@/ui/pages/profiles/recipes/profile.recipes")));
+
 const UserRoutes: RouteObject[] = [
 	{
 		path: "/profile",
@@ -83,6 +86,20 @@ const UserRoutes: RouteObject[] = [
 						<SchedulesPage></SchedulesPage>
 					</RBACRoutes>
 				),
+			},
+			{
+				path: "recipes",
+				element: (
+					<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
+						<RecipesPage></RecipesPage>
+					</RBACRoutes>
+				),
+				children: [
+					{
+						path: ":recipeId",
+						element: <CreateRecipePage></CreateRecipePage>,
+					},
+				],
 			},
 		],
 	},

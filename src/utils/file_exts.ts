@@ -7,6 +7,7 @@ export const handleBeforeUploadFile = (file: RcFile) => {
 		file.type === "image/jpeg" ||
 		file.type === "image/jpg" ||
 		file.type === "image/webp";
+
 	if (!isPNG) {
 		showToast("error", "Please upload a image file");
 	}

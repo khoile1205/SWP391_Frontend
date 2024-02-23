@@ -1,26 +1,18 @@
-import { Category } from "@/models/category.model";
-import { categoriesUsecase } from "@/usecases";
+import { categoriesStore } from "@/zustand/category.store";
 import { useLoadingStore } from "@/zustand/loading.store";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect } from "react";
 
 export const useCategories = () => {
-	const [categories, setCategories] = useState<Category[]>([]);
 	const { setLoading } = useLoadingStore((state) => state);
+	const { getAllCategories } = categoriesStore((state) => state);
 	useEffect(() => {
 		const fetchData = async () => {
 			setLoading(true);
-			const response = await categoriesUsecase.getAllCategories();
-			if (response.isSuccess) {
-				setCategories(response.data as Category[]);
-			}
+			await getAllCategories();
 			setLoading(false);
 		};
 
 		fetchData();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
-
-	const memoizedCategories = useMemo(() => categories, [categories]);
-
-	return { categories: memoizedCategories };
 };

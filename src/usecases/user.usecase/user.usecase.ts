@@ -12,6 +12,7 @@ abstract class UserUseCase {
 
 class UserUseCaseImpl implements UserUseCase {
 	constructor(private readonly userDatasource: UserDatasource) {}
+
 	updateUserInformation(data: UpdateUserInformationType): Promise<Response> {
 		return this.userDatasource.updateUserInformation(data);
 	}

@@ -11,7 +11,7 @@ import { useLoadingCallback } from "@/hooks/useLoadingCallback";
 const navigation = [
 	{ name: "Home", href: "/", current: true },
 	{ name: "About us", href: "#", current: false },
-	{ name: "Recipes", href: "/posts", current: false },
+	{ name: "Recipes", href: "/recipes", current: false },
 	{ name: "Booking", href: "#", current: false },
 ];
 
@@ -29,7 +29,7 @@ export function Header() {
 	}, 500);
 
 	return (
-		<Disclosure as="nav" className="">
+		<Disclosure as="nav" className="relative z-50">
 			{({ open }) => (
 				<>
 					<div className="sticky">
@@ -74,9 +74,9 @@ export function Header() {
 									<a
 										href="/search"
 										type="button"
-										className="text-medium relative flex rounded-full p-1 hover:ring-offset-gray-700"
+										className="text-medium flex rounded-full p-1 hover:ring-offset-gray-700"
 									>
-										<span className="absolute -inset-1.5" />
+										<span className="-inset-1.5" />
 										<span className="sr-only">Search recipes</span>
 										<MagnifyingGlassIcon
 											className="h-6 w-6"
@@ -85,16 +85,16 @@ export function Header() {
 									</a>
 									<button
 										type="button"
-										className="text-medium relative hidden rounded-full p-1 hover:ring-offset-gray-700 lg:flex"
+										className="text-medium  hidden rounded-full p-1 hover:ring-offset-gray-700 lg:flex"
 									>
-										<span className="absolute -inset-1.5" />
+										<span className=" -inset-1.5" />
 										<span className="sr-only">View notifications</span>
 										<BellIcon className="h-6 w-6" aria-hidden="true" />
 									</button>
 
 									{/* Profile dropdown */}
 									{user != null ? (
-										<Menu as="div" className="relative ml-3">
+										<Menu as="div" className="relative z-50 ml-3">
 											<div>
 												<Menu.Button className="relative flex rounded-full hover:ring-offset-gray-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-700">
 													<span className="absolute -inset-1.5" />
@@ -118,7 +118,10 @@ export function Header() {
 												leaveFrom="transform opacity-100 scale-100"
 												leaveTo="transform opacity-0 scale-95"
 											>
-												<Menu.Items className="z-100 absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+												<Menu.Items
+													static
+													className="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+												>
 													<Menu.Item>
 														{({ active }) => (
 															<a
@@ -129,19 +132,6 @@ export function Header() {
 																)}
 															>
 																Your Profile
-															</a>
-														)}
-													</Menu.Item>
-													<Menu.Item>
-														{({ active }) => (
-															<a
-																href="#"
-																className={classNames(
-																	active ? "bg-primary-100" : "",
-																	"block px-4 py-2 text-sm text-gray-700"
-																)}
-															>
-																Settings
 															</a>
 														)}
 													</Menu.Item>
