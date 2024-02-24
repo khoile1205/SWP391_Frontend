@@ -80,7 +80,7 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 		},
 		validateOnChange: true,
 		validationSchema: becomeChefRequestValidator,
-		validateOnMount: true,
+		isInitialValid: false,
 	});
 
 	useEffect(() => {
@@ -163,7 +163,11 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 						name="identityImageUrl"
 						className="mt-2"
 						required
-						validateStatus={formik.errors.identityImageUrl ? "error" : "success"}
+						validateStatus={
+							formik.errors.identityImageUrl && formik.touched.identityImageUrl
+								? "error"
+								: "success"
+						}
 						help={
 							formik.errors.identityImageUrl &&
 							formik.touched.identityImageUrl && (
@@ -203,7 +207,11 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 						name="certificateImageUrls"
 						className="mt-2"
 						required
-						validateStatus={formik.errors.certificateImageUrls ? "error" : "success"}
+						validateStatus={
+							formik.errors.certificateImageUrls && formik.touched.certificateImageUrls
+								? "error"
+								: "success"
+						}
 						help={
 							formik.errors.certificateImageUrls &&
 							formik.touched.certificateImageUrls && (
@@ -280,7 +288,9 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 								className="mt-2"
 								label="Full name"
 								required
-								validateStatus={formik.errors.fullName ? "error" : "success"}
+								validateStatus={
+									formik.errors.fullName && formik.touched.fullName ? "error" : "success"
+								}
 								help={
 									formik.errors.fullName &&
 									formik.touched.fullName && (
@@ -309,7 +319,9 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 								className="mt-2"
 								label="Phone number"
 								required
-								validateStatus={formik.errors.phoneNumber ? "error" : "success"}
+								validateStatus={
+									formik.errors.phoneNumber && formik.touched.phoneNumber ? "error" : "success"
+								}
 								help={
 									formik.errors.phoneNumber &&
 									formik.touched.phoneNumber && (
@@ -340,7 +352,7 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 								className="mt-2"
 								label="Gender"
 								required
-								validateStatus={formik.errors.gender ? "error" : "success"}
+								validateStatus={formik.errors.gender && formik.touched.gender ? "error" : "success"}
 								help={
 									formik.errors.gender &&
 									formik.touched.gender && (
@@ -369,7 +381,9 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 								className="mt-2"
 								label="Address"
 								required
-								validateStatus={formik.errors.address ? "error" : "success"}
+								validateStatus={
+									formik.errors.address && formik.touched.address ? "error" : "success"
+								}
 								help={
 									formik.errors.address &&
 									formik.touched.address && (
@@ -400,7 +414,7 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 								className="mt-2"
 								label="Date of Birth"
 								required
-								validateStatus={formik.errors.dob ? "error" : "success"}
+								validateStatus={formik.errors.dob && formik.touched.dob ? "error" : "success"}
 								help={
 									formik.errors.dob &&
 									formik.touched.dob && (
@@ -430,7 +444,9 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 								className="mt-2"
 								label="Specilized"
 								required
-								validateStatus={formik.errors.category ? "error" : "success"}
+								validateStatus={
+									formik.errors.category && formik.touched.category ? "error" : "success"
+								}
 								help={
 									formik.errors.category &&
 									formik.touched.category && (
@@ -461,7 +477,7 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 								className="mt-2"
 								label="Email"
 								required
-								validateStatus={formik.errors.email ? "error" : "success"}
+								validateStatus={formik.errors.email && formik.touched.email ? "error" : "success"}
 								help={
 									formik.errors.email &&
 									formik.touched.email && (
@@ -519,7 +535,9 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 								className="mt-2"
 								label="Achivement"
 								required
-								validateStatus={formik.errors.achievement ? "error" : "success"}
+								validateStatus={
+									formik.errors.achievement && formik.touched.achievement ? "error" : "success"
+								}
 								help={
 									formik.errors.achievement &&
 									formik.touched.achievement && (
