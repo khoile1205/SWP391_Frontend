@@ -21,6 +21,7 @@ import NotFound from "../not-found.page";
 import { recipeStore } from "@/zustand/recipe.store";
 import { showToast } from "@/utils/notify";
 import { useRecipeBookmark } from "@/hooks/useRecipeBookmark";
+import userStore from "@/zustand/user.store";
 type CommentItem = {
 	author: string;
 	avatar: JSX.Element;
@@ -35,7 +36,7 @@ export default function RecipeDetailPage() {
 	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 	const [shareModalVisible, setShareModalVisible] = useState(false);
 	const { saveFavoriteRecipe, removeFavoriteRecipe } = recipeStore((state) => state);
-
+	const { user } = userStore((state) => state);
 	// Hooks
 	const { recipeId } = useParams();
 	const { recipe, checkedIngredients, setCheckedIngredients } = useGetRecipeById(recipeId);
@@ -63,6 +64,10 @@ export default function RecipeDetailPage() {
 
 	// Controller
 	const handleBookmarkClick = async () => {
+		if (user == null) {
+			showToast("error", "Please sign in to save your favorite recipe");
+			return;
+		}
 		setBookmarked(!bookmarked);
 		if (!bookmarked) {
 			const response = await saveFavoriteRecipe(recipeId!);

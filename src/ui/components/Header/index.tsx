@@ -10,8 +10,8 @@ import { useLoadingCallback } from "@/hooks/useLoadingCallback";
 
 const navigation = [
 	{ name: "Home", href: "/", current: true },
-	{ name: "About us", href: "#", current: false },
 	{ name: "Recipes", href: "/recipes", current: false },
+	{ name: "Category", href: "/category", current: false },
 	{ name: "Booking", href: "#", current: false },
 ];
 

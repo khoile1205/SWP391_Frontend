@@ -13,7 +13,6 @@ i18nInit();
 function App() {
 	const { isLoading } = useLoadingStore((state) => state);
 	return (
-		// <div className="relative">
 		<GoogleOAuthProvider clientId={import.meta.env.VITE_APP_GOOGLE_CLIENT_ID}>
 			{isLoading && <Loading></Loading>}
 			<div className="container mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -28,7 +27,7 @@ function App() {
 				style={{
 					backgroundColor: "#f9f9f9",
 				}}
-				className="lg:mt-10"
+				className="mt-10"
 			>
 				<Footer></Footer>
 			</div>

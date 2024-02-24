@@ -11,6 +11,7 @@ type Action = {
 	getUserFavoriteRecipe: (userId: string) => Promise<Result>;
 	getRecipesWithPagination: (page: number) => Promise<Result>;
 	getAllRecipes: () => Promise<Result>;
+	getRecipesByCategoryId: (categoryId: string) => Promise<Result>;
 };
 
 export const recipeStore = create<Action>(() => ({
@@ -59,6 +60,13 @@ export const recipeStore = create<Action>(() => ({
 	},
 	getRecipesWithPagination: async (page: number): Promise<Result> => {
 		const response = await recipeUseCase.getRecipesWithPagination(page);
+		if (!response.isSuccess) {
+			return Result.failed(response.message);
+		}
+		return Result.success(response.message, response.data);
+	},
+	getRecipesByCategoryId: async (categoryId: string): Promise<Result> => {
+		const response = await recipeUseCase.getRecipesByCategoryId(categoryId);
 		if (!response.isSuccess) {
 			return Result.failed(response.message);
 		}

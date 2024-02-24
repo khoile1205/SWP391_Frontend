@@ -11,10 +11,14 @@ export abstract class IRecipeUseCase {
 	abstract saveFavoriteRecipe(recipeId: string): Promise<Response>;
 	abstract removeFavoriteRecipe(recipeId: string): Promise<Response>;
 	abstract getUserFavoriteRecipes(userId: string): Promise<Response>;
+	abstract getRecipesByCategoryId(categoryId: string): Promise<Response>;
 }
 
 export class RecipeUseCase implements IRecipeUseCase {
 	constructor(private readonly recipeDatasource: IRecipeDatasource) {}
+	async getRecipesByCategoryId(categoryId: string): Promise<Response> {
+		return await this.recipeDatasource.getRecipesByCategoryId(categoryId);
+	}
 	async getRecipesWithPagination(page: number): Promise<Response> {
 		return await this.recipeDatasource.getRecipeWithPagination(page);
 	}

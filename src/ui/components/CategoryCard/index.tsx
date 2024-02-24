@@ -1,12 +1,13 @@
 import { Category } from "@/models/category.model";
+import { useLoadingStore } from "@/zustand/loading.store";
 import { Avatar, Skeleton, Typography } from "antd";
 
 interface CategoryCardProps {
 	category: Category;
-	isLoading: boolean;
 }
 
-export function CategoryCard({ category, isLoading }: CategoryCardProps) {
+export function CategoryCard({ category }: CategoryCardProps) {
+	const { isLoading } = useLoadingStore((state) => state);
 	return (
 		<Skeleton loading={isLoading}>
 			<a href={`/category/${category.id}`} className="text-center">
