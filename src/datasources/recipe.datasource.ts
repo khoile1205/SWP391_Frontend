@@ -13,9 +13,19 @@ export abstract class IRecipeDatasource {
 	abstract saveFavoriteRecipe(recipeId: string): Promise<Response>;
 	abstract removeFavoriteRecipe(recipeId: string): Promise<Response>;
 	abstract getUserFavoriteRecipe(userId: string): Promise<Response>;
+	abstract getRecipesByCategoryId(categoryId: string): Promise<Response>;
 }
 
 export class RecipeDatasource implements IRecipeDatasource {
+	async getRecipesByCategoryId(categoryId: string): Promise<Response> {
+		const response = await apiService.get(`/api/recipes/categories/${categoryId}`);
+		const isSuccess = response.status === 200;
+		const resBody = await response.json();
+		const message = resBody.message;
+		if (!isSuccess) return new Response(false, null, message);
+
+		return new Response(true, resBody.result, message);
+	}
 	async getAllRecipes(): Promise<Response> {
 		const response = await apiService.get("/api/recipes");
 		const isSuccess = response.status === 200;

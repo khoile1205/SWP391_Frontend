@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Typography, Card, Menu, Dropdown, Avatar, Rate } from "antd";
 import { Recipe } from "@/models/recipe.model";
 import { HeartOutlined, ShareAltOutlined, StarOutlined } from "@ant-design/icons";
@@ -7,6 +6,9 @@ import { SocialShareButton } from "..";
 import { useRecipeBookmark } from "@/hooks/useRecipeBookmark";
 import AppColor from "@/utils/appColor";
 import { recipeStore } from "@/zustand/recipe.store";
+import { useNavigate } from "react-router-dom";
+import userStore from "@/zustand/user.store";
+import { showToast } from "@/utils/notify";
 
 interface RecipeCardProps {
 	recipe: Recipe;
@@ -30,17 +32,17 @@ const ShareMenu: React.FC = () => (
 );
 
 export const RecipeCard = ({ recipe }: RecipeCardProps) => {
-	const [loading, setLoading] = useState(true);
 	const { bookmarked, setBookmarked } = useRecipeBookmark(recipe.id);
 	const { saveFavoriteRecipe, removeFavoriteRecipe } = recipeStore((state) => state);
-	useEffect(() => {
-		const timeOutId = setTimeout(() => {
-			setLoading(false);
-		}, 1000);
-		return () => clearTimeout(timeOutId);
-	});
+	const { user } = userStore((state) => state);
+	const navigator = useNavigate();
 
 	const handleClickFavourite = () => {
+		if (user == null) {
+			showToast("error", "Please sign in to save your favorite recipe");
+			navigator("/sign-in");
+			return;
+		}
 		if (bookmarked) {
 			removeFavoriteRecipe(recipe.id);
 			setBookmarked(false);
@@ -54,7 +56,6 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 	};
 	return (
 		<Card
-			loading={loading}
 			bordered={false}
 			actions={[
 				<HeartOutlined key="react" onClick={handleReactRecipe} className="text-red-500" />,
@@ -89,12 +90,8 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 							{recipe.title}
 						</Typography.Title>
 					</a>
-				} // Make the title larger
-				description={
-					// <Typography.Text type="secondary">
-					// </Typography.Text>
-					<Rate disabled value={recipe.ratings}></Rate>
-				} // Make the description smaller and a different color
+				}
+				description={<Rate disabled value={recipe.ratings}></Rate>}
 			/>
 		</Card>
 	);

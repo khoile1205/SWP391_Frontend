@@ -6,8 +6,9 @@ import { useCategories } from "@/hooks/useCategories";
 
 export function withAuthProvider(WrappedComponent: ComponentType) {
 	const AuthProvider: FunctionComponent = (props) => {
-		useUserAuthentication();
 		useCategories();
+		useUserAuthentication();
+
 		return (
 			<>
 				<ToastContainer

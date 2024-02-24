@@ -18,6 +18,11 @@ const VerifyEmailPage = Loadable(lazy(() => import("@/ui/pages/verify-email.page
 
 // redner - reset password
 const ResetPasswordPage = Loadable(lazy(() => import("@/ui/pages/reset.password.page")));
+
+// redner - category Page
+const RecipeCategoryPage = Loadable(lazy(() => import("@/ui/pages/category/category.recipe")));
+const CategoryHomepage = Loadable(lazy(() => import("@/ui/pages/category/category.homepage")));
+// render - reset password
 const NotFoundPage = Loadable(lazy(() => import("@/ui/pages/not-found.page")));
 
 const MainRoutes: RouteObject[] = [
@@ -72,6 +77,19 @@ const MainRoutes: RouteObject[] = [
 			{
 				path: ":recipeId",
 				element: <RecipeDetailPage></RecipeDetailPage>,
+			},
+		],
+	},
+	{
+		path: "category",
+		children: [
+			{
+				path: "",
+				element: <CategoryHomepage></CategoryHomepage>,
+			},
+			{
+				path: ":categoryId",
+				element: <RecipeCategoryPage></RecipeCategoryPage>,
 			},
 		],
 	},
