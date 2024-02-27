@@ -1,5 +1,5 @@
 import { useLoadingCallbackWithFormik } from "@/hooks/useLoadingCallback";
-import { Gender, UpdateUserInformationType } from "@/types/user";
+import { UpdateUserInformationType } from "@/types/user";
 import AppColor from "@/utils/appColor";
 import { showToast } from "@/utils/notify";
 import userStore from "@/zustand/user.store";
@@ -24,6 +24,7 @@ import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { RcFile } from "antd/es/upload";
 import fileStore from "@/zustand/file.store";
+import { Gender } from "@/enums";
 
 const updateUserValidationSchema = Yup.object().shape({
 	username: Yup.string().required("Username is required"),

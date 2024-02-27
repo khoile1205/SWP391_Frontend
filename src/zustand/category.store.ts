@@ -1,7 +1,7 @@
-import { Category } from "@/models/category.model";
 import { categoriesUsecase } from "@/usecases";
 import { create } from "zustand";
 import Result from "./commons/result";
+import { Category } from "@/types/recipe";
 
 type State = {
 	categories: Category[];

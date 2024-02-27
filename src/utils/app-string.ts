@@ -1,5 +1,6 @@
 export default class AppString {
 	static readonly APP_NAME = "Nest Cooking";
+	static readonly success = "Success";
 	static readonly loginSuccessfully = "Login successfully !";
 	static readonly loginFailure = "Login failed";
 	static readonly alreadyLoggedIn = "You are already logged in";
@@ -33,4 +34,6 @@ export default class AppString {
 	static readonly createRecipeSuccessMessage = "Recipe created successfully";
 	static readonly getRecipeSuccessMessage = "Recipe retrieved successfully";
 	static readonly updateRecipeSuccessMessage = "Recipe updated successfully";
+	static readonly deleteRecipeSuccessMessage = "Recipe deleted successfully";
+	static readonly noResultFoundMessage = "No result found matching the specified criteria!";
 }

@@ -1,4 +1,4 @@
-import { CreateRecipeDTO } from "@/types/recipe";
+import { CreateRecipeDTO, UpdateRecipeDTO } from "@/types/recipe";
 import { recipeUseCase } from "@/usecases";
 import { create } from "zustand";
 import Result from "./commons/result";
@@ -11,12 +11,29 @@ type Action = {
 	getUserFavoriteRecipe: (userId: string) => Promise<Result>;
 	getRecipesWithPagination: (page: number) => Promise<Result>;
 	getAllRecipes: () => Promise<Result>;
-	getRecipesByCategoryId: (categoryId: string) => Promise<Result>;
+	getRecipesByCategoryId: (categoryId: number) => Promise<Result>;
+	getRecipesByUserId: (userId: string) => Promise<Result>;
+	updateRecipeById: (recipeId: string, newRecipe: UpdateRecipeDTO) => Promise<Result>;
+	deleteRecipeById: (recipeId: string) => Promise<Result>;
 };
 
 export const recipeStore = create<Action>(() => ({
+	deleteRecipeById: async (recipeId): Promise<Result> => {
+		const response = await recipeUseCase.deleteRecipeById(recipeId);
+		if (!response.isSuccess) {
+			return Result.failed(response.message);
+		}
+		return Result.success(response.message, response.data);
+	},
 	createRecipe: async (data: CreateRecipeDTO): Promise<Result> => {
 		const response = await recipeUseCase.createRecipe(data);
+		if (!response.isSuccess) {
+			return Result.failed(response.message);
+		}
+		return Result.success(response.message, response.data);
+	},
+	updateRecipeById: async (recipeId, newRecipe): Promise<Result> => {
+		const response = await recipeUseCase.updateRecipeById(recipeId, newRecipe);
 		if (!response.isSuccess) {
 			return Result.failed(response.message);
 		}
@@ -65,8 +82,15 @@ export const recipeStore = create<Action>(() => ({
 		}
 		return Result.success(response.message, response.data);
 	},
-	getRecipesByCategoryId: async (categoryId: string): Promise<Result> => {
+	getRecipesByCategoryId: async (categoryId: number): Promise<Result> => {
 		const response = await recipeUseCase.getRecipesByCategoryId(categoryId);
+		if (!response.isSuccess) {
+			return Result.failed(response.message);
+		}
+		return Result.success(response.message, response.data);
+	},
+	getRecipesByUserId: async (userId: string): Promise<Result> => {
+		const response = await recipeUseCase.getRecipesByUserId(userId);
 		if (!response.isSuccess) {
 			return Result.failed(response.message);
 		}

@@ -1,5 +1,5 @@
 import RBACRoutes from "@/HOCs/RBACRoutes";
-import { Roles } from "@/types/user";
+import { Roles } from "@/enums";
 import { Loadable } from "@/ui/components/Loadable";
 import { MemoizedProfileLayout } from "@/ui/pages/profiles/profile.layout";
 import { lazy } from "react";
@@ -23,7 +23,10 @@ const BookingHistoryPage = Loadable(
 const SchedulesPage = Loadable(
 	lazy(() => import("@/ui/pages/profiles/schedules/profile.schedules.page"))
 );
-const CreateRecipePage = Loadable(lazy(() => import("@/ui/pages/recipes/recipes.create.page")));
+const UpdateRecipePage = Loadable(
+	lazy(() => import("@/ui/pages/profiles/recipes/profile.recipes.update"))
+);
+
 const RecipesPage = Loadable(lazy(() => import("@/ui/pages/profiles/recipes/profile.recipes")));
 
 const UserRoutes: RouteObject[] = [
@@ -89,20 +92,26 @@ const UserRoutes: RouteObject[] = [
 			},
 			{
 				path: "recipes",
-				element: (
-					<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
-						<RecipesPage></RecipesPage>
-					</RBACRoutes>
-				),
 				children: [
 					{
-						path: ":recipeId",
-						element: <CreateRecipePage></CreateRecipePage>,
+						path: "",
+						element: (
+							<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
+								<RecipesPage></RecipesPage>
+							</RBACRoutes>
+						),
+					},
+					{
+						path: "edit/:recipeId",
+						element: (
+							<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
+								<UpdateRecipePage></UpdateRecipePage>
+							</RBACRoutes>
+						),
 					},
 				],
 			},
 		],
 	},
 ];
-
 export default UserRoutes;

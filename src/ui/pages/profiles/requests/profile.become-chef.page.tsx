@@ -6,10 +6,10 @@ import TextArea from "antd/es/input/TextArea";
 import AppColor from "@/utils/appColor";
 import CreateRequestModal from "./profile.created-request.modal";
 import { CloseCircleOutlined, ExclamationCircleFilled } from "@ant-design/icons";
-import { ActionStatus } from "@/enums/status";
 import { becomeChefRequestStore } from "@/zustand/become-chef-request";
 import { showToast } from "@/utils/notify";
 import useUserChefRequest from "@/hooks/useUserChefRequest";
+import { ActionStatus } from "@/enums";
 
 dayjs.extend(customParseFormat);
 
@@ -51,7 +51,6 @@ export default function ProfileBecomeChefPage() {
 
 	const { deleteRequestById } = becomeChefRequestStore((state) => state);
 
-	console.log(request);
 	const handleDeleleRequest = async () => {
 		showToast("info", "Deleting the request...");
 		const response = await deleteRequestById(request?.requestChefId as string);

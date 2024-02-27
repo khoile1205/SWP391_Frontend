@@ -11,12 +11,20 @@ export abstract class IRecipeUseCase {
 	abstract saveFavoriteRecipe(recipeId: string): Promise<Response>;
 	abstract removeFavoriteRecipe(recipeId: string): Promise<Response>;
 	abstract getUserFavoriteRecipes(userId: string): Promise<Response>;
-	abstract getRecipesByCategoryId(categoryId: string): Promise<Response>;
+	abstract getRecipesByCategoryId(categoryId: number): Promise<Response>;
+	abstract getRecipesByUserId(userId: string): Promise<Response>;
+	abstract deleteRecipeById(recipeId: string): Promise<Response>;
 }
 
 export class RecipeUseCase implements IRecipeUseCase {
 	constructor(private readonly recipeDatasource: IRecipeDatasource) {}
-	async getRecipesByCategoryId(categoryId: string): Promise<Response> {
+	async deleteRecipeById(recipeId: string): Promise<Response> {
+		return await this.recipeDatasource.deleteRecipeById(recipeId);
+	}
+	async getRecipesByUserId(userId: string): Promise<Response> {
+		return await this.recipeDatasource.getRecipesByUserId(userId);
+	}
+	async getRecipesByCategoryId(categoryId: number): Promise<Response> {
 		return await this.recipeDatasource.getRecipesByCategoryId(categoryId);
 	}
 	async getRecipesWithPagination(page: number): Promise<Response> {
@@ -40,7 +48,7 @@ export class RecipeUseCase implements IRecipeUseCase {
 	async getAllRecipes(): Promise<Response> {
 		return await this.recipeDatasource.getAllRecipes();
 	}
-	async updateRecipeById(id: string, recipe: Partial<UpdateRecipeDTO>): Promise<Response> {
+	async updateRecipeById(id: string, recipe: UpdateRecipeDTO): Promise<Response> {
 		return await this.recipeDatasource.updateRecipeById(id, recipe);
 	}
 }

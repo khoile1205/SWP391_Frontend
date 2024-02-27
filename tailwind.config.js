@@ -7,7 +7,7 @@ export default {
 			inter: ["Inter", "sans-serif"],
 		},
 		colors: {
-			primary: colors.indigo,
+			primary: colors.amber, // Set primary color to #ff642f
 			gray: colors.gray,
 			black: colors.black,
 			white: "#ffffff",

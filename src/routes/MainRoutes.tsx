@@ -1,4 +1,6 @@
 import ProtectedRoutes from "@/HOCs/ProtectedRoutes";
+import RBACRoutes from "@/HOCs/RBACRoutes";
+import { Roles } from "@/enums";
 import { Loadable } from "@/ui/components/Loadable";
 import { HomePage } from "@/ui/pages/home.page";
 import CreateRecipePage from "@/ui/pages/recipes/recipes.create.page";
@@ -22,8 +24,17 @@ const ResetPasswordPage = Loadable(lazy(() => import("@/ui/pages/reset.password.
 // redner - category Page
 const RecipeCategoryPage = Loadable(lazy(() => import("@/ui/pages/category/category.recipe")));
 const CategoryHomepage = Loadable(lazy(() => import("@/ui/pages/category/category.homepage")));
+
 // render - reset password
 const NotFoundPage = Loadable(lazy(() => import("@/ui/pages/not-found.page")));
+
+// render - user
+const UserProfilePage = Loadable(lazy(() => import("@/ui/pages/users/users.profile.page")));
+
+// render - search page
+const SearchAllPage = Loadable(lazy(() => import("@/ui/pages/search/search.all.page")));
+// const SearchUsersPage = Loadable(lazy(() => import("@/ui/pages/search/search.users.page")));
+// const SearchRecipesPage = Loadable(lazy(() => import("@/ui/pages/search/search.recipes.page")));
 
 const MainRoutes: RouteObject[] = [
 	{
@@ -72,7 +83,11 @@ const MainRoutes: RouteObject[] = [
 			},
 			{
 				path: "create",
-				element: <CreateRecipePage></CreateRecipePage>,
+				element: (
+					<RBACRoutes allowedRoles={[Roles.USER, Roles.CHEF]}>
+						<CreateRecipePage></CreateRecipePage>
+					</RBACRoutes>
+				),
 			},
 			{
 				path: ":recipeId",
@@ -90,6 +105,32 @@ const MainRoutes: RouteObject[] = [
 			{
 				path: ":categoryId",
 				element: <RecipeCategoryPage></RecipeCategoryPage>,
+			},
+		],
+	},
+	{
+		path: "search",
+		children: [
+			{
+				path: ":type",
+				element: <SearchAllPage></SearchAllPage>,
+			},
+			// {
+			// 	path: "/recipes",
+			// 	element: <SearchRecipesPage></SearchRecipesPage>,
+			// },
+			// {
+			// 	path: "/users",
+			// 	element: <SearchUsersPage></SearchUsersPage>,
+			// },
+		],
+	},
+	{
+		path: "user",
+		children: [
+			{
+				path: ":userId",
+				element: <UserProfilePage></UserProfilePage>,
 			},
 		],
 	},

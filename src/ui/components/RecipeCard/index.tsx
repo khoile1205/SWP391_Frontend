@@ -58,23 +58,32 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 		<Card
 			bordered={false}
 			actions={[
-				<HeartOutlined key="react" onClick={handleReactRecipe} className="text-red-500" />,
+				<HeartOutlined
+					key="react"
+					onClick={handleReactRecipe}
+					className="hover:!text-primary text-red-500"
+				/>,
 				<StarOutlined
 					key="save"
+					className="hover:!text-primary text-red-500"
 					style={{
-						color: bookmarked ? AppColor.deepOrangeColor : "black",
+						color: bookmarked ? AppColor.deepOrangeColor : "rgba(0,0,0,0.45)",
 					}}
 					onClick={() => {
 						handleClickFavourite(), setBookmarked(!bookmarked);
 					}}
 				/>,
-				<Dropdown overlay={() => <ShareMenu />} trigger={["click"]}>
+				<Dropdown
+					overlay={() => <ShareMenu />}
+					trigger={["click"]}
+					className="hover:!text-primary focus:!text-primary text-[#00000073]"
+				>
 					<ShareAltOutlined key="share" />
 				</Dropdown>,
 			]}
 			cover={
 				<a href={`/recipes/${recipe.id}`}>
-					<img alt="example" src={recipe.thumbnailUrl} />
+					<img alt="example" src={recipe.thumbnailUrl} className="h-[227px] w-full" />
 				</a>
 			}
 		>
@@ -91,7 +100,7 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 						</Typography.Title>
 					</a>
 				}
-				description={<Rate disabled value={recipe.ratings}></Rate>}
+				description={<Rate disabled value={recipe.difficult}></Rate>}
 			/>
 		</Card>
 	);

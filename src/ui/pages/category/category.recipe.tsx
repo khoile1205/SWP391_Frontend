@@ -8,7 +8,7 @@ export default function RecipeCategoryPage() {
 	// Hooks
 	const { categoryId } = useParams();
 
-	const { recipes, category } = useGetRecipeByCategoryId(categoryId!);
+	const { recipes, category } = useGetRecipeByCategoryId(parseInt(categoryId!));
 
 	return !category ? (
 		<NotFound></NotFound>

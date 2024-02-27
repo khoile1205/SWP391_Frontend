@@ -9,13 +9,20 @@ export type Ingredients = {
 	amount: string;
 	ingredientTipId?: string;
 };
+
+export interface Category {
+	id: number;
+	imageURL: string;
+	name: string;
+}
+
 export interface CreateRecipeDTO {
 	title: string;
 	description: string;
 	thumbnailUrl?: string;
 	isPrivate: boolean;
 	price: number;
-	ratings: number;
+	difficult: number;
 	cookingTime: number;
 	portion: number;
 	categories: number[];

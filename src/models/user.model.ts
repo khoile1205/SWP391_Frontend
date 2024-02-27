@@ -1,4 +1,4 @@
-import { Roles } from "@/types/user";
+import { Roles } from "@/enums";
 
 interface User {
 	id: string;

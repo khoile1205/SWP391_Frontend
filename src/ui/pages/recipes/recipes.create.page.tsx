@@ -1,11 +1,12 @@
-import { useGetRecipeById } from "@/hooks/useGetRecipeById";
+import { Roles } from "@/enums";
+import { User } from "@/models/user.model";
 import { CreateRecipeDTO, Ingredients, Instructors } from "@/types/recipe";
-import { Roles } from "@/types/user";
-import { MultiImagesUploadComponent } from "@/ui/components";
+import { ConfirmModal, MultiImagesUploadComponent } from "@/ui/components";
 import DraggerUpload from "@/ui/components/DraggerUpload";
 import AppColor from "@/utils/appColor";
 import { AppConstant } from "@/utils/constant";
 import { showToast } from "@/utils/notify";
+import { createRecipeValidationSchema } from "@/utils/validation";
 import { categoriesStore } from "@/zustand/category.store";
 import fileStore from "@/zustand/file.store";
 import { useLoadingStore } from "@/zustand/loading.store";
@@ -18,47 +19,17 @@ import {
 	CameraOutlined,
 	EyeOutlined,
 } from "@ant-design/icons";
-import { Button, Form, Input, Modal, Radio, Rate, Select, Typography } from "antd";
+import { Button, Flex, Form, Input, Modal, Radio, Rate, Select, Typography } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { Field, FieldArray, Formik, FormikErrors } from "formik";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
-import * as Yup from "yup";
-
-const createRecipeValidationSchema = Yup.object().shape({
-	title: Yup.string().required("Title is required"),
-	description: Yup.string().required("Description is required"),
-	portion: Yup.number()
-		.required("Portion is required")
-		.min(1, "Portion must be greater than 0")
-		.max(999, "Portion must be less than 999"),
-	cookingTime: Yup.number()
-		.required("Cooking time is required")
-		.min(1, "Cooking time must be greater than 0")
-		.max(999, "Cooking time must be less than 999"),
-	price: Yup.number().required("Price is required").min(1, "Price must be greater than 0"),
-	categories: Yup.array()
-		.required("Categories is required")
-		.min(1, "Recipe must be have at least one category"),
-	ratings: Yup.number().required("Ratings is required"),
-	ingredients: Yup.array().of(
-		Yup.object().shape({
-			name: Yup.string().required("Ingredient name is required"),
-			amount: Yup.string().required("Ingredient amount is required"),
-		})
-	),
-	instructors: Yup.array().of(
-		Yup.object().shape({
-			description: Yup.string().required("Step description is required"),
-		})
-	),
-});
+import { useNavigate } from "react-router-dom";
 
 export default function CreateRecipePage() {
+	const navigator = useNavigate();
 	// State
 	const [isPreviewVisible, setPreviewVisible] = useState(false);
-	const [isOpenConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
-	const [isConfirmLoading, setConfirmLoading] = useState(false);
+	const [isUploading, setUploading] = useState(false);
 	// Zustand store
 	const { categories } = categoriesStore((state) => state);
 	const { createRecipe } = recipeStore((state) => state);
@@ -71,6 +42,7 @@ export default function CreateRecipePage() {
 		const response = await createRecipe(value);
 		if (response.isSuccess) {
 			showToast("success", "Create recipe successfully");
+			navigator(`/recipes/${response.data.id}`);
 		} else {
 			showToast("error", "Create recipe failed");
 		}
@@ -86,48 +58,36 @@ export default function CreateRecipePage() {
 	};
 
 	// Hooks
-	const { recipeId } = useParams();
-	const { recipe } = useGetRecipeById(recipeId);
+
 	return (
 		<div className="flex w-full justify-center">
 			<Formik
 				initialValues={{
-					thumbnailUrl: recipe?.thumbnailUrl ?? "",
-					title: recipe?.title ?? "",
-					description: recipe?.description ?? "",
-					portion: recipe?.portion ?? 0,
-					cookingTime: recipe?.cookingTime ?? 0,
-					isPrivate: recipe?.isPrivate ?? false,
-					price: recipe?.price ?? 0,
-					ratings: recipe?.ratings ?? 0,
-					categories: recipe?.categories ?? [],
-					ingredients: recipe?.ingredients ?? [
-						{
-							name: "",
-							amount: "",
-						},
+					thumbnailUrl: "",
+					title: "",
+					description: "",
+					portion: 0,
+					cookingTime: 0,
+					isPrivate: false,
+					price: 0,
+					difficult: 0,
+					categories: [],
+					ingredients: [
 						{
 							name: "",
 							amount: "",
 						},
 					],
-					instructors:
-						recipe?.instructors ??
-						([
-							{
-								instructorOrder: 0,
-								imageUrls: [] as string[],
-								description: "",
-							},
-							{
-								instructorOrder: 1,
-								imageUrls: [] as string[],
-								description: "",
-							},
-						] as Instructors[]),
+					instructors: [
+						{
+							instructorOrder: 0,
+							imageUrls: [] as string[],
+							description: "",
+						},
+					] as Instructors[],
 				}}
 				onSubmit={handleCreateRecipe}
-				validationSchema={createRecipeValidationSchema}
+				validationSchema={() => createRecipeValidationSchema(user as User)}
 				isInitialValid={false}
 			>
 				{({
@@ -151,17 +111,13 @@ export default function CreateRecipePage() {
 										showUploadList={false}
 										description="After investing time and creativity in your dish, show it off. Let others admire your culinary skills and the delicious dish you've created. You might inspire them to cook too!"
 										onChange={async (info) => {
-											let isUploading = false;
-											let i = 0;
 											if (info.file.status === "error") {
 												showToast("error", "Upload images failed");
 												return;
 											}
 
 											if (info.file.status === "uploading" && !isUploading) {
-												i++;
-												console.log(i);
-												isUploading = true;
+												setUploading(true);
 												showToast("info", "Uploading image...");
 												return;
 											}
@@ -171,6 +127,7 @@ export default function CreateRecipePage() {
 													setFieldValue(`thumbnailUrl`, imageURL);
 													showToast("success", "Upload image successfully");
 												}
+												setUploading(false);
 											}
 										}}
 									></DraggerUpload>
@@ -185,39 +142,15 @@ export default function CreateRecipePage() {
 												></EyeOutlined>
 												<DeleteOutlined
 													className="p-1 hover:cursor-pointer"
-													onClick={() => setOpenConfirmDeleteModal(true)}
+													onClick={() =>
+														ConfirmModal({
+															content: "Are you sure you want to delete this image?",
+															onOk: () => setFieldValue("thumbnailUrl", ""),
+														})
+													}
 												></DeleteOutlined>
 											</div>
 										</div>
-										<Modal
-											title={
-												<Typography.Title className="text-center" level={3}>
-													Warning !
-												</Typography.Title>
-											}
-											open={isOpenConfirmDeleteModal}
-											centered
-											onCancel={() => setOpenConfirmDeleteModal(false)}
-											okButtonProps={{
-												className: `!bg-[${AppColor.deepOrangeColor}]`,
-												style: { backgroundColor: AppColor.deepOrangeColor },
-											}}
-											onOk={() => {
-												setConfirmLoading(true);
-												setTimeout(() => {
-													setConfirmLoading(false);
-													setOpenConfirmDeleteModal(false);
-													setFieldValue("thumbnailUrl", "");
-												}, 1000);
-											}}
-											okText="Confirm"
-											cancelText="Cancel"
-											confirmLoading={isConfirmLoading}
-										>
-											<div className="text-center">
-												<Typography>Are you sure you want to delete this image?</Typography>
-											</div>
-										</Modal>
 										<Modal
 											open={isPreviewVisible}
 											onCancel={() => setPreviewVisible(false)}
@@ -277,7 +210,10 @@ export default function CreateRecipePage() {
 									</div>
 								</div>
 							</Form.Item>
-							<Form.Item name="cookingTime" extra="How long does it take to prepare this recipe?">
+							<Form.Item
+								name="cookingTime"
+								extra="How long does it take to prepare this recipe? (time is minutes)"
+							>
 								<div className="flex items-center">
 									<Typography.Title level={5} className="basis-1/2">
 										Cooking Time
@@ -288,7 +224,7 @@ export default function CreateRecipePage() {
 											type="number"
 											defaultValue={values.cookingTime}
 											{...getFieldProps("cookingTime")}
-											placeholder="Title: My eggs!"
+											placeholder="Cooking Time..."
 										/>
 										{errors.cookingTime && touched.cookingTime && (
 											<Typography className="ms-1 mt-2 text-red-500">
@@ -341,7 +277,7 @@ export default function CreateRecipePage() {
 								</>
 							)}
 
-							<Form.Item name="ratings">
+							<Form.Item name="difficult">
 								<div className="flex items-center">
 									<Typography.Title level={5} className="!mb-0 basis-1/2">
 										Difficult
@@ -349,13 +285,13 @@ export default function CreateRecipePage() {
 									<div className="w-full">
 										<Rate
 											style={{ color: AppColor.deepOrangeColor }}
-											defaultValue={values.ratings}
+											defaultValue={values.difficult}
 											allowHalf
 											allowClear
-											onChange={(value) => setFieldValue("ratings", value)}
+											onChange={(value) => setFieldValue("difficult", value)}
 										/>
-										{errors.ratings && touched.ratings && (
-											<Typography className="ms-1 mt-2 text-red-500">{errors.ratings}</Typography>
+										{errors.difficult && touched.difficult && (
+											<Typography className="ms-1 mt-2 text-red-500">{errors.difficult}</Typography>
 										)}
 									</div>
 								</div>
@@ -363,7 +299,7 @@ export default function CreateRecipePage() {
 							<Form.Item name="categories">
 								<div className="flex items-center">
 									<Typography.Title level={5} className="!mb-0 basis-1/2">
-										Price
+										Category
 									</Typography.Title>
 									<div className="w-full">
 										<Select
@@ -390,15 +326,15 @@ export default function CreateRecipePage() {
 						<div className="space-y-3 bg-gray-50 p-6">
 							<Typography.Title level={3}>Ingredients</Typography.Title>
 							<FieldArray name="ingredients">
-								{({ push, move }) => (
+								{({ push, move, remove }) => (
 									<>
 										<div className="space-y-2">
 											{values.ingredients.map((_, index) => (
 												<Field name={`ingredients.${index}`} key={index}>
 													{() => (
 														<>
-															<div className="flex items-center space-x-2">
-																<div className="flex flex-col">
+															<div className="flex items-start space-x-2">
+																<div className="mt-3 flex flex-col">
 																	{index > 0 && (
 																		<CaretUpFilled
 																			size={4}
@@ -419,8 +355,9 @@ export default function CreateRecipePage() {
 																		className="w-full rounded-md border border-gray-300 px-4"
 																		type="text"
 																		{...getFieldProps(`ingredients.${index}.name`)}
-																		placeholder="Title: My eggs!"
+																		placeholder="100 ml"
 																	/>
+
 																	{errors.ingredients &&
 																		errors.ingredients[index] &&
 																		touched.ingredients &&
@@ -437,12 +374,22 @@ export default function CreateRecipePage() {
 																</div>
 
 																<div className="basis-1/2">
-																	<Input
-																		className="w-full rounded-md border border-gray-300 px-4"
-																		type="text"
-																		{...getFieldProps(`ingredients.${index}.amount`)}
-																		placeholder="Title: My eggs!"
-																	/>
+																	<Flex align="center">
+																		<Input
+																			className="w-full rounded-md border border-gray-300 px-4"
+																			type="text"
+																			{...getFieldProps(`ingredients.${index}.amount`)}
+																			placeholder="water"
+																		/>
+																		<DeleteOutlined
+																			size={4}
+																			className="px-2 py-1"
+																			onClick={() => {
+																				if (values.ingredients.length) remove(index);
+																			}}
+																		></DeleteOutlined>
+																	</Flex>
+
 																	{errors.ingredients &&
 																		errors.ingredients[index] &&
 																		touched.ingredients &&
@@ -511,7 +458,7 @@ export default function CreateRecipePage() {
 																<TextArea
 																	className="rounded-md border border-gray-300 px-4 py-2"
 																	{...getFieldProps(`instructors.${index}.description`)}
-																	placeholder="Title: My eggs!"
+																	placeholder="Boil water"
 																/>
 																{
 																	<DeleteOutlined
@@ -544,17 +491,25 @@ export default function CreateRecipePage() {
 																		);
 																	}
 
+																	if (info.file.status === "uploading" && !isUploading) {
+																		setUploading(true);
+																		showToast("info", "Uploading image...");
+																		return;
+																	}
 																	if (info.file.status === "done") {
 																		const imageURL = await handleUploadImage(
 																			info.file.originFileObj as File
 																		);
 																		if (imageURL != null) {
-																			setFieldValue(`instructors.${index}.imageUrls`, [
-																				...values.instructors[index].imageUrls,
+																			const updatedInstructors = [...values.instructors];
+																			updatedInstructors[index].imageUrls = [
+																				...updatedInstructors[index].imageUrls,
 																				imageURL,
-																			]);
+																			];
+																			setFieldValue("instructors", updatedInstructors);
 																			showToast("success", "Upload image successfully");
 																		}
+																		setUploading(false);
 																	}
 																}}
 															></MultiImagesUploadComponent>
@@ -582,16 +537,17 @@ export default function CreateRecipePage() {
 								)}
 							</FieldArray>
 						</div>
-						<div>
+						<div className="pt-4 text-center">
 							<Form.Item>
-								<Button
-									htmlType="submit"
+								<button
+									className="bg-primary w-1/2 rounded-lg p-2 text-white"
+									type="submit"
 									onClick={() => {
 										if (!isValid) showToast("error", "Please fill in all fields");
 									}}
 								>
 									Upload
-								</Button>
+								</button>
 							</Form.Item>
 						</div>
 					</Form>

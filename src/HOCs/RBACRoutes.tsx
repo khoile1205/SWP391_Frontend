@@ -1,5 +1,5 @@
+import { Roles } from "@/enums";
 import { User } from "@/models/user.model";
-import { Roles } from "@/types/user";
 import ForbiddenPage from "@/ui/pages/forbidden.page";
 import userStore from "@/zustand/user.store";
 import { useEffect, useState } from "react";

@@ -1,9 +1,8 @@
 import { BecomeChefRequest } from "@/models/become-chef-request.model";
 import { UploadButton } from "@/ui/components";
 import AppColor from "@/utils/appColor";
-import { handleBeforeUploadFile } from "@/utils/file_exts";
+import { handleBeforeUploadFile, renderUploadedRequestImage } from "@/utils/file_exts";
 import { showToast } from "@/utils/notify";
-import { generateRandomString } from "@/utils/string.extension";
 import { becomeChefRequestStore } from "@/zustand/become-chef-request";
 import { categoriesStore } from "@/zustand/category.store";
 import fileStore from "@/zustand/file.store";
@@ -41,18 +40,6 @@ const becomeChefRequestValidator = Yup.object().shape({
 
 const dateFormat = "DD-MM-YYYY";
 
-const renderUploadedRequestImage = (imageUrls: string[] | undefined): UploadFile[] => {
-	if (!imageUrls) {
-		return [];
-	} else {
-		return imageUrls.map((imageUrl) => ({
-			uid: generateRandomString(10),
-			name: imageUrl,
-			status: "done",
-			url: imageUrl,
-		}));
-	}
-};
 export default function CreateRequestModal({ open, onClick, request }: CreateRequestModalProps) {
 	const [listCertificateImages, setListCertificateImages] = useState<UploadFile[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);

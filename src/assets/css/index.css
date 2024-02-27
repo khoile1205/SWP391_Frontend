@@ -6,4 +6,10 @@
     html {
       font-family: "Inter", system-ui, sans-serif;
     }
+    .bg-primary {
+      background-color:rgb(255,100,47);
+    }
+    .text-primary {
+      color: rgb(255,100,47);
+    }
   }
