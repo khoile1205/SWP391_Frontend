@@ -1,4 +1,4 @@
-import { Category } from "@/models/category.model";
+import { Category } from "@/types/recipe";
 import { useLoadingStore } from "@/zustand/loading.store";
 import { Avatar, Skeleton, Typography } from "antd";
 

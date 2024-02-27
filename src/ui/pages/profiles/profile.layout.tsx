@@ -2,8 +2,8 @@ import React, { useCallback, useMemo } from "react";
 import { Tabs } from "antd";
 import { useNavigate, Outlet } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import { Roles } from "@/types/user";
 import userStore from "@/zustand/user.store";
+import { Roles } from "@/enums";
 
 const { TabPane } = Tabs;
 

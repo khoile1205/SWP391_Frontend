@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Button, Typography } from "antd";
+import { Typography } from "antd";
 import { categoriesStore } from "@/zustand/category.store";
 import { CategoryCard } from "@/ui/components";
-import { Category } from "@/models/category.model";
+import Loadmore from "@/ui/components/Loadmore";
+import { Category } from "@/types/recipe";
 
 export default function CategoryHomepage() {
 	const { categories } = categoriesStore((state) => state);
@@ -29,9 +30,7 @@ export default function CategoryHomepage() {
 				))}
 			</div>
 			{visibleCategories.length < categories.length && (
-				<div className="mt-5 text-center">
-					<Button onClick={handleLoadMore}>Load More</Button>
-				</div>
+				<Loadmore onClick={handleLoadMore} title="Load More Comment"></Loadmore>
 			)}
 		</div>
 	);

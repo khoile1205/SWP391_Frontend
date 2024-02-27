@@ -9,15 +9,23 @@ export abstract class IRecipeDatasource {
 	abstract getAllRecipes(): Promise<Response>;
 	abstract getRecipeWithPagination(page: number): Promise<Response>;
 	abstract updateRecipeById(id: string, recipe: UpdateRecipeDTO): Promise<Response>;
-	abstract getRecipeByUserId(userId: string): Promise<Response>;
+	abstract getRecipesByUserId(userId: string): Promise<Response>;
 	abstract saveFavoriteRecipe(recipeId: string): Promise<Response>;
 	abstract removeFavoriteRecipe(recipeId: string): Promise<Response>;
 	abstract getUserFavoriteRecipe(userId: string): Promise<Response>;
-	abstract getRecipesByCategoryId(categoryId: string): Promise<Response>;
+	abstract getRecipesByCategoryId(categoryId: number): Promise<Response>;
+	abstract deleteRecipeById(recipeId: string): Promise<Response>;
 }
 
 export class RecipeDatasource implements IRecipeDatasource {
-	async getRecipesByCategoryId(categoryId: string): Promise<Response> {
+	async deleteRecipeById(recipeId: string): Promise<Response> {
+		const response = await apiService.delete(`/api/recipes/delete/${recipeId}`);
+		const isSuccess = response.status === 204;
+		if (!isSuccess) return new Response(false, null, AppString.deleteDataErrorMessage);
+
+		return new Response(true, null, AppString.deleteRecipeSuccessMessage);
+	}
+	async getRecipesByCategoryId(categoryId: number): Promise<Response> {
 		const response = await apiService.get(`/api/recipes/categories/${categoryId}`);
 		const isSuccess = response.status === 200;
 		const resBody = await response.json();
@@ -81,7 +89,7 @@ export class RecipeDatasource implements IRecipeDatasource {
 
 		return new Response(true, resBody.result, AppString.getRecipeSuccessMessage);
 	}
-	async getRecipeByUserId(userId: string): Promise<Response> {
+	async getRecipesByUserId(userId: string): Promise<Response> {
 		const response = await apiService.get(`/api/recipes/user/${userId}`);
 		const isSuccess = response.status === 200;
 		const resBody = await response.json();
@@ -91,7 +99,7 @@ export class RecipeDatasource implements IRecipeDatasource {
 		return new Response(true, resBody.result, message);
 	}
 	async updateRecipeById(id: string, recipe: Partial<CreateRecipeDTO>): Promise<Response> {
-		const response = await apiService.put(`/api/recipes/${id}`, recipe);
+		const response = await apiService.patch(`/api/recipes/${id}`, recipe);
 		const isSuccess = response.status === 200;
 		const resBody = await response.json();
 		const message = resBody.message;

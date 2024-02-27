@@ -1,5 +1,17 @@
 import { useState, useEffect } from "react";
-import { Avatar, Divider, Button, List, Tooltip, message, Rate, Typography, Flex, Col } from "antd";
+import {
+	Avatar,
+	Divider,
+	Button,
+	List,
+	Tooltip,
+	message,
+	Rate,
+	Typography,
+	Flex,
+	Col,
+	Image,
+} from "antd";
 import {
 	UserOutlined,
 	CalendarOutlined,
@@ -109,7 +121,12 @@ export default function RecipeDetailPage() {
 					<Flex align="center" className="mb-4">
 						<div className="mr-5 flex items-center">
 							<Col xs={12} md={7}>
-								<Avatar size={"default"} icon={<UserOutlined />} style={{ marginRight: "10px" }} />
+								<Avatar
+									size={"default"}
+									icon={<UserOutlined />}
+									style={{ marginRight: "10px" }}
+									src={recipe.user.avatarUrl}
+								/>
 								<Typography.Text strong className="me-5 truncate">
 									{recipe.user.firstName + " " + recipe.user.lastName}
 								</Typography.Text>
@@ -133,7 +150,7 @@ export default function RecipeDetailPage() {
 								<Rate
 									disabled
 									allowHalf
-									defaultValue={recipe.ratings}
+									defaultValue={recipe.difficult}
 									style={{ color: AppColor.deepOrangeColor }}
 								/>
 							</Col>
@@ -244,15 +261,23 @@ export default function RecipeDetailPage() {
 					<ol style={{ paddingLeft: "20px", fontSize: "20px", fontFamily: "Arial, sans-serif" }}>
 						{recipe.instructors.map((instructor, index) => (
 							<li key={index} style={{ marginBottom: "25px" }}>
-								<Typography.Text
-									className={`text-md me-3 rounded-full px-2 py-1 font-inter font-medium text-white`}
-									style={{ backgroundColor: AppColor.deepOrangeColor }}
-								>
-									{index + 1}
-								</Typography.Text>
-								<Typography.Text className={`font-inter text-lg font-medium`}>
-									{instructor.description}
-								</Typography.Text>
+								<div>
+									<Typography.Text
+										className={`text-md me-3 rounded-full px-2 py-1 font-inter font-medium text-white`}
+										style={{ backgroundColor: AppColor.deepOrangeColor }}
+									>
+										{index + 1}
+									</Typography.Text>
+									<Typography.Text className={`font-inter text-lg font-medium`}>
+										{instructor.description}
+									</Typography.Text>
+								</div>
+								<div className="mt-3 md:grid md:grid-cols-3 md:gap-4">
+									{instructor.imageUrls &&
+										instructor.imageUrls.map((imageUrls) => (
+											<Image width={200} height={200} src={imageUrls}></Image>
+										))}
+								</div>
 							</li>
 						))}
 					</ol>

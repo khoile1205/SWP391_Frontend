@@ -1,4 +1,4 @@
-import { ActionStatus } from "@/enums/status";
+import { ActionStatus } from "@/enums";
 
 export type BecomeChefRequest = {
 	requestChefId: string;

@@ -1,3 +1,5 @@
+import { Roles } from "@/enums";
+import { User } from "@/models/user.model";
 import * as Yup from "yup";
 
 const phoneRegExp =
@@ -22,4 +24,40 @@ const signUpValidationSchema = Yup.object().shape({
 		.matches(/[!@#$%^&*.,_-]/, "Password must contain at least one special character"),
 });
 
-export { phoneRegExp, signUpValidationSchema, loginSchema };
+const createRecipeValidationSchema = (user: User) =>
+	Yup.object().shape({
+		title: Yup.string().required("Title is required"),
+		description: Yup.string().required("Description is required"),
+		portion: Yup.number()
+			.required("Portion is required")
+			.min(1, "Portion must be greater than 0")
+			.max(999, "Portion must be less than 999"),
+		cookingTime: Yup.number()
+			.required("Cooking time is required")
+			.min(1, "Cooking time must be greater than 0")
+			.max(999, "Cooking time must be less than 999"),
+		price:
+			user?.role === Roles.CHEF
+				? Yup.number().required("Price is required").min(1, "Price must be greater than 0")
+				: Yup.number(),
+		categories: Yup.array()
+			.required("Categories is required")
+			.min(1, "Recipe must be have at least one category"),
+		difficult: Yup.number()
+			.min(0.5, "Difficult of recipe must be greater than 0")
+			.max(5, "Difficult of recipe must be less than 5")
+			.required("Difficult of recipe is required"),
+		ingredients: Yup.array().of(
+			Yup.object().shape({
+				name: Yup.string().required("Ingredient name is required"),
+				amount: Yup.string().required("Ingredient amount is required"),
+			})
+		),
+		instructors: Yup.array().of(
+			Yup.object().shape({
+				description: Yup.string().required("Step description is required"),
+			})
+		),
+	});
+
+export { phoneRegExp, signUpValidationSchema, loginSchema, createRecipeValidationSchema };

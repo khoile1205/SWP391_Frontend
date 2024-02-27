@@ -7,9 +7,18 @@ abstract class UserDatasource {
 	abstract getUserProfile(): Promise<User | null>;
 	abstract changePassword(data: ChangePasswordType): Promise<Response>;
 	abstract updateUserInformation(data: UpdateUserInformationType): Promise<Response>;
+	abstract getUserById(userId: string): Promise<Response>;
 }
 
 class UserDatasourceImpl extends UserDatasource {
+	async getUserById(userId: string): Promise<Response> {
+		const response = await apiService.get(`/api/user/${userId}`);
+		const isSuccess = response.status === 200;
+		const resBody = await response.json();
+		const message = resBody.message;
+
+		return new Response(isSuccess, resBody.result, message);
+	}
 	async updateUserInformation(data: UpdateUserInformationType): Promise<Response> {
 		const res = await apiService.patch("/api/user", data);
 		const isSuccess = res.status === 200;

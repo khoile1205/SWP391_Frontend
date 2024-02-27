@@ -10,6 +10,8 @@ import { BecomeChefRequestUseCase } from "./become-chef-request/become-chef-requ
 import { BecomeChefRequestDatasource } from "@/datasources/become-chef-request.datasource";
 import { RecipeUseCase } from "./recipe.usecase/recipe.usecase";
 import { RecipeDatasource } from "@/datasources/recipe.datasource";
+import { SearchUseCaseImpl } from "./search.usecases/search.usecase";
+import { SearchDatasourceImpl } from "@/datasources/search.datasource";
 
 const authUseCase = new AuthUseCase(new AuthDataSourceImpl(), new UserDatasourceImpl());
 const userUseCase = new UserUseCaseImpl(new UserDatasourceImpl());
@@ -17,6 +19,7 @@ const fileUseCase = new FileUseCaseImpl(new FileDatasourceImpl());
 const categoriesUsecase = new CategoriesUsecaseImpl(new CategoriesDatasourceImpl());
 const becomeChefRequestUseCase = new BecomeChefRequestUseCase(new BecomeChefRequestDatasource());
 const recipeUseCase = new RecipeUseCase(new RecipeDatasource());
+const searchUseCase = new SearchUseCaseImpl(new SearchDatasourceImpl());
 
 export {
 	authUseCase,
@@ -25,4 +28,5 @@ export {
 	categoriesUsecase,
 	becomeChefRequestUseCase,
 	recipeUseCase,
+	searchUseCase,
 };

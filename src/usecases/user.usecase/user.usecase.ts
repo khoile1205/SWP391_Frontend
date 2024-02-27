@@ -8,10 +8,14 @@ abstract class UserUseCase {
 	abstract getUserProfile(): Promise<User | null>;
 	abstract changePassword(data: ChangePasswordType): Promise<Response>;
 	abstract updateUserInformation(data: UpdateUserInformationType): Promise<Response>;
+	abstract getUserById(userId: string): Promise<Response>;
 }
 
 class UserUseCaseImpl implements UserUseCase {
 	constructor(private readonly userDatasource: UserDatasource) {}
+	async getUserById(userId: string): Promise<Response> {
+		return await this.userDatasource.getUserById(userId);
+	}
 
 	updateUserInformation(data: UpdateUserInformationType): Promise<Response> {
 		return this.userDatasource.updateUserInformation(data);

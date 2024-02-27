@@ -1,14 +1,3 @@
-export enum Roles {
-	USER = "user",
-	ADMIN = "admin",
-	CHEF = "chef",
-}
-
-export enum Gender {
-	MALE = "male",
-	FEMALE = "female",
-}
-
 export type ChangePasswordType = {
 	currentPassword: string;
 	newPassword: string;

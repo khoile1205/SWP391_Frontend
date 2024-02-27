@@ -1,4 +1,4 @@
-import { Ingredients, Instructors } from "@/types/recipe";
+import { Category, Ingredients, Instructors } from "@/types/recipe";
 import { ShortInfoUser } from "@/types/user";
 
 export class Recipe {
@@ -11,10 +11,10 @@ export class Recipe {
 	portion: number;
 	cookingTime: number;
 	price: number;
-	ratings: number;
+	difficult: number;
 	instructors: Instructors[];
 	ingredients: Ingredients[];
-	categories: number[];
+	categories: Category[];
 	createdAt: Date;
 	updatedAt: Date;
 
@@ -28,10 +28,10 @@ export class Recipe {
 		portion: number,
 		cookingTime: number,
 		price: number,
-		ratings: number,
+		difficult: number,
 		instructors: Instructors[],
 		ingredients: Ingredients[],
-		categories: number[],
+		categories: Category[],
 		createdAt: Date,
 		updatedAt: Date
 	) {
@@ -44,7 +44,7 @@ export class Recipe {
 		this.portion = portion;
 		this.cookingTime = cookingTime;
 		this.price = price;
-		this.ratings = ratings;
+		this.difficult = difficult;
 		this.instructors = instructors;
 		this.ingredients = ingredients;
 		this.categories = categories;

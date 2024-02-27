@@ -21,6 +21,7 @@ type UserStore = {
 	signInWithFacebook(data: OAuth2SignInData): Promise<Result>;
 	signInWithGoogle(data: OAuth2SignInData): Promise<Result>;
 	handleSignIn(signInMethod: () => Promise<Response>): Promise<Result>;
+	getUserById(userId: string): Promise<Result>;
 };
 
 const userStore = create<UserStore>()((set, get) => ({
@@ -87,6 +88,9 @@ const userStore = create<UserStore>()((set, get) => ({
 		}
 
 		return result;
+	},
+	getUserById: async (userId: string) => {
+		return await handleUseCase(userUseCase.getUserById(userId));
 	},
 }));
 
