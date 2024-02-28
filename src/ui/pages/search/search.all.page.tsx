@@ -1,6 +1,5 @@
 import { useGetSearchResult } from "@/hooks/useGetSearchResult";
 import { RecipeCard } from "@/ui/components";
-import { pickRandomElements } from "@/utils/array_exts";
 import { Typography } from "antd";
 
 export default function SearchAllPage() {
@@ -9,20 +8,27 @@ export default function SearchAllPage() {
 
 	return (
 		<>
-			<Typography.Title>Search Result</Typography.Title>
-			<Typography.Text>Search for: {searchKeyword}</Typography.Text>
+			<Typography.Title className="font-playfair">
+				Search result for {searchKeyword}
+			</Typography.Title>
 			{(type === "all" || type == "recipes") && (
 				<>
-					{pickRandomElements(result.recipes, 8).map((recipe) => (
-						<RecipeCard recipe={recipe}></RecipeCard>
-					))}
+					<Typography.Title className="font-playfair" level={3}>
+						For Recipe:{" "}
+					</Typography.Title>
+
+					<div className="md:grid md:grid-cols-3 md:gap-4">
+						{result.recipes.map((recipe) => (
+							<RecipeCard recipe={recipe} key={recipe.id}></RecipeCard>
+						))}
+					</div>
 				</>
 			)}
-			{(type === "all" || type == "users") && (
+			{/* {(type === "all" || type == "users") && (
 				<>
 					<div>{pickRandomElements(result.users, 3).map((user) => user.id)}</div>
 				</>
-			)}
+			)} */}
 		</>
 	);
 }
