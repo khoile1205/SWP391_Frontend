@@ -120,7 +120,7 @@ export default function RecipeDetailPage() {
 					</Typography.Title>
 					<Flex align="center" className="mb-4">
 						<div className="mr-5 flex items-center">
-							<Col xs={12} md={7}>
+							<Col xs={12} md={9}>
 								<Avatar
 									size={"default"}
 									icon={<UserOutlined />}

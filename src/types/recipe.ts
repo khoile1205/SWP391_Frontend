@@ -12,7 +12,7 @@ export type Ingredients = {
 
 export interface Category {
 	id: number;
-	imageURL: string;
+	imageUrl: string;
 	name: string;
 }
 
