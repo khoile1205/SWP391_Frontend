@@ -30,7 +30,7 @@ export default function CategoryHomepage() {
 				))}
 			</div>
 			{visibleCategories.length < categories.length && (
-				<Loadmore onClick={handleLoadMore} title="Load More Comment"></Loadmore>
+				<Loadmore onClick={handleLoadMore} title="Load More Categories"></Loadmore>
 			)}
 		</div>
 	);

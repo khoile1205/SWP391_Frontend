@@ -7,13 +7,14 @@ import { showToast } from "@/utils/notify";
 import userStore from "@/zustand/user.store";
 import { SearchOutlined } from "@ant-design/icons";
 import { Button, Input, Typography } from "antd";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function RecipesPage() {
 	const { user } = userStore((state) => state);
 
 	const { recipes } = useGetAllRecipes();
-
+	const [searchKeyword, setSearchKeyword] = useState<string>("");
 	const navigate = useNavigate();
 
 	const handleRedirectCreateRecipe = () => {
@@ -24,6 +25,11 @@ export default function RecipesPage() {
 			navigate("/sign-in");
 		}
 	};
+
+	const specialRecipes = useMemo(() => pickRandomElements(recipes, 3), [recipes]);
+	const maybeLikeItRecipes = useMemo(() => pickRandomElements(recipes, 3), [recipes]);
+	const superDeliciousRecipes = useMemo(() => pickRandomElements(recipes, 3), [recipes]);
+
 	return (
 		<div className="mx-auto">
 			<div className="space-y-4 text-center">
@@ -31,20 +37,22 @@ export default function RecipesPage() {
 				<Input
 					prefix={<SearchOutlined></SearchOutlined>}
 					className={"w-4/5 sm:w-2/5"}
+					onChange={(e) => setSearchKeyword(e.target.value)}
 					suffix={
 						<Button
 							style={{
 								backgroundColor: AppColor.deepOrangeColor,
 							}}
 							className=" !text-white"
+							href={`/search/recipes?q=${searchKeyword}`}
 						>
-							<a href="/recipes/1">Find</a>
+							Find
 						</Button>
 					}
 					placeholder="Your recipes"
 				></Input>
 				<Typography
-					className="text-primary hover:cursor-pointer"
+					className="text-primary text-lg hover:cursor-pointer"
 					onClick={() => handleRedirectCreateRecipe()}
 				>
 					Create your own recipe
@@ -56,7 +64,7 @@ export default function RecipesPage() {
 						Special Recipes
 					</Typography.Title>
 					<div className="md:grid md:grid-cols-3 md:gap-4">
-						{pickRandomElements(recipes, 3).map((recipe) => (
+						{specialRecipes.map((recipe) => (
 							<RecipeCard key={recipe.id} recipe={recipe} />
 						))}
 					</div>
@@ -67,7 +75,7 @@ export default function RecipesPage() {
 						Maybe you like it
 					</Typography.Title>
 					<div className="md:grid md:grid-cols-3 md:gap-4">
-						{pickRandomElements(recipes, 3).map((recipe) => (
+						{maybeLikeItRecipes.map((recipe) => (
 							<RecipeCard key={recipe.id} recipe={recipe} />
 						))}
 					</div>
@@ -78,7 +86,7 @@ export default function RecipesPage() {
 						Super Delicious
 					</Typography.Title>
 					<div className="md:grid md:grid-cols-3 md:gap-4">
-						{pickRandomElements(recipes, 3).map((recipe) => (
+						{superDeliciousRecipes.map((recipe) => (
 							<RecipeCard key={recipe.id} recipe={recipe} />
 						))}
 					</div>

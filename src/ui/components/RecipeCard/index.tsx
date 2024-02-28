@@ -48,9 +48,11 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 		}
 		if (bookmarked) {
 			removeFavoriteRecipe(recipe.id);
+			showToast("success", "Your recipe remove favorite successfully");
 			setBookmarked(false);
 		} else {
 			saveFavoriteRecipe(recipe.id);
+			showToast("success", "Your recipe saved favourite successfully");
 			setBookmarked(true);
 		}
 	};
@@ -92,7 +94,7 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 		>
 			<Meta
 				avatar={
-					<Tooltip title={user?.firstName + " " + user?.lastName}>
+					<Tooltip title={recipe.user.firstName + " " + recipe.user.lastName}>
 						<a className="relative z-50">
 							<Avatar src={recipe.user.avatarUrl} />
 						</a>

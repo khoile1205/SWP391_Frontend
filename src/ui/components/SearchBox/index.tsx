@@ -44,12 +44,13 @@ const SearchBox: React.FC<SearchBoxProps> = ({ open, setOpen }) => {
 					}}
 					suffix={
 						<Button
+							href={`/search/${searchType}?q=${searchTerm}`}
 							style={{
 								backgroundColor: AppColor.deepOrangeColor,
 							}}
 							className=" !text-white"
 						>
-							<a href={`/search/${searchType}?q=${searchTerm}`}>Find</a>
+							Find
 						</Button>
 					}
 					placeholder="Your recipes"

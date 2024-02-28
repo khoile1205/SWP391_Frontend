@@ -157,7 +157,7 @@ export default function ProfilePage() {
 						<div className="flex flex-col items-center space-y-8 text-center sm:flex-row sm:space-x-8 sm:space-y-0">
 							<Avatar rootClassName="w-24 h-24" src={avatarUrl}></Avatar>
 							<Upload
-								action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+								// action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
 								name="avatarUrl"
 								beforeUpload={handleBeforeUpload}
 								onChange={async (info) => {
@@ -166,18 +166,12 @@ export default function ProfilePage() {
 										setIsUploading(true);
 										return;
 									}
-									if (info.file.status == "done") {
-										showToast("success", "Upload avatar successfully");
-										const avatarUrl = await handleChangeAvatar(info.file);
-										if (avatarUrl) setFieldValue("avatarUrl", avatarUrl);
-										setIsUploading(false);
-										return;
-									}
 
-									if (info.file.status == "error") {
-										showToast("error", "Upload avatar failed");
-										return;
-									}
+									const avatarUrl = await handleChangeAvatar(info.file);
+									if (avatarUrl) setFieldValue("avatarUrl", avatarUrl);
+									showToast("success", "Upload avatar successfully");
+									setIsUploading(false);
+									return;
 								}}
 								showUploadList={false}
 							>
@@ -206,6 +200,56 @@ export default function ProfilePage() {
 						<Divider></Divider>
 
 						<Form className="space-y-8" onFinish={handleSubmit}>
+							<Row className="space-y-8 sm:space-y-0">
+								<Col
+									xs={{ span: 24, offset: 0 }}
+									md={{ span: 12, offset: 0 }}
+									lg={{ span: 8, offset: 0 }}
+								>
+									<Form.Item
+										name={"userName"}
+										required
+										validateStatus={errors.userName ? "error" : "success"}
+										help={
+											errors.userName &&
+											touched.userName && <div className="my-3">{errors.userName}</div>
+										}
+									>
+										<Typography className="uppercase opacity-75">username</Typography>
+										<Input
+											name="userName"
+											prefix={"@"}
+											className={`border-b-1 mt-2 space-x-2 border border-x-0 border-t-0 ps-2`}
+											disabled={true}
+											defaultValue={values.userName}
+											onChange={handleChange}
+										></Input>
+									</Form.Item>
+								</Col>
+								<Col
+									xs={{ span: 24, offset: 0 }}
+									md={{ span: 12, offset: 0 }}
+									lg={{ span: 8, offset: 1 }}
+									className=""
+								>
+									<Typography className="uppercase opacity-75">password</Typography>
+									<Input
+										prefix={<LockOutlined></LockOutlined>}
+										className={`border-b-1 mt-2 space-x-2 border border-x-0 border-t-0 ps-2`}
+										value={"************"}
+										disabled
+									></Input>
+									<Typography
+										className={`hover:text-primary mt-2 text-end text-[${AppColor.deepOrangeColor}] hover:cursor-pointer`}
+										onClick={() => {
+											window.scrollTo({ behavior: "smooth", top: 0 });
+											navigate("/profile/change-password");
+										}}
+									>
+										Change password
+									</Typography>
+								</Col>
+							</Row>
 							<Row className="space-y-8 sm:space-y-0">
 								<Col
 									xs={{ span: 24, offset: 0 }}
@@ -260,56 +304,7 @@ export default function ProfilePage() {
 									</Form.Item>
 								</Col>
 							</Row>
-							<Row className="space-y-8 sm:space-y-0">
-								<Col
-									xs={{ span: 24, offset: 0 }}
-									md={{ span: 12, offset: 0 }}
-									lg={{ span: 8, offset: 0 }}
-								>
-									<Form.Item
-										name={"userName"}
-										required
-										validateStatus={errors.userName ? "error" : "success"}
-										help={
-											errors.userName &&
-											touched.userName && <div className="my-3">{errors.userName}</div>
-										}
-									>
-										<Typography className="uppercase opacity-75">username</Typography>
-										<Input
-											name="userName"
-											prefix={"@"}
-											className={`border-b-1 mt-2 space-x-2 border border-x-0 border-t-0 ps-2`}
-											disabled={!isEdit}
-											defaultValue={values.userName}
-											onChange={handleChange}
-										></Input>
-									</Form.Item>
-								</Col>
-								<Col
-									xs={{ span: 24, offset: 0 }}
-									md={{ span: 12, offset: 0 }}
-									lg={{ span: 8, offset: 1 }}
-									className=""
-								>
-									<Typography className="uppercase opacity-75">password</Typography>
-									<Input
-										prefix={<LockOutlined></LockOutlined>}
-										className={`border-b-1 mt-2 space-x-2 border border-x-0 border-t-0 ps-2`}
-										value={"************"}
-										disabled
-									></Input>
-									<Typography
-										className={`hover:text-primary mt-2 text-end text-[${AppColor.deepOrangeColor}] hover:cursor-pointer`}
-										onClick={() => {
-											window.scrollTo({ behavior: "smooth", top: 0 });
-											navigate("/profile/change-password");
-										}}
-									>
-										Change password
-									</Typography>
-								</Col>
-							</Row>
+
 							<Row className="space-y-8 sm:space-y-0">
 								<Col
 									xs={{ span: 24, offset: 0 }}
