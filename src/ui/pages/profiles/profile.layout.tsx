@@ -11,42 +11,42 @@ const profileTabs = [
 	{
 		tab: "Profile",
 		key: "",
-		role: [Roles.USER, Roles.CHEF],
+		role: [Roles.ADMIN, Roles.USER, Roles.CHEF],
 	},
 	{
 		tab: "Recipes",
 		key: "recipes",
-		role: [Roles.USER, Roles.CHEF],
+		role: [Roles.ADMIN, Roles.USER, Roles.CHEF],
 	},
 	{
 		tab: "Change Password",
 		key: "change-password",
-		role: [Roles.USER, Roles.CHEF],
+		role: [Roles.ADMIN, Roles.USER, Roles.CHEF],
 	},
 	{
 		tab: "Reports",
 		key: "reports",
-		role: [Roles.USER, Roles.CHEF],
+		role: [Roles.ADMIN, Roles.USER, Roles.CHEF],
 	},
 	{
 		tab: "Transaction",
 		key: "transactions",
-		role: [Roles.USER, Roles.CHEF],
+		role: [Roles.ADMIN, Roles.USER, Roles.CHEF],
 	},
 	{
 		tab: "Booking",
 		key: "bookings",
-		role: [Roles.USER],
+		role: [Roles.ADMIN, Roles.USER],
 	},
 	{
 		tab: "Become-Chef Request",
 		key: "requests",
-		role: [Roles.USER],
+		role: [Roles.ADMIN, Roles.USER],
 	},
 	{
 		tab: "Schedules",
 		key: "schedules",
-		role: [Roles.CHEF],
+		role: [Roles.ADMIN, Roles.CHEF],
 	},
 ];
 
