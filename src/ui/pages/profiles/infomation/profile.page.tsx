@@ -60,15 +60,15 @@ export default function ProfilePage() {
 	const { uploadImage } = fileStore((state) => state);
 	// React state
 	const [isEdit, setIsEdit] = useState<boolean>(false);
-	const [isEditPhoneNumber, setIsEditPhoneNumber] = useState<boolean>(false);
+	// const [isEditPhoneNumber, setIsEditPhoneNumber] = useState<boolean>(false);
 	const [isShowAccountBalance, setIsEditShowAccountBalance] = useState<boolean>(false);
 	const [avatarUrl, setAvatarUrl] = useState<string | null | undefined>(user?.avatarUrl);
 	const [isUploading, setIsUploading] = useState<boolean>(false);
 
 	// Hooks
 	const balanceDisplay = useMemo(() => {
-		return isShowAccountBalance ? "100000" : "******";
-	}, [isShowAccountBalance]);
+		return isShowAccountBalance ? user?.balance : "******";
+	}, [isShowAccountBalance, user?.balance]);
 
 	// Controller
 	const handleUpdateUser = useLoadingCallbackWithFormik(
@@ -300,7 +300,7 @@ export default function ProfilePage() {
 										disabled
 									></Input>
 									<Typography
-										className={`mt-2 text-end text-[${AppColor.deepOrangeColor}] hover:cursor-pointer`}
+										className={`hover:text-primary mt-2 text-end text-[${AppColor.deepOrangeColor}] hover:cursor-pointer`}
 										onClick={() => {
 											window.scrollTo({ behavior: "smooth", top: 0 });
 											navigate("/profile/change-password");
@@ -371,7 +371,7 @@ export default function ProfilePage() {
 				)}
 			</Formik>
 
-			<Form className="mt-10">
+			{/* <Form className="mt-10">
 				<Row className="space-x-7">
 					<Form className="block items-start space-x-5 sm:flex">
 						<Form.Item label="Contact number" name="" rootClassName="flex items-center">
@@ -402,7 +402,7 @@ export default function ProfilePage() {
 						</div>
 					</Form>
 				</Row>
-			</Form>
+			</Form> */}
 
 			<Divider></Divider>
 
@@ -435,9 +435,6 @@ export default function ProfilePage() {
 				</div>
 			</Row>
 			<Divider></Divider>
-			<Row>
-				<Typography.Title level={3}>Recipes</Typography.Title>
-			</Row>
 		</div>
 	);
 }

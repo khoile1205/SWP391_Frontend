@@ -1,4 +1,4 @@
-import { Typography, Card, Menu, Dropdown, Avatar, Rate } from "antd";
+import { Typography, Card, Menu, Dropdown, Avatar, Rate, Tooltip } from "antd";
 import { Recipe } from "@/models/recipe.model";
 import { HeartOutlined, ShareAltOutlined, StarOutlined } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
@@ -14,18 +14,21 @@ interface RecipeCardProps {
 	recipe: Recipe;
 }
 
-const ShareMenu: React.FC = () => (
+interface ShareMenuProps {
+	recipe: Recipe;
+}
+const ShareMenu: React.FC<ShareMenuProps> = ({ recipe }) => (
 	<Menu>
 		<Menu.Item>
 			<SocialShareButton
 				platform={"Facebook"}
-				url={`${import.meta.env.VITE_URL}${window.location.pathname}`}
+				url={`${import.meta.env.VITE_URL}/recipes/${recipe.id}`}
 			></SocialShareButton>
 		</Menu.Item>
 		<Menu.Item>
 			<SocialShareButton
 				platform={"Twitter"}
-				url={`${import.meta.env.VITE_URL}${window.location.pathname}`}
+				url={`${import.meta.env.VITE_URL}/recipes/${recipe.id}`}
 			></SocialShareButton>
 		</Menu.Item>
 	</Menu>
@@ -74,7 +77,7 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 					}}
 				/>,
 				<Dropdown
-					overlay={() => <ShareMenu />}
+					overlay={() => <ShareMenu recipe={recipe} />}
 					trigger={["click"]}
 					className="hover:!text-primary focus:!text-primary text-[#00000073]"
 				>
@@ -89,9 +92,11 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 		>
 			<Meta
 				avatar={
-					<a className="relative z-50">
-						<Avatar src={recipe.user.avatarUrl} />
-					</a>
+					<Tooltip title={user?.firstName + " " + user?.lastName}>
+						<a className="relative z-50">
+							<Avatar src={recipe.user.avatarUrl} />
+						</a>
+					</Tooltip>
 				}
 				title={
 					<a href={`/recipes/${recipe.id}`}>

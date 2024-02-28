@@ -12,6 +12,7 @@ interface User {
 	bookingPrice: number | null;
 	createdAt: string;
 	updatedAt: string;
+	balance: number;
 	role: Roles;
 }
 
