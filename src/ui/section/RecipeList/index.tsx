@@ -4,7 +4,6 @@ import React from "react";
 
 interface RecipeListSectionProps {
 	listRecipes: Recipe[];
-	// className?: React.Class;
 }
 export const RecipeListSection: React.FC<RecipeListSectionProps> = ({ listRecipes }) => {
 	return (

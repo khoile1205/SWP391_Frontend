@@ -6,10 +6,8 @@ import { useGetUserById } from "@/hooks/user";
 import { useGetRecipesByUserId } from "@/hooks/recipes";
 import { RecipeListSection } from "@/ui/section";
 import NotFound from "../not-found.page";
-import { Roles } from "@/enums";
-import { showToast } from "@/utils/notify";
-import { CheckCircleOutlined } from "@ant-design/icons";
-import { Flex, Avatar, Typography, Tooltip, Button, Divider, Space } from "antd";
+import { UserProfileLayout } from "@/ui/components";
+import { Divider, Flex, Typography, Space } from "antd";
 
 type Filter = {
 	type: "newest" | "oldest";
@@ -18,7 +16,6 @@ type Filter = {
 
 export default function UserProfilePage() {
 	const { userId } = useParams();
-	const [isFollower, setIsFollower] = useState(false);
 	const [filter, setFilter] = useState<Filter>({
 		description: "Newest",
 		type: "newest",
@@ -35,42 +32,9 @@ export default function UserProfilePage() {
 		);
 	};
 
-	const handleFollowUser = () => {
-		setIsFollower(!isFollower);
-		showToast("success", !isFollower ? "Follow user successfully" : "Unfollow user successfully");
-	};
 	return user ? (
 		<>
-			<Flex align="end" className="space-x-4">
-				<Avatar size={100} src={user.avatarUrl} />
-				<div className="space-y-2">
-					<Flex className="space-x-4">
-						<Typography.Title level={3} className="!mb-0">
-							{user.firstName + " " + user.lastName}
-						</Typography.Title>
-						{user.role == Roles.CHEF && (
-							<Tooltip title="This is the chef">
-								<CheckCircleOutlined className="text-primary" />
-							</Tooltip>
-						)}
-						<Button
-							className={`${!isFollower ? "bg-primary text-white" : ""}`}
-							onClick={handleFollowUser}
-						>
-							{!isFollower ? "Follow" : "Unfollow"}
-						</Button>
-					</Flex>
-					<div className="inline-block space-x-7">
-						<Typography.Link href="/" className="!text-gray-600">
-							10 Follower
-						</Typography.Link>
-						<Typography.Link href="/" className="!text-gray-600">
-							10 Following
-						</Typography.Link>
-					</div>
-				</div>
-			</Flex>
-			<Divider></Divider>
+			<UserProfileLayout user={user} />
 			<Flex align="center" justify="space-between">
 				<Typography.Title level={3} className="!m-0">
 					Recipes

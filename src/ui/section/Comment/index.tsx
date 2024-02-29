@@ -1,37 +1,21 @@
+import { Comment } from "@/models/comment.model";
+import { User } from "@/models/user.model";
 import { IconText } from "@/ui/components";
 import AppColor from "@/utils/appColor";
-import { showToast } from "@/utils/notify";
 import userStore from "@/zustand/user.store";
-import {
-	MessageOutlined,
-	HeartOutlined,
-	CloseCircleOutlined,
-	UserOutlined,
-} from "@ant-design/icons";
+import { MessageOutlined, HeartOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { List, Avatar, Typography, Button, Divider, Space, Form } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import Link from "antd/es/typography/Link";
 import { useFormik } from "formik";
 import moment from "moment";
+// import moment from "moment";
 import { useState } from "react";
 import * as Yup from "yup";
 
-type CommentItem = {
-	author: string;
-	avatar: JSX.Element;
-	content: JSX.Element;
-	datetime: Date;
-	likes: number;
-	replying?: boolean;
-};
-
 interface CommentProps {
-	listComments: CommentItem[];
+	listComments: Comment[];
 }
-
-const timeElapsed = (datetime: Date) => {
-	return moment(datetime).fromNow();
-};
 
 const commentRecipeValidationSchema = Yup.object().shape({
 	comment: Yup.string().required("Comment is required"),
@@ -41,69 +25,69 @@ export const CommentSection: React.FC<CommentProps> = ({ listComments }) => {
 	const [displayedComments, setDisplayedComments] = useState<number>(10);
 	const [replyingTo, setReplyingTo] = useState<number | null>(null);
 	const [replyValue, setReplyValue] = useState("");
-	const [likedComments, setLikedComments] = useState<number[]>([]);
+	// const [likedComments, setLikedComments] = useState<number[]>([]);
 
 	const commentFormik = useFormik({
 		initialValues: {
 			comment: "",
 		},
 		onSubmit: () => {
-			handlePostComment(commentFormik.values.comment);
+			// handlePostComment(commentFormik.values.comment);
 		},
 		validationSchema: commentRecipeValidationSchema,
 	});
 
-	const handleLikeButtonClick = (index: number) => {
-		const updatedComments = [...listComments];
-		const updatedLikes = [...likedComments];
-		updatedComments[index] = {
-			...updatedComments[index],
-			likes: updatedComments[index].likes === 0 ? 1 : 0,
-		};
-		const indexOfComment = likedComments.indexOf(index);
-		if (indexOfComment === -1) {
-			updatedLikes.push(index);
-		} else {
-			updatedLikes.splice(indexOfComment, 1);
-		}
-		// setComments(updatedComments);
-		setLikedComments(updatedLikes);
-		// showToast(
-		// 	"success",
-		// 	updatedComments[index].likes === 1 ? "You liked this comment!" : "You unliked this comment!"
-		// );
-	};
+	// const handleLikeButtonClick = (index: number) => {
+	// 	const updatedComments = [...listComments];
+	// 	const updatedLikes = [...likedComments];
+	// 	updatedComments[index] = {
+	// 		...updatedComments[index],
+	// 		likes: updatedComments[index].likes === 0 ? 1 : 0,
+	// 	};
+	// 	const indexOfComment = likedComments.indexOf(index);
+	// 	if (indexOfComment === -1) {
+	// 		updatedLikes.push(index);
+	// 	} else {
+	// 		updatedLikes.splice(indexOfComment, 1);
+	// 	}
+	// 	// setComments(updatedComments);
+	// 	setLikedComments(updatedLikes);
+	// 	// showToast(
+	// 	// 	"success",
+	// 	// 	updatedComments[index].likes === 1 ? "You liked this comment!" : "You unliked this comment!"
+	// 	// );
+	// };
 
 	const handleReplyButtonClick = (index: number) => {
 		setReplyingTo(index);
 		setReplyValue("");
 	};
 
-	const handlePostComment = (value: string) => {
-		if (value.trim() !== "") {
-			const newComment = {
-				author: "You",
-				avatar: <Avatar icon={<UserOutlined />} size={32} />,
-				content: <p>{value}</p>,
-				datetime: new Date(),
-				likes: 0,
-			};
-			if (replyingTo !== null) {
-				const updatedComments = [...listComments];
-				updatedComments.splice(replyingTo + 1, 0, newComment);
-				// setComments(updatedComments);
-				setReplyingTo(null);
-				setReplyValue("");
-				showToast("success", "Your reply has been posted!");
-			} else {
-				// setComments([...listComments, newComment]);
-				setReplyValue("");
-				showToast("success", "Your reply has been posted!");
-			}
-		} else {
-			// message.error("Please enter a comment!");
-		}
-	};
+	// const handlePostComment = (value: string) => {
+	// 	if (value.trim() !== "") {
+	// 		const newComment = {
+	// 			author: "You",
+	// 			avatar: <Avatar icon={<UserOutlined />} size={32} />,
+	// 			content: <p>{value}</p>,
+	// 			datetime: new Date(),
+	// 			likes: 0,
+	// 		};
+	// 		if (replyingTo !== null) {
+	// 			const updatedComments = [...listComments];
+	// 			updatedComments.splice(replyingTo + 1, 0, newComment);
+	// 			// setComments(updatedComments);
+	// 			setReplyingTo(null);
+	// 			setReplyValue("");
+	// 			showToast("success", "Your reply has been posted!");
+	// 		} else {
+	// 			// setComments([...listComments, newComment]);
+	// 			setReplyValue("");
+	// 			showToast("success", "Your reply has been posted!");
+	// 		}
+	// 	} else {
+	// 		// message.error("Please enter a comment!");
+	// 	}
+	// };
 
 	const handleLoadMoreComments = () => {
 		setDisplayedComments((prev) => prev + 10);
@@ -136,7 +120,7 @@ export const CommentSection: React.FC<CommentProps> = ({ listComments }) => {
 						</div>
 					)
 				}
-				renderItem={(item, index) => (
+				renderItem={(comment, index) => (
 					<>
 						<List.Item
 							style={{
@@ -155,7 +139,7 @@ export const CommentSection: React.FC<CommentProps> = ({ listComments }) => {
 								/>,
 								<IconText
 									icon={HeartOutlined}
-									onClick={() => handleLikeButtonClick(1)}
+									// onClick={() => handleLikeButtonClick(1)}
 									text="156"
 									key="list-vertical-like-o"
 								/>,
@@ -163,21 +147,31 @@ export const CommentSection: React.FC<CommentProps> = ({ listComments }) => {
 						>
 							<List.Item.Meta
 								avatar={
-									<Link href={item.author}>
-										<Avatar src={item.avatar} />
+									<Link
+										href={`/user/${(comment.userId as User).firstName + " " + (comment.userId as User).lastName}`}
+									>
+										<Avatar src={(comment.userId as User).avatarUrl} />
 									</Link>
 								}
 								title={
 									<>
-										<Link href={item.author}>
-											<Typography className="font-bold">{item.author}</Typography>
+										<Link
+											href={`/user/${(comment.userId as User).firstName + " " + (comment.userId as User).lastName}`}
+										>
+											<Typography className="font-bold">
+												{(comment.userId as User).firstName +
+													" " +
+													(comment.userId as User).lastName}
+											</Typography>
 										</Link>
-										<small className="text-[#00000073]">{timeElapsed(new Date())}</small>
+										<small className="text-[#00000073]">
+											{moment(comment.createdAt).fromNow()}
+										</small>
 									</>
 								}
 								description={
 									<Space direction="vertical">
-										<Typography>{item.content}</Typography>
+										<Typography>{comment.content}</Typography>
 									</Space>
 								}
 							/>
@@ -207,7 +201,7 @@ export const CommentSection: React.FC<CommentProps> = ({ listComments }) => {
 									</Button>
 									<Button
 										type="primary"
-										onClick={() => handlePostComment(replyValue)}
+										// onClick={() => handlePostComment(replyValue)}
 										style={{ background: "#1890ff" }}
 									>
 										Send

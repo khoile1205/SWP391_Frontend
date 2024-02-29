@@ -7,7 +7,6 @@ export const useGetRecipeById = (recipeId: string | undefined) => {
 	const [recipe, setRecipe] = useState<Recipe | null>(null);
 	const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>([]);
 	const { getRecipeById } = recipeStore((state) => state);
-
 	const fetchData = async () => {
 		if (recipeId == undefined) return;
 

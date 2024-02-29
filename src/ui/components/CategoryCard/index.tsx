@@ -8,7 +8,6 @@ interface CategoryCardProps {
 
 export function CategoryCard({ category }: CategoryCardProps) {
 	const { isLoading } = useLoadingStore((state) => state);
-	console.log(category);
 	return (
 		<Skeleton loading={isLoading}>
 			<a href={`/category/${category.id}`} className="text-center">
