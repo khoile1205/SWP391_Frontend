@@ -1,4 +1,4 @@
-import { useGetSearchResult } from "@/hooks/useGetSearchResult";
+import { useGetSearchResult } from "@/hooks/search";
 import { RecipeCard } from "@/ui/components";
 import { Typography } from "antd";
 

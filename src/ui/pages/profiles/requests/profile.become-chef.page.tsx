@@ -8,8 +8,8 @@ import CreateRequestModal from "./profile.created-request.modal";
 import { CloseCircleOutlined, ExclamationCircleFilled } from "@ant-design/icons";
 import { becomeChefRequestStore } from "@/zustand/become-chef-request";
 import { showToast } from "@/utils/notify";
-import useUserChefRequest from "@/hooks/useUserChefRequest";
 import { ActionStatus } from "@/enums";
+import { useUserChefRequest } from "@/hooks/request";
 
 dayjs.extend(customParseFormat);
 

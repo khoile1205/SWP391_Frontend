@@ -3,12 +3,12 @@ import { Recipe } from "@/models/recipe.model";
 import { HeartOutlined, ShareAltOutlined, StarOutlined } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
 import { SocialShareButton } from "..";
-import { useRecipeBookmark } from "@/hooks/useRecipeBookmark";
 import AppColor from "@/utils/appColor";
 import { recipeStore } from "@/zustand/recipe.store";
 import { useNavigate } from "react-router-dom";
 import userStore from "@/zustand/user.store";
 import { showToast } from "@/utils/notify";
+import { useRecipeBookmark } from "@/hooks/recipes";
 
 interface RecipeCardProps {
 	recipe: Recipe;

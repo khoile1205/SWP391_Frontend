@@ -27,13 +27,12 @@ import Pasta from "@/assets/Icon/pasta.jpg";
 import AppColor from "@/utils/appColor";
 import { ShareRecipeModal } from "@/ui/components";
 import { CommentSection } from "@/ui/section";
-import { useGetRecipeById } from "@/hooks/useGetRecipeById";
 import { useParams } from "react-router-dom";
 import NotFound from "../not-found.page";
 import { recipeStore } from "@/zustand/recipe.store";
 import { showToast } from "@/utils/notify";
-import { useRecipeBookmark } from "@/hooks/useRecipeBookmark";
 import userStore from "@/zustand/user.store";
+import { useGetRecipeById, useRecipeBookmark } from "@/hooks/recipes";
 type CommentItem = {
 	author: string;
 	avatar: JSX.Element;

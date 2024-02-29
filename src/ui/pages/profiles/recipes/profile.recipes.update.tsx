@@ -1,5 +1,4 @@
 import { Roles } from "@/enums";
-import { useGetRecipeById } from "@/hooks/useGetRecipeById";
 import { Ingredients, Instructors, UpdateRecipeDTO } from "@/types/recipe";
 import { ConfirmModal, MultiImagesUploadComponent } from "@/ui/components";
 import DraggerUpload from "@/ui/components/DraggerUpload";
@@ -27,6 +26,7 @@ import NotFound from "../../not-found.page";
 import { User } from "@/models/user.model";
 import { createRecipeValidationSchema } from "@/utils/validation";
 import { renderUploadedRequestImage } from "@/utils/file_exts";
+import { useGetRecipeById } from "@/hooks/recipes";
 
 export default function UpdateRecipesPage() {
 	// Hooks

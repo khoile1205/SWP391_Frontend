@@ -2,11 +2,11 @@ import { Table, Button, Input, Tooltip, Image, Flex, Typography, Select } from "
 import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Recipe } from "@/models/recipe.model";
 import userStore from "@/zustand/user.store";
-import { useGetRecipesByUserIdWithPagination } from "@/hooks/useGetRecipesByUserIdWithPagination";
 import { ConfirmModal } from "@/ui/components";
 import { useEffect, useState } from "react";
 import { recipeStore } from "@/zustand/recipe.store";
 import { showToast } from "@/utils/notify";
+import { useGetRecipesByUserIdWithPagination } from "@/hooks/recipes";
 
 type Column<T> = {
 	title: string;

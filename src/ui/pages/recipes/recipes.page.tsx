@@ -1,4 +1,4 @@
-import { useGetAllRecipes } from "@/hooks/useGetAllRecipes";
+import { useGetAllRecipes } from "@/hooks/recipes";
 import { RecipeCard } from "@/ui/components";
 import AppString from "@/utils/app-string";
 import AppColor from "@/utils/appColor";

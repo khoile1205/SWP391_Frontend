@@ -3,7 +3,7 @@ import { useLoadingStore } from "@/zustand/loading.store";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-const useEmailVerification = () => {
+export const useEmailVerification = () => {
 	const [isVerified, setVerified] = useState<boolean>(false);
 	const { search } = useLocation();
 	const { isLoading, setLoading } = useLoadingStore((state) => state);
@@ -27,5 +27,3 @@ const useEmailVerification = () => {
 
 	return { isLoading, isVerified };
 };
-
-export default useEmailVerification;

@@ -4,7 +4,7 @@ import { useLoadingStore } from "@/zustand/loading.store";
 import userStore from "@/zustand/user.store";
 import { useEffect, useState } from "react";
 
-const useUserChefRequest = () => {
+export const useUserChefRequest = () => {
 	const [request, setRequest] = useState<BecomeChefRequest>();
 	const { setLoading } = useLoadingStore((state) => state);
 	const { getRequestByUserId } = becomeChefRequestStore((state) => state);
@@ -27,5 +27,3 @@ const useUserChefRequest = () => {
 
 	return { request };
 };
-
-export default useUserChefRequest;

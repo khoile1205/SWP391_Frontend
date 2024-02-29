@@ -1,5 +1,3 @@
-import { useGetRecipesByUserId } from "@/hooks/useGetRecipesByUserId";
-import { useGetUserById } from "@/hooks/useGetUserById";
 import { RecipeCard } from "@/ui/components";
 import { AntDesignOutlined } from "@ant-design/icons";
 import { Avatar, Button, Divider, Flex, Space, Typography } from "antd";
@@ -8,6 +6,8 @@ import { GoSortAsc, GoSortDesc } from "react-icons/go";
 import Loadmore from "@/ui/components/Loadmore";
 import { useState } from "react";
 import Link from "antd/es/typography/Link";
+import { useGetUserById } from "@/hooks/user";
+import { useGetRecipesByUserId } from "@/hooks/recipes";
 
 type Filter = {
 	type: "newest" | "oldest";

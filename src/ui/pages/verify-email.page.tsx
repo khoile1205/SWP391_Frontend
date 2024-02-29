@@ -1,4 +1,4 @@
-import useEmailVerification from "@/hooks/useEmailVerification";
+import { useEmailVerification } from "@/hooks/auth";
 import AppString from "@/utils/app-string";
 import { Typography } from "antd";
 

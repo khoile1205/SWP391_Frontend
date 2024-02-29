@@ -1,9 +1,9 @@
 import { Typography } from "antd";
 import { CategoryCard, RecipeCard } from "../components";
 import { categoriesStore } from "@/zustand/category.store";
-import { useGetAllRecipes } from "@/hooks/useGetAllRecipes";
 import { pickRandomElements } from "@/utils/array_exts";
 import HeroSection from "@/assets/images/HeroSection.svg";
+import { useGetAllRecipes } from "@/hooks/recipes";
 export function HomePage() {
 	const { categories } = categoriesStore((state) => state);
 	const { recipes } = useGetAllRecipes();

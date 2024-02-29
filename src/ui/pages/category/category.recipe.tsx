@@ -1,8 +1,8 @@
-import { useGetRecipeByCategoryId } from "@/hooks/useGetRecipeByCategoryId";
 import { Typography } from "antd";
 import { useParams } from "react-router-dom";
 import NotFound from "../not-found.page";
 import { RecipeCard } from "@/ui/components";
+import { useGetRecipeByCategoryId } from "@/hooks/recipes";
 
 export default function RecipeCategoryPage() {
 	// Hooks
