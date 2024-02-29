@@ -15,20 +15,20 @@ interface RecipeCardProps {
 }
 
 interface ShareMenuProps {
-	recipe: Recipe;
+	recipeId: string;
 }
-const ShareMenu: React.FC<ShareMenuProps> = ({ recipe }) => (
+const ShareMenu: React.FC<ShareMenuProps> = ({ recipeId }) => (
 	<Menu>
 		<Menu.Item>
 			<SocialShareButton
 				platform={"Facebook"}
-				url={`${import.meta.env.VITE_URL}/recipes/${recipe.id}`}
+				url={`${import.meta.env.VITE_URL}/recipes/${recipeId}`}
 			></SocialShareButton>
 		</Menu.Item>
 		<Menu.Item>
 			<SocialShareButton
 				platform={"Twitter"}
-				url={`${import.meta.env.VITE_URL}/recipes/${recipe.id}`}
+				url={`${import.meta.env.VITE_URL}/recipes/${recipeId}`}
 			></SocialShareButton>
 		</Menu.Item>
 	</Menu>
@@ -79,7 +79,7 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 					}}
 				/>,
 				<Dropdown
-					overlay={() => <ShareMenu recipe={recipe} />}
+					overlay={() => <ShareMenu recipeId={recipe.id} />}
 					trigger={["click"]}
 					className="hover:!text-primary focus:!text-primary text-[#00000073]"
 				>
@@ -95,7 +95,7 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 			<Meta
 				avatar={
 					<Tooltip title={recipe.user.firstName + " " + recipe.user.lastName}>
-						<a className="relative z-50">
+						<a href={`/user/${recipe.user.id}`} className="relative z-50">
 							<Avatar src={recipe.user.avatarUrl} />
 						</a>
 					</Tooltip>

@@ -1,13 +1,15 @@
-import { RecipeCard } from "@/ui/components";
-import { AntDesignOutlined } from "@ant-design/icons";
-import { Avatar, Button, Divider, Flex, Space, Typography } from "antd";
 import { useParams } from "react-router-dom";
 import { GoSortAsc, GoSortDesc } from "react-icons/go";
 import Loadmore from "@/ui/components/Loadmore";
 import { useState } from "react";
-import Link from "antd/es/typography/Link";
 import { useGetUserById } from "@/hooks/user";
 import { useGetRecipesByUserId } from "@/hooks/recipes";
+import { RecipeListSection } from "@/ui/section";
+import NotFound from "../not-found.page";
+import { Roles } from "@/enums";
+import { showToast } from "@/utils/notify";
+import { CheckCircleOutlined } from "@ant-design/icons";
+import { Flex, Avatar, Typography, Tooltip, Button, Divider, Space } from "antd";
 
 type Filter = {
 	type: "newest" | "oldest";
@@ -16,12 +18,13 @@ type Filter = {
 
 export default function UserProfilePage() {
 	const { userId } = useParams();
-
+	const [isFollower, setIsFollower] = useState(false);
 	const [filter, setFilter] = useState<Filter>({
 		description: "Newest",
 		type: "newest",
 	});
 	const { visibleRecipes, handleLoadMore, hasMore } = useGetRecipesByUserId(userId, filter.type);
+
 	const { user } = useGetUserById(userId);
 
 	const handleFilter = () => {
@@ -31,28 +34,40 @@ export default function UserProfilePage() {
 				: { type: "newest", description: "Newest" }
 		);
 	};
-	console.log(user);
-	return (
+
+	const handleFollowUser = () => {
+		setIsFollower(!isFollower);
+		showToast("success", !isFollower ? "Follow user successfully" : "Unfollow user successfully");
+	};
+	return user ? (
 		<>
 			<Flex align="end" className="space-x-4">
-				<Avatar
-					// size={{ xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100 }}
-					size={100}
-					icon={<AntDesignOutlined />}
-				/>
-				<div className="space-y-1">
-					<Typography.Title level={3} className="!mb-0">
-						User Profile Page
-					</Typography.Title>
-					<div className="inline space-x-3">
-						<Typography.Text>
-							<Link href="/">10 Follower</Link>
-						</Typography.Text>
-						<Typography.Text>
-							<Link href="/">10 Following</Link>
-						</Typography.Text>
+				<Avatar size={100} src={user.avatarUrl} />
+				<div className="space-y-2">
+					<Flex className="space-x-4">
+						<Typography.Title level={3} className="!mb-0">
+							{user.firstName + " " + user.lastName}
+						</Typography.Title>
+						{user.role == Roles.CHEF && (
+							<Tooltip title="This is the chef">
+								<CheckCircleOutlined className="text-primary" />
+							</Tooltip>
+						)}
+						<Button
+							className={`${!isFollower ? "bg-primary text-white" : ""}`}
+							onClick={handleFollowUser}
+						>
+							{!isFollower ? "Follow" : "Unfollow"}
+						</Button>
+					</Flex>
+					<div className="inline-block space-x-7">
+						<Typography.Link href="/" className="!text-gray-600">
+							10 Follower
+						</Typography.Link>
+						<Typography.Link href="/" className="!text-gray-600">
+							10 Following
+						</Typography.Link>
 					</div>
-					<Button className="bg-primary text-white"> Follow</Button>
 				</div>
 			</Flex>
 			<Divider></Divider>
@@ -73,11 +88,8 @@ export default function UserProfilePage() {
 			</Flex>
 			<Divider></Divider>
 			<Space direction="vertical" size={"middle"} className="w-full">
-				{visibleRecipes.map((recipe) => (
-					<RecipeCard recipe={recipe} key={recipe.id}></RecipeCard>
-				))}
+				<RecipeListSection listRecipes={visibleRecipes}></RecipeListSection>
 			</Space>
-			{/* <div className="text-center"> */}
 			{hasMore && (
 				<Loadmore
 					onClick={handleLoadMore}
@@ -85,7 +97,8 @@ export default function UserProfilePage() {
 					className="text-center"
 				></Loadmore>
 			)}
-			{/* </div> */}
 		</>
+	) : (
+		<NotFound></NotFound>
 	);
 }

@@ -21,6 +21,7 @@ import {
 	BookOutlined,
 	ClockCircleOutlined,
 	TeamOutlined,
+	StarOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import Pasta from "@/assets/Icon/pasta.jpg";
@@ -117,9 +118,9 @@ export default function RecipeDetailPage() {
 					<Typography.Title className={"mb-10 font-playfair !text-5xl"}>
 						{recipe.title}
 					</Typography.Title>
-					<Flex align="center" className="mb-4">
-						<div className="mr-5 flex items-center">
-							<Col xs={12} md={9}>
+					<div className="mb-5 mr-5 mt-5 block items-center justify-start space-y-5 sm:flex sm:space-y-0">
+						<Col>
+							<Typography.Link href={`/user/${recipe.user.id}`}>
 								<Avatar
 									size={"default"}
 									icon={<UserOutlined />}
@@ -129,42 +130,36 @@ export default function RecipeDetailPage() {
 								<Typography.Text strong className="me-5 truncate">
 									{recipe.user.firstName + " " + recipe.user.lastName}
 								</Typography.Text>
-								<Divider type="vertical" style={{ height: "20px", marginRight: "10px" }} />
-							</Col>
-							<Col xs={13} md={8}>
-								<CalendarOutlined className={"me-2 text-xl"} />
-								<Typography.Text strong className="me-5">
-									{moment(recipe.createdAt).format("ll")}
-								</Typography.Text>
-								<Divider type="vertical" style={{ height: "20px", marginRight: "10px" }} />
-							</Col>
-							<Col xs={7} md={4}>
-								<CommentOutlined className={"me-2 text-xl"} />
-								<Typography.Text strong className="me-5">
-									{comments.length}
-								</Typography.Text>
-								<Divider type="vertical" style={{ height: "20px", marginRight: "10px" }} />
-							</Col>
-							<Col xs={0} md={8}>
-								<Rate
-									disabled
-									allowHalf
-									defaultValue={recipe.difficult}
-									style={{ color: AppColor.deepOrangeColor }}
-								/>
-							</Col>
-						</div>
-					</Flex>
-					<Flex align="center" className="mb-4 flex sm:hidden">
-						<Col span={8} xs={24} md={8}>
-							<Rate
-								disabled
-								allowHalf
-								defaultValue={4.5}
-								style={{ color: AppColor.deepOrangeColor }}
+							</Typography.Link>
+							<Divider
+								className="hidden sm:inline-block"
+								type="vertical"
+								style={{ height: "20px", marginRight: "10px" }}
 							/>
 						</Col>
-					</Flex>
+						<Col>
+							<CalendarOutlined className={"me-2 text-xl"} />
+							<Typography.Text strong className="me-5">
+								{moment(recipe.createdAt).format("ll")}
+							</Typography.Text>
+							<Divider
+								className="hidden sm:inline-block"
+								type="vertical"
+								style={{ height: "20px", marginRight: "10px" }}
+							/>
+						</Col>
+						<Col>
+							<CommentOutlined className={"me-2 text-xl"} />
+							<Typography.Text strong className="me-5">
+								{comments.length}
+							</Typography.Text>
+							<Divider
+								className="hidden sm:inline-block"
+								type="vertical"
+								style={{ height: "20px", marginRight: "10px" }}
+							/>
+						</Col>
+					</div>
 				</div>
 				<div className="space-y-3 sm:space-x-4">
 					<Tooltip title="Share">
@@ -205,26 +200,42 @@ export default function RecipeDetailPage() {
 					boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
 				}}
 			/>
-			<Flex align="center" className="mb-4">
-				<div className="mr-5 flex items-center">
-					<Col span={15}>
-						<ClockCircleOutlined
-							style={{ marginRight: "10px", fontSize: "24px", marginTop: "30px" }}
-						/>
-						<Typography.Text strong className="me-5">
-							Prep Time: {recipe.cookingTime} minutes
-						</Typography.Text>
-						<Divider type="vertical" style={{ height: "20px", marginRight: "10px" }} />
-					</Col>
-					<Col span={10}>
-						<TeamOutlined style={{ marginRight: "10px", fontSize: "24px", marginTop: "30px" }} />
-						<Typography.Text strong className="me-5">
-							Servings: {recipe.portion}
-						</Typography.Text>
-						<Divider type="vertical" style={{ height: "20px", marginRight: "10px" }} />
-					</Col>
-				</div>
-			</Flex>
+			<div className="mr-5 mt-5 block items-center justify-start space-y-5 sm:flex sm:space-y-0">
+				<Col>
+					<ClockCircleOutlined style={{ marginRight: "10px", fontSize: "24px" }} />
+					<Typography.Text strong className="me-5">
+						Prep Time: {recipe.cookingTime} minutes
+					</Typography.Text>
+					<Divider
+						className="hidden sm:inline-block"
+						type="vertical"
+						style={{ height: "20px", marginRight: "10px" }}
+					/>
+				</Col>
+				<Col>
+					<TeamOutlined style={{ marginRight: "10px", fontSize: "24px" }} />
+					<Typography.Text strong className="me-5">
+						Servings: {recipe.portion}
+					</Typography.Text>
+					<Divider
+						className="hidden sm:inline-block"
+						type="vertical"
+						style={{ height: "20px", marginRight: "10px" }}
+					/>
+				</Col>
+				<Col>
+					<StarOutlined style={{ marginRight: "10px", fontSize: "24px" }} />
+					<Typography.Text strong className="me-5">
+						Difficult:
+					</Typography.Text>
+					<Rate disabled allowHalf defaultValue={4.5} style={{ color: AppColor.deepOrangeColor }} />
+					<Divider
+						className="hidden sm:inline-block"
+						type="vertical"
+						style={{ height: "20px", marginRight: "10px" }}
+					/>
+				</Col>
+			</div>
 			<Divider style={{ marginTop: "20px", marginBottom: "20px" }} />
 			<div className="block space-y-3 sm:flex sm:space-y-0">
 				<div className="basis-2/5">
