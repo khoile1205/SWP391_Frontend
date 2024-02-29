@@ -1,19 +1,47 @@
-import React from "react";
-import { Upload } from "antd";
 import { UploadButton } from "..";
 import { handleBeforeUploadFile } from "@/utils/file_exts";
 import { UploadComponentProps } from "@/types/@override/Upload";
+import fileStore from "@/zustand/file.store";
+import { AppConstant } from "@/utils/constant";
+import Upload, { RcFile } from "antd/es/upload";
+import { showToast } from "@/utils/notify";
 
-const MultiImagesUploadComponent: React.FC<UploadComponentProps> = ({ ...props }) => (
-	<Upload
-		className="mt-2"
-		listType="picture-card"
-		action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
-		beforeUpload={handleBeforeUploadFile}
-		{...props}
-	>
-		<UploadButton />
-	</Upload>
-);
+const MultiImagesUploadComponent: React.FC<UploadComponentProps> = ({ ...props }) => {
+	const { uploadImage } = fileStore((state) => state);
+	const customRequest = async ({ file, onSuccess, onError }: any) => {
+		try {
+			if (!handleBeforeUploadFile(file as RcFile)) {
+				onError();
+				return;
+			}
+			showToast("warning", "Uploading image ...");
+			const response = await uploadImage(file as RcFile, AppConstant.recipeFolder);
+
+			if (response.isSuccess) {
+				const result = response.data;
+				showToast("success", "File uploaded successfully");
+				onSuccess(result, file);
+			} else {
+				throw new Error("Failed to upload file");
+			}
+		} catch (error) {
+			console.error(error);
+			showToast("error", (error as Error).message);
+			onError(error);
+		}
+	};
+
+	return (
+		<Upload
+			accept="image/*"
+			className="mt-2"
+			listType="picture-card"
+			customRequest={customRequest}
+			{...props}
+		>
+			<UploadButton />
+		</Upload>
+	);
+};
 
 export { MultiImagesUploadComponent };

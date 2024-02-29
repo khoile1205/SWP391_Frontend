@@ -22,7 +22,7 @@ export const UserConnectionCard: React.FC<UserConnectionCardProps> = ({ userConn
 
 	const handleFollowUser = async () => {
 		if (!user) {
-			showToast("error", AppString.accessDenied);
+			showToast("error", AppString.authorizeRequiredErrorMessage);
 			navigate("/sign-in");
 			return;
 		}

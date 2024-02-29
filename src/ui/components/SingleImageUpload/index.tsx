@@ -1,21 +1,52 @@
-import React from "react";
-import { Upload, UploadProps } from "antd";
+import React, { useState } from "react";
 import { UploadButton } from "..";
 import { handleBeforeUploadFile } from "@/utils/file_exts";
+import { showToast } from "@/utils/notify";
+import Upload, { RcFile } from "antd/es/upload";
+import fileStore from "@/zustand/file.store";
+import { AppConstant } from "@/utils/constant";
+import { UploadComponentProps } from "@/types/@override/Upload";
 
-// Define the props type for SingleImageUploadComponent
-type UploadComponentProps = Omit<UploadProps, "beforeUpload">;
+const SingleImageUploadComponent: React.FC<UploadComponentProps & { loading: boolean }> = ({
+	...props
+}) => {
+	const { uploadImage } = fileStore((state) => state);
+	const [image, setImage] = useState<string>("");
+	const customRequest = async ({ file, onSuccess, onError }: any) => {
+		try {
+			if (!handleBeforeUploadFile(file as RcFile)) {
+				onError();
+				return;
+			}
+			showToast("warning", "Uploading image ...");
+			const response = await uploadImage(file as RcFile, AppConstant.recipeFolder);
 
-const SingleImageUploadComponent: React.FC<UploadComponentProps> = ({ ...props }) => (
-	<Upload
-		className="mt-2"
-		listType="picture-card"
-		action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
-		beforeUpload={handleBeforeUploadFile}
-		{...props}
-	>
-		<UploadButton />
-	</Upload>
-);
+			if (response.isSuccess) {
+				const result = response.data;
+				setImage(result);
+				showToast("success", "File uploaded successfully");
+				onSuccess(result, file);
+			} else {
+				throw new Error("Failed to upload file");
+			}
+		} catch (error) {
+			console.error(error);
+			showToast("error", (error as Error).message);
+			onError(error);
+		}
+	};
+	return (
+		<Upload
+			accept="image/*"
+			className="mt-2"
+			customRequest={customRequest}
+			listType="picture-card"
+			showUploadList={false}
+			{...props}
+		>
+			{image ? <img src={image} alt="avatar" style={{ width: "100%" }}></img> : <UploadButton />}
+		</Upload>
+	);
+};
 
 export { SingleImageUploadComponent };

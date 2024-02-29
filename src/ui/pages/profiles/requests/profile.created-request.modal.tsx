@@ -1,6 +1,7 @@
 import { BecomeChefRequest } from "@/models/become-chef-request.model";
-import { UploadButton } from "@/ui/components";
+import { SingleImageUploadComponent, UploadButton } from "@/ui/components";
 import AppColor from "@/utils/appColor";
+import { AppConstant } from "@/utils/constant";
 import { handleBeforeUploadFile, renderUploadedRequestImage } from "@/utils/file_exts";
 import { showToast } from "@/utils/notify";
 import { becomeChefRequestStore } from "@/zustand/become-chef-request";
@@ -8,7 +9,7 @@ import { categoriesStore } from "@/zustand/category.store";
 import fileStore from "@/zustand/file.store";
 import { Col, DatePicker, Form, Input, Modal, Row, Select, Typography, UploadFile } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import Upload, { RcFile, UploadChangeParam } from "antd/es/upload";
+import Upload, { RcFile } from "antd/es/upload";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useFormik } from "formik";
@@ -42,7 +43,7 @@ const dateFormat = "DD-MM-YYYY";
 
 export default function CreateRequestModal({ open, onClick, request }: CreateRequestModalProps) {
 	const [listCertificateImages, setListCertificateImages] = useState<UploadFile[]>([]);
-	const [loading, setLoading] = useState<boolean>(false);
+	const [loading] = useState<boolean>(false);
 
 	const { uploadImage } = fileStore((state) => state);
 	const { createBecomeChefRequest, updateRequestById } = becomeChefRequestStore((state) => state);
@@ -51,7 +52,7 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 	const formik = useFormik({
 		initialValues: {
 			identityImageUrl: "",
-			certificateImageUrls: [""],
+			certificateImageUrls: [] as string[],
 			fullName: "",
 			phoneNumber: "",
 			email: "",
@@ -90,18 +91,8 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [request]);
-	const handleChangeImage = async (
-		info: UploadChangeParam<UploadFile<any>>
-	): Promise<string | null> => {
-		const file = info.file.originFileObj;
 
-		const response = await uploadImage(file as File, "become-chef-request");
-		if (response.isSuccess) {
-			return response.data;
-		}
-		return null;
-	};
-
+	// Controller
 	const handleSubmitForm = async () => {
 		let response: any = null;
 
@@ -122,18 +113,44 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 			}
 		}, 1000);
 	};
+
+	const customRequest = async ({ file, onSuccess, onError }: any) => {
+		try {
+			if (!handleBeforeUploadFile(file as RcFile)) {
+				onError();
+				return;
+			}
+			showToast("warning", "Uploading image ...");
+			const response = await uploadImage(file as RcFile, AppConstant.becomeChefFolder);
+
+			if (response.isSuccess) {
+				const result = response.data;
+				showToast("success", "File uploaded successfully");
+				onSuccess(result, file);
+			} else {
+				throw new Error("Failed to upload file");
+			}
+		} catch (error) {
+			console.error(error);
+			showToast("error", (error as Error).message);
+			onError(error);
+		}
+	};
 	return (
 		<Modal
 			width={1000}
 			open={open}
 			onOk={async () => {
+				console.log(formik.values);
 				if (formik.isValid) {
 					handleSubmitForm();
 				} else {
 					showToast("error", "Please fill all required fields");
 				}
 			}}
-			onCancel={() => onClick(false)}
+			onCancel={() => {
+				onClick(false);
+			}}
 			okButtonProps={{
 				htmlType: "submit",
 				className: `!bg-[${AppColor.deepOrangeColor}]`,
@@ -165,20 +182,19 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 						<Typography.Title level={5}>
 							<Typography.Text style={{ color: "red" }}>*</Typography.Text> Identity Image
 						</Typography.Title>
-						<Upload
+						{/* <Upload
 							name="identityImageUrl"
 							listType="picture-card"
 							className="avatar-uploader mt-2 text-center"
 							showUploadList={false}
-							action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+							accept="image/*"
+							customRequest={customRequest}
 							beforeUpload={handleBeforeUploadFile}
 							onChange={async (info) => {
-								setLoading(true);
-								const imageURL = await handleChangeImage(info);
+								const imageURL = info.file.response;
 								if (imageURL !== null) {
 									formik.setFieldValue("identityImageUrl", imageURL);
 								}
-								setLoading(false);
 							}}
 						>
 							{formik.values.identityImageUrl ? (
@@ -186,7 +202,20 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 							) : (
 								<UploadButton loading={loading}></UploadButton>
 							)}
-						</Upload>
+						</Upload> */}
+
+						<SingleImageUploadComponent
+							className="text-center"
+							loading={loading}
+							onChange={async (info) => {
+								if (info.file.status == "done") {
+									const imageURL = info.file.response;
+									if (imageURL !== null) {
+										formik.setFieldValue("identityImageUrl", imageURL);
+									}
+								}
+							}}
+						></SingleImageUploadComponent>
 					</Form.Item>
 
 					<Form.Item
@@ -214,38 +243,34 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 						<Upload
 							className="mt-2 text-center"
 							listType="picture-card"
-							fileList={listCertificateImages}
-							action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
-							beforeUpload={handleBeforeUploadFile}
+							accept="image/*"
+							defaultFileList={listCertificateImages}
+							customRequest={customRequest}
 							onChange={async (info) => {
 								let currentFileList = info.fileList;
 
-								if (
-									info.file.status === "error" ||
-									!handleBeforeUploadFile(info.file.originFileObj as RcFile)
-								) {
-									showToast("error", "Upload avatar failed");
+								if (info.file.status === "error") {
 									currentFileList = currentFileList.filter((file) => file.uid !== info.file.uid);
+									return;
 								}
 
 								setListCertificateImages(currentFileList);
 
 								if (info.file.status === "done") {
-									const imageURL = await handleChangeImage(info);
+									const imageURL = info.file.response;
 									if (imageURL != null) {
-										formik.setFieldValue("certificateImageUrls", [
-											...formik.values.certificateImageUrls,
-											imageURL,
-										]);
-										info.file.url = imageURL;
-										showToast("success", "Upload image successfully");
+										formik.setFieldValue(
+											"certificateImageUrls",
+											formik.values.certificateImageUrls.concat(imageURL)
+										);
 									}
 								}
 							}}
 							onRemove={(file) => {
 								// Handle removal from formik values
+								console.log(formik.values.certificateImageUrls, file.response);
 								const updatedCertificateImageUrls = formik.values.certificateImageUrls.filter(
-									(url) => url !== file.url
+									(url) => url !== file.response
 								);
 								formik.setFieldValue("certificateImageUrls", updatedCertificateImageUrls);
 
@@ -495,7 +520,9 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 								className="mt-2"
 								label="Experience"
 								required
-								validateStatus={formik.errors.experience ? "error" : "success"}
+								validateStatus={
+									formik.errors.experience && formik.touched.experience ? "error" : "success"
+								}
 								help={
 									formik.errors.experience &&
 									formik.touched.experience && (
@@ -506,8 +533,7 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 								<TextArea
 									rows={5}
 									defaultValue={formik.values.experience}
-									showCount
-									maxLength={300}
+									// showCount
 									onChange={formik.handleChange}
 									placeholder="Experience"
 								/>
@@ -535,8 +561,7 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 								<TextArea
 									rows={5}
 									defaultValue={formik.values.achievement}
-									showCount
-									maxLength={300}
+									// showCount
 									onChange={formik.handleChange}
 									placeholder="Achievement"
 								/>
