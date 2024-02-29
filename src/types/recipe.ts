@@ -30,4 +30,10 @@ export interface CreateRecipeDTO {
 	instructors: Instructors[];
 }
 
+export type Reaction = {
+	haha: string;
+	like: string;
+	favorite: string;
+};
+
 export type UpdateRecipeDTO = Partial<CreateRecipeDTO>;

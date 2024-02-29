@@ -22,6 +22,10 @@ type UserStore = {
 	signInWithGoogle(data: OAuth2SignInData): Promise<Result>;
 	handleSignIn(signInMethod: () => Promise<Response>): Promise<Result>;
 	getUserById(userId: string): Promise<Result>;
+	getFollowerByUserId(userId: string): Promise<Result>;
+	getFollowingByUserId(userId: string): Promise<Result>;
+	followUser(userId: string): Promise<Result>;
+	unfollowUser(userId: string): Promise<Result>;
 };
 
 const userStore = create<UserStore>()((set, get) => ({
@@ -91,6 +95,18 @@ const userStore = create<UserStore>()((set, get) => ({
 	},
 	getUserById: async (userId: string) => {
 		return await handleUseCase(userUseCase.getUserById(userId));
+	},
+	getFollowerByUserId: async (userId: string) => {
+		return await handleUseCase(userUseCase.getFollowerByUserId(userId));
+	},
+	getFollowingByUserId: async (userId: string) => {
+		return await handleUseCase(userUseCase.getFollowingByUserId(userId));
+	},
+	followUser: async (userId: string) => {
+		return await handleUseCase(userUseCase.followUser(userId));
+	},
+	unfollowUser: async (userId: string) => {
+		return await handleUseCase(userUseCase.unfollowUser(userId));
 	},
 }));
 

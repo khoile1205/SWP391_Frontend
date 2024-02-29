@@ -11,24 +11,29 @@ export default function SearchAllPage() {
 			<Typography.Title className="font-playfair">
 				Search result for {searchKeyword}
 			</Typography.Title>
-			{(type === "all" || type == "recipes") && (
-				<>
-					<Typography.Title className="font-playfair" level={3}>
-						For Recipe:{" "}
-					</Typography.Title>
+			<div>
+				{(type === "all" || type == "recipes") && (
+					<>
+						<Typography.Title className="font-playfair" level={3}>
+							For Recipe:{" "}
+						</Typography.Title>
 
-					<div className="md:grid md:grid-cols-3 md:gap-4">
-						{result.recipes.map((recipe) => (
-							<RecipeCard recipe={recipe} key={recipe.id}></RecipeCard>
-						))}
-					</div>
-				</>
-			)}
-			{/* {(type === "all" || type == "users") && (
-				<>
-					<div>{pickRandomElements(result.users, 3).map((user) => user.id)}</div>
-				</>
-			)} */}
+						<div className="md:grid md:grid-cols-3 md:gap-4">
+							{result.recipes.map((recipe) => (
+								<RecipeCard recipe={recipe} key={recipe.id}></RecipeCard>
+							))}
+						</div>
+					</>
+				)}
+				{(type === "all" || type == "users") && (
+					<>
+						{/* <div>{pickRandomElements(result.users, 3).map((user) => user.id)}</div> */}
+						<Typography.Title className="font-playfair" level={3}>
+							For User:{" "}
+						</Typography.Title>
+					</>
+				)}
+			</div>
 		</>
 	);
 }

@@ -36,4 +36,6 @@ export default class AppString {
 	static readonly updateRecipeSuccessMessage = "Recipe updated successfully";
 	static readonly deleteRecipeSuccessMessage = "Recipe deleted successfully";
 	static readonly noResultFoundMessage = "No result found matching the specified criteria!";
+	static readonly followSuccessMessage = "Followed successfully";
+	static readonly unfollowSuccessMessage = "Unfollowed successfully";
 }

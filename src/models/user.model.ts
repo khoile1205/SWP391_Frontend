@@ -14,6 +14,8 @@ interface User {
 	updatedAt: string;
 	balance: number;
 	role: Roles;
+	followers: User[];
+	followings: User[];
 }
 
 export type { User };

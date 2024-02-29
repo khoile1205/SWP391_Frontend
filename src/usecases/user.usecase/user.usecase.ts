@@ -9,12 +9,43 @@ abstract class UserUseCase {
 	abstract changePassword(data: ChangePasswordType): Promise<Response>;
 	abstract updateUserInformation(data: UpdateUserInformationType): Promise<Response>;
 	abstract getUserById(userId: string): Promise<Response>;
+	abstract getFollowerByUserId(userId: string): Promise<Response>;
+	abstract getFollowingByUserId(userId: string): Promise<Response>;
+	abstract followUser(userId: string): Promise<Response>;
+	abstract unfollowUser(userId: string): Promise<Response>;
 }
 
 class UserUseCaseImpl implements UserUseCase {
 	constructor(private readonly userDatasource: UserDatasource) {}
+	async unfollowUser(userId: string): Promise<Response> {
+		return await this.userDatasource.unfollowUser(userId);
+	}
+	async followUser(userId: string): Promise<Response> {
+		return await this.userDatasource.followUser(userId);
+	}
+	async getFollowerByUserId(userId: string): Promise<Response> {
+		return await this.userDatasource.getFollowerByUserId(userId);
+	}
+	async getFollowingByUserId(userId: string): Promise<Response> {
+		return await this.userDatasource.getFollowingByUserId(userId);
+	}
 	async getUserById(userId: string): Promise<Response> {
-		return await this.userDatasource.getUserById(userId);
+		const result = await this.userDatasource.getUserById(userId);
+		if (!result.data) {
+			return result;
+		}
+		const user = result.data as User;
+		const userFollower = await this.userDatasource.getFollowerByUserId(user.id);
+		const userFollowing = await this.userDatasource.getFollowingByUserId(user.id);
+
+		return {
+			...result,
+			data: {
+				...user,
+				followers: userFollower.data as User[],
+				followings: userFollowing.data as User[],
+			},
+		};
 	}
 
 	updateUserInformation(data: UpdateUserInformationType): Promise<Response> {
@@ -30,9 +61,17 @@ class UserUseCaseImpl implements UserUseCase {
 
 		if (!user) {
 			Cookies.remove(AppConstant.accessTokenKey);
+			return user;
 		}
 
-		return user;
+		const userFollower = await this.userDatasource.getFollowerByUserId(user.id);
+		const userFollowing = await this.userDatasource.getFollowingByUserId(user.id);
+
+		return {
+			...user,
+			followers: userFollower.data as User[],
+			followings: userFollowing.data as User[],
+		};
 	}
 }
 

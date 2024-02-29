@@ -1,7 +1,8 @@
 import { CreateRecipeDTO, UpdateRecipeDTO } from "@/types/recipe";
-import { recipeUseCase } from "@/usecases";
+import { recipeUseCase, userUseCase } from "@/usecases";
 import { create } from "zustand";
 import Result from "./commons/result";
+import { Recipe } from "@/models/recipe.model";
 
 type Action = {
 	createRecipe: (data: CreateRecipeDTO) => Promise<Result>;
@@ -45,6 +46,16 @@ export const recipeStore = create<Action>(() => ({
 		if (!response.isSuccess) {
 			return Result.failed(response.message);
 		}
+		const recipeData = response.data as Recipe;
+
+		recipeData.comments = await Promise.all(
+			recipeData.comments.map(async (comment: any) => {
+				const userId = comment.userId;
+				const userData = await userUseCase.getUserById(userId as string);
+				return { ...comment, userId: userData.data };
+			})
+		);
+
 		return Result.success(response.message, response.data);
 	},
 	saveFavoriteRecipe: async (recipeId): Promise<Result> => {

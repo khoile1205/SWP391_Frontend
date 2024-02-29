@@ -34,17 +34,9 @@ import { recipeStore } from "@/zustand/recipe.store";
 import { showToast } from "@/utils/notify";
 import userStore from "@/zustand/user.store";
 import { useGetRecipeById, useRecipeBookmark } from "@/hooks/recipes";
-type CommentItem = {
-	author: string;
-	avatar: JSX.Element;
-	content: JSX.Element;
-	datetime: Date;
-	likes: number;
-	replying?: boolean;
-};
+
 export default function RecipeDetailPage() {
 	// States
-	const [comments, setComments] = useState<CommentItem[]>([]);
 	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 	const [shareModalVisible, setShareModalVisible] = useState(false);
 	const { saveFavoriteRecipe, removeFavoriteRecipe } = recipeStore((state) => state);
@@ -61,17 +53,6 @@ export default function RecipeDetailPage() {
 		return () => {
 			window.removeEventListener("resize", handleResize);
 		};
-	}, []);
-
-	useEffect(() => {
-		const initialComments: CommentItem[] = Array.from({ length: 21 }, (_, index) => ({
-			author: "User " + (index + 1),
-			avatar: <Avatar icon={<UserOutlined />} size={32} />,
-			content: <p>This is a comment on the recipe.</p>,
-			datetime: moment().subtract(index, "days").toDate(),
-			likes: 0,
-		}));
-		setComments(initialComments);
 	}, []);
 
 	// Controller
@@ -151,7 +132,7 @@ export default function RecipeDetailPage() {
 						<Col>
 							<CommentOutlined className={"me-2 text-xl"} />
 							<Typography.Text strong className="me-5">
-								{comments.length}
+								{recipe.comments.length}
 							</Typography.Text>
 							<Divider
 								className="hidden sm:inline-block"
@@ -295,7 +276,7 @@ export default function RecipeDetailPage() {
 			</div>
 			<Divider style={{ marginTop: "20px", marginBottom: "20px" }} />
 
-			<CommentSection listComments={comments}></CommentSection>
+			<CommentSection listComments={recipe.comments}></CommentSection>
 
 			<Divider></Divider>
 

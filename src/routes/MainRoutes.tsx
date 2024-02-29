@@ -30,11 +30,11 @@ const NotFoundPage = Loadable(lazy(() => import("@/ui/pages/not-found.page")));
 
 // render - user
 const UserProfilePage = Loadable(lazy(() => import("@/ui/pages/users/users.profile.page")));
+const UserFollowerPage = Loadable(lazy(() => import("@/ui/pages/users/users.follower.page")));
+const UserFollowingPage = Loadable(lazy(() => import("@/ui/pages/users/users.following.page")));
 
 // render - search page
 const SearchAllPage = Loadable(lazy(() => import("@/ui/pages/search/search.all.page")));
-// const SearchUsersPage = Loadable(lazy(() => import("@/ui/pages/search/search.users.page")));
-// const SearchRecipesPage = Loadable(lazy(() => import("@/ui/pages/search/search.recipes.page")));
 
 const MainRoutes: RouteObject[] = [
 	{
@@ -115,14 +115,6 @@ const MainRoutes: RouteObject[] = [
 				path: ":type",
 				element: <SearchAllPage></SearchAllPage>,
 			},
-			// {
-			// 	path: "/recipes",
-			// 	element: <SearchRecipesPage></SearchRecipesPage>,
-			// },
-			// {
-			// 	path: "/users",
-			// 	element: <SearchUsersPage></SearchUsersPage>,
-			// },
 		],
 	},
 	{
@@ -130,7 +122,20 @@ const MainRoutes: RouteObject[] = [
 		children: [
 			{
 				path: ":userId",
-				element: <UserProfilePage></UserProfilePage>,
+				children: [
+					{
+						path: "",
+						element: <UserProfilePage></UserProfilePage>,
+					},
+					{
+						path: "follower",
+						element: <UserFollowerPage></UserFollowerPage>,
+					},
+					{
+						path: "following",
+						element: <UserFollowingPage></UserFollowingPage>,
+					},
+				],
 			},
 		],
 	},

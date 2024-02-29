@@ -1,5 +1,6 @@
-import { Category, Ingredients, Instructors } from "@/types/recipe";
+import { Category, Ingredients, Instructors, Reaction } from "@/types/recipe";
 import { ShortInfoUser } from "@/types/user";
+import { Comment } from "./comment.model";
 
 export class Recipe {
 	id: string;
@@ -17,7 +18,8 @@ export class Recipe {
 	categories: Category[];
 	createdAt: Date;
 	updatedAt: Date;
-
+	comments: Comment[];
+	reaction: Reaction;
 	constructor(
 		id: string,
 		user: ShortInfoUser,
@@ -33,7 +35,9 @@ export class Recipe {
 		ingredients: Ingredients[],
 		categories: Category[],
 		createdAt: Date,
-		updatedAt: Date
+		updatedAt: Date,
+		comments: Comment[],
+		reaction: Reaction
 	) {
 		this.id = id;
 		this.user = user;
@@ -50,5 +54,7 @@ export class Recipe {
 		this.categories = categories;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
+		this.comments = comments;
+		this.reaction = reaction;
 	}
 }
