@@ -118,7 +118,7 @@ export default function ProfileBecomeChefPage() {
 							</Col>
 							<Col span={16} xs={24} md={{ span: 16, offset: 2 }}>
 								<div className="mt-5 space-y-6">
-									<Row className="space-y-6 text-center sm:space-y-0">
+									<Row className="text-center">
 										<Col span={11} xs={24} md={11}>
 											<div className="flex items-center space-x-2 ">
 												<Typography className="basis-1/3">Full name</Typography>
@@ -140,7 +140,7 @@ export default function ProfileBecomeChefPage() {
 											</div>
 										</Col>
 									</Row>
-									<Row className="space-y-6 text-center sm:space-y-0">
+									<Row className="text-center">
 										<Col span={11} xs={24} md={11}>
 											<div className="flex items-center space-x-2">
 												<Typography className="basis-1/3">Email</Typography>
@@ -162,7 +162,7 @@ export default function ProfileBecomeChefPage() {
 											</div>
 										</Col>
 									</Row>
-									<Row className="space-y-6 text-center sm:space-y-0">
+									<Row className="text-center">
 										<Col span={11} xs={24} md={11}>
 											<div className="flex items-center space-x-2">
 												<Typography className="basis-1/3">Address</Typography>
@@ -184,7 +184,7 @@ export default function ProfileBecomeChefPage() {
 											</div>
 										</Col>
 									</Row>
-									<Row className="space-y-6 text-center sm:space-y-0">
+									<Row className="text-center">
 										<Col span={11} xs={24} md={11}>
 											<div className="flex items-center space-x-2">
 												<Typography className="basis-1/3">Date of birth</Typography>
@@ -206,9 +206,9 @@ export default function ProfileBecomeChefPage() {
 											</div>
 										</Col>
 									</Row>
-									<Row className="space-y-6 text-center sm:space-y-0">
+									<Row className="text-center ">
 										<Col span={24}>
-											<Form.Item hasFeedback name="chefDetail" className="mt-2" label="Experience">
+											<Form.Item label="Experience">
 												<TextArea
 													readOnly
 													rows={5}
@@ -219,9 +219,9 @@ export default function ProfileBecomeChefPage() {
 											</Form.Item>
 										</Col>
 									</Row>
-									<Row className="space-y-6 text-center sm:space-y-0">
+									<Row className=" text-center ">
 										<Col span={24}>
-											<Form.Item hasFeedback name="experience" className="mt-2" label="Achivement">
+											<Form.Item label="Achivement">
 												<TextArea
 													rows={5}
 													readOnly

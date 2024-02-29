@@ -3,10 +3,8 @@ import { Ingredients, Instructors, UpdateRecipeDTO } from "@/types/recipe";
 import { ConfirmModal, MultiImagesUploadComponent } from "@/ui/components";
 import DraggerUpload from "@/ui/components/DraggerUpload";
 import AppColor from "@/utils/appColor";
-import { AppConstant } from "@/utils/constant";
 import { showToast } from "@/utils/notify";
 import { categoriesStore } from "@/zustand/category.store";
-import fileStore from "@/zustand/file.store";
 import { useLoadingStore } from "@/zustand/loading.store";
 import { recipeStore } from "@/zustand/recipe.store";
 import userStore from "@/zustand/user.store";
@@ -36,11 +34,9 @@ export default function UpdateRecipesPage() {
 
 	// State
 	const [isPreviewVisible, setPreviewVisible] = useState(false);
-	const [isUploading, setUploading] = useState<boolean>(false);
 	// Zustand store
 	const { updateRecipeById } = recipeStore((state) => state);
 	const { categories } = categoriesStore((state) => state);
-	const { uploadImage } = fileStore((state) => state);
 	const { setLoading } = useLoadingStore((state) => state);
 	const { user } = userStore((state) => state);
 
@@ -58,14 +54,6 @@ export default function UpdateRecipesPage() {
 		}
 
 		setLoading(false);
-	};
-
-	const handleUploadImage = async (file: File): Promise<string | null> => {
-		const response = await uploadImage(file, AppConstant.recipeFolder);
-		if (response.isSuccess) {
-			return response.data;
-		}
-		return null;
 	};
 
 	return recipe ? (
@@ -110,21 +98,10 @@ export default function UpdateRecipesPage() {
 										showUploadList={false}
 										description="After investing time and creativity in your dish, show it off. Let others admire your culinary skills and the delicious dish you've created. You might inspire them to cook too!"
 										onChange={async (info) => {
-											if (info.file.status === "error") {
-												showToast("error", "Upload images failed");
-												return;
-											}
-
-											if (info.file.status === "uploading" && !isUploading) {
-												setUploading(true);
-												showToast("info", "Uploading image...");
-												return;
-											}
 											if (info.file.status === "done") {
-												const imageURL = await handleUploadImage(info.file.originFileObj as File);
+												const imageURL = info.file.response;
 												if (imageURL != null) {
 													setFieldValue(`thumbnailUrl`, imageURL);
-													showToast("success", "Upload image successfully");
 												}
 											}
 										}}
@@ -484,22 +461,14 @@ export default function UpdateRecipesPage() {
 																)}
 																onChange={async (info) => {
 																	if (info.file.status === "error") {
-																		showToast("error", "Upload avatar failed");
 																		info.fileList = info.fileList.filter(
 																			(file) => file.uid !== info.file.uid
 																		);
-																	}
-
-																	if (info.file.status === "uploading" && !isUploading) {
-																		setUploading(true);
-																		showToast("info", "Uploading image...");
 																		return;
 																	}
 
 																	if (info.file.status === "done") {
-																		const imageURL = await handleUploadImage(
-																			info.file.originFileObj as File
-																		);
+																		const imageURL = info.file.response;
 																		if (imageURL != null) {
 																			const updatedInstructors = [...values.instructors];
 																			updatedInstructors[index].imageUrls = [
@@ -507,9 +476,7 @@ export default function UpdateRecipesPage() {
 																				imageURL,
 																			];
 																			setFieldValue("instructors", updatedInstructors);
-																			showToast("success", "Upload image successfully");
 																		}
-																		setUploading(false);
 																	}
 																}}
 															></MultiImagesUploadComponent>
@@ -543,6 +510,7 @@ export default function UpdateRecipesPage() {
 									className="bg-primary w-1/2 rounded-lg p-2 text-white"
 									type="submit"
 									onClick={() => {
+										console.log(values);
 										if (!isValid) showToast("error", "Please fill in all fields");
 									}}
 								>

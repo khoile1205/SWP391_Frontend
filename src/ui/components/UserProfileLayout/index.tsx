@@ -24,7 +24,7 @@ export const UserProfileLayout: React.FC<UserProfileLayoutProps> = ({ user }) =>
 
 	const handleFollowUser = async () => {
 		if (!currentUser) {
-			showToast("error", AppString.accessDenied);
+			showToast("error", AppString.authorizeRequiredErrorMessage);
 			navigate("/sign-in");
 			return;
 		}

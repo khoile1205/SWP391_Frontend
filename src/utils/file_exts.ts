@@ -2,7 +2,7 @@ import { RcFile, UploadFile } from "antd/es/upload";
 import { showToast } from "./notify";
 import { generateRandomString } from "./string.extension";
 
-export const handleBeforeUploadFile = (file: RcFile) => {
+export const handleBeforeUploadFile = (file: RcFile): Promise<boolean> | boolean => {
 	const isPNG =
 		file.type === "image/png" ||
 		file.type === "image/jpeg" ||
@@ -11,15 +11,16 @@ export const handleBeforeUploadFile = (file: RcFile) => {
 
 	if (!isPNG) {
 		showToast("error", "Please upload a image file");
+		return false;
 	}
 
 	const isAcceptedFileSize = file.size < 1024 * 1024 * 10;
 	if (!isAcceptedFileSize) {
 		showToast("error", "Please upload a image file less than 10MB");
+		return false;
 	}
 	return isPNG && isAcceptedFileSize;
 };
-
 export const renderUploadedRequestImage = (imageUrls: string[] | undefined): UploadFile[] => {
 	if (!imageUrls) {
 		return [];

@@ -142,7 +142,7 @@ export default function RecipeDetailPage() {
 						</Col>
 					</div>
 				</div>
-				<div className="space-y-3 sm:space-x-4">
+				<div className="flex flex-col space-x-0 space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
 					<Tooltip title="Share">
 						<Button
 							type="text"

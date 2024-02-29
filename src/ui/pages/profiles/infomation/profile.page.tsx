@@ -25,6 +25,8 @@ import * as Yup from "yup";
 import { RcFile } from "antd/es/upload";
 import fileStore from "@/zustand/file.store";
 import { Gender } from "@/enums";
+import { handleBeforeUploadFile } from "@/utils/file_exts";
+import { AppConstant } from "@/utils/constant";
 
 const updateUserValidationSchema = Yup.object().shape({
 	username: Yup.string().required("Username is required"),
@@ -34,25 +36,7 @@ const updateUserValidationSchema = Yup.object().shape({
 	address: Yup.string().required("Address is required"),
 });
 
-const handleBeforeUpload = (file: RcFile) => {
-	const isPNG =
-		file.type === "image/png" ||
-		file.type == "image/jpeg" ||
-		file.type === "image/jpg" ||
-		file.type === "image/webp";
-	if (!isPNG) {
-		showToast("error", "Please upload a image file");
-	}
-
-	const isAcceptedFileSize = file.size < 1024 * 1024 * 10;
-	if (!isAcceptedFileSize) {
-		showToast("error", "Please upload a image file less than 10MB");
-	}
-	return isPNG && isAcceptedFileSize;
-};
-
 export default function ProfilePage() {
-	//
 	const navigate = useNavigate();
 
 	// Zustand state
@@ -63,7 +47,6 @@ export default function ProfilePage() {
 	// const [isEditPhoneNumber, setIsEditPhoneNumber] = useState<boolean>(false);
 	const [isShowAccountBalance, setIsEditShowAccountBalance] = useState<boolean>(false);
 	const [avatarUrl, setAvatarUrl] = useState<string | null | undefined>(user?.avatarUrl);
-	const [isUploading, setIsUploading] = useState<boolean>(false);
 
 	// Hooks
 	const balanceDisplay = useMemo(() => {
@@ -95,6 +78,29 @@ export default function ProfilePage() {
 
 		return handleAvatarChange;
 	}, [setAvatarUrl, uploadImage]);
+
+	const customRequest = async ({ file, onSuccess, onError }: any) => {
+		try {
+			if (!handleBeforeUploadFile(file as RcFile)) {
+				onError();
+				return;
+			}
+			showToast("warning", "Uploading image ...");
+			const response = await uploadImage(file as RcFile, AppConstant.avatarFolder);
+
+			if (response.isSuccess) {
+				const result = response.data;
+				onSuccess(result, file);
+			} else {
+				throw new Error("Failed to upload file");
+			}
+		} catch (error) {
+			console.error(error);
+			showToast("error", (error as Error).message);
+			onError(error);
+		}
+	};
+
 	return (
 		<div className="">
 			<Formik
@@ -157,21 +163,15 @@ export default function ProfilePage() {
 						<div className="flex flex-col items-center space-y-8 text-center sm:flex-row sm:space-x-8 sm:space-y-0">
 							<Avatar rootClassName="w-24 h-24" src={avatarUrl}></Avatar>
 							<Upload
-								// action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+								customRequest={customRequest}
 								name="avatarUrl"
-								beforeUpload={handleBeforeUpload}
+								accept="image/*"
 								onChange={async (info) => {
-									if (info.file.status == "uploading" && !isUploading) {
-										showToast("warning", "Uploading ...");
-										setIsUploading(true);
-										return;
+									if (info.file.status == "done") {
+										const avatarUrl = await handleChangeAvatar(info.file);
+										if (avatarUrl) setFieldValue("avatarUrl", avatarUrl);
+										showToast("success", "Upload avatar successfully");
 									}
-
-									const avatarUrl = await handleChangeAvatar(info.file);
-									if (avatarUrl) setFieldValue("avatarUrl", avatarUrl);
-									showToast("success", "Upload avatar successfully");
-									setIsUploading(false);
-									return;
 								}}
 								showUploadList={false}
 							>
@@ -326,7 +326,12 @@ export default function ProfilePage() {
 												className="w-5/6 ps-2"
 												disabled={!isEdit}
 												defaultValue={values.isMale ? Gender.MALE : Gender.FEMALE}
-												onChange={handleChange}
+												onChange={(event) => {
+													setFieldValue(
+														"isMale",
+														event.target.value === Gender.MALE ? true : false
+													);
+												}}
 											>
 												<Radio value={Gender.MALE}>Male</Radio>
 												<Radio value={Gender.FEMALE}>Female</Radio>
