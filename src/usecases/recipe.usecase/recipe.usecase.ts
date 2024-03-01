@@ -1,6 +1,11 @@
 import { IRecipeDatasource } from "@/datasources/recipe.datasource";
-import { CreateRecipeDTO, UpdateRecipeDTO } from "@/types/recipe";
+import { CreateRecipeDTO, Reaction, UpdateRecipeDTO } from "@/types/recipe";
 import Response from "../auth.usecase/responses/response";
+import { Comment } from "@/models/comment.model";
+import { Recipe } from "@/models/recipe.model";
+import { ReactionDatasource } from "@/datasources/reaction.datasource";
+import { UserDatasource } from "@/datasources/user.datasource";
+import { User } from "@/models/user.model";
 
 export abstract class IRecipeUseCase {
 	abstract createRecipe(data: CreateRecipeDTO): Promise<Response>;
@@ -17,7 +22,11 @@ export abstract class IRecipeUseCase {
 }
 
 export class RecipeUseCase implements IRecipeUseCase {
-	constructor(private readonly recipeDatasource: IRecipeDatasource) {}
+	constructor(
+		private readonly recipeDatasource: IRecipeDatasource,
+		private readonly reactionDatasource: ReactionDatasource,
+		private readonly userDatasource: UserDatasource
+	) {}
 	async deleteRecipeById(recipeId: string): Promise<Response> {
 		return await this.recipeDatasource.deleteRecipeById(recipeId);
 	}
@@ -43,7 +52,67 @@ export class RecipeUseCase implements IRecipeUseCase {
 		return await this.recipeDatasource.createRecipe(data);
 	}
 	async getRecipeById(id: string): Promise<Response> {
-		return await this.recipeDatasource.getRecipeById(id);
+		const response = await this.recipeDatasource.getRecipeById(id);
+		if (!response.isSuccess) {
+			return response;
+		}
+
+		const recipe = response.data!;
+		const rootComments: Comment[] = [];
+
+		await Promise.all(
+			(recipe as Recipe).comments.map(async (comment) => {
+				if (comment.parentCommentId == null) {
+					const reaction = (
+						await this.reactionDatasource.getReactionsByTargetId("comment", comment.commentId)
+					).data;
+					const userData = (await this.userDatasource.getUserById(comment.userId as string)).data;
+					const newRootComments: Comment = {
+						...comment,
+						userId: userData as User,
+						listChildComments: [],
+						reaction: reaction as Reaction,
+					};
+					rootComments.push(newRootComments);
+				}
+			})
+		);
+
+		const stack: Comment[] = [...rootComments];
+
+		while (stack.length > 0) {
+			const currentComment = stack.pop() as Comment;
+			const listChildComments: Comment[] = [];
+
+			await Promise.all(
+				(recipe as Recipe).comments.map(async (comment) => {
+					if (comment.parentCommentId == currentComment.commentId) {
+						const reaction = (
+							await this.reactionDatasource.getReactionsByTargetId("comment", comment.commentId)
+						).data;
+						const userData = await this.userDatasource.getUserById(comment.userId as string);
+
+						const commentWithChildren: Comment = {
+							...comment,
+							userId: userData.data as User,
+							listChildComments: [],
+							reaction: reaction as Reaction,
+						};
+						listChildComments.push(commentWithChildren);
+						stack.push(commentWithChildren);
+					}
+				})
+			);
+			currentComment.listChildComments = listChildComments;
+		}
+
+		return {
+			...response,
+			data: {
+				...response.data,
+				comments: rootComments,
+			},
+		};
 	}
 	async getAllRecipes(): Promise<Response> {
 		return await this.recipeDatasource.getAllRecipes();

@@ -8,13 +8,13 @@ import AppString from "@/utils/app-string";
 import { LoginOutlined } from "@ant-design/icons";
 import { useLoadingCallback } from "@/hooks/useLoadingCallback";
 import { Button } from "antd";
-import SearchBox from "../SearchBox";
+import { SearchBox } from "..";
 
 const navigation = [
 	{ name: "Home", href: "/", current: true },
 	{ name: "Recipes", href: "/recipes", current: false },
 	{ name: "Category", href: "/category", current: false },
-	{ name: "Booking", href: "#", current: false },
+	{ name: "Booking", href: "/booking", current: false },
 ];
 
 function classNames(...classes: unknown[]) {

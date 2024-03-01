@@ -14,13 +14,18 @@ import { SearchUseCaseImpl } from "./search.usecases/search.usecase";
 import { SearchDatasourceImpl } from "@/datasources/search.datasource";
 import { CommentUsecaseImpl } from "./comment/comment.usecase";
 import { CommentDatasourceImpl } from "@/datasources/comment.datasource";
+import { ReactionDatasourceImpl } from "@/datasources/reaction.datasource";
 
 const authUseCase = new AuthUseCase(new AuthDataSourceImpl(), new UserDatasourceImpl());
 const userUseCase = new UserUseCaseImpl(new UserDatasourceImpl());
 const fileUseCase = new FileUseCaseImpl(new FileDatasourceImpl());
 const categoriesUsecase = new CategoriesUsecaseImpl(new CategoriesDatasourceImpl());
 const becomeChefRequestUseCase = new BecomeChefRequestUseCase(new BecomeChefRequestDatasource());
-const recipeUseCase = new RecipeUseCase(new RecipeDatasource());
+const recipeUseCase = new RecipeUseCase(
+	new RecipeDatasource(),
+	new ReactionDatasourceImpl(),
+	new UserDatasourceImpl()
+);
 const searchUseCase = new SearchUseCaseImpl(new SearchDatasourceImpl());
 const commentUseCase = new CommentUsecaseImpl(new CommentDatasourceImpl());
 
