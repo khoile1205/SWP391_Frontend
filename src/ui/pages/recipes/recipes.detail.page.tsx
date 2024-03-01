@@ -209,7 +209,12 @@ export default function RecipeDetailPage() {
 					<Typography.Text strong className="me-5">
 						Difficult:
 					</Typography.Text>
-					<Rate disabled allowHalf defaultValue={4.5} style={{ color: AppColor.deepOrangeColor }} />
+					<Rate
+						disabled
+						allowHalf
+						defaultValue={recipe.difficult}
+						style={{ color: AppColor.deepOrangeColor }}
+					/>
 					<Divider
 						className="hidden sm:inline-block"
 						type="vertical"

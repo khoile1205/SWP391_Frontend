@@ -36,6 +36,9 @@ const UserFollowingPage = Loadable(lazy(() => import("@/ui/pages/users/users.fol
 // render - search page
 const SearchAllPage = Loadable(lazy(() => import("@/ui/pages/search/search.all.page")));
 
+// render - booking page
+const BookingPage = Loadable(lazy(() => import("@/ui/pages/booking/booking.page")));
+
 const MainRoutes: RouteObject[] = [
 	{
 		path: "/",
@@ -138,6 +141,10 @@ const MainRoutes: RouteObject[] = [
 				],
 			},
 		],
+	},
+	{
+		path: "booking",
+		element: <BookingPage></BookingPage>,
 	},
 	{
 		path: "*",

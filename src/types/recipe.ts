@@ -31,9 +31,15 @@ export interface CreateRecipeDTO {
 }
 
 export type Reaction = {
-	haha: string;
-	like: string;
-	favorite: string;
+	haha: number;
+	like: number;
+	favorite: number;
+};
+
+export const initializeReactionData = {
+	haha: 0,
+	like: 0,
+	favorite: 0,
 };
 
 export type UpdateRecipeDTO = Partial<CreateRecipeDTO>;

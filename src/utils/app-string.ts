@@ -38,4 +38,5 @@ export default class AppString {
 	static readonly noResultFoundMessage = "No result found matching the specified criteria!";
 	static readonly followSuccessMessage = "Followed successfully";
 	static readonly unfollowSuccessMessage = "Unfollowed successfully";
+	static readonly commentSuccessMessage = "Comment successfully";
 }

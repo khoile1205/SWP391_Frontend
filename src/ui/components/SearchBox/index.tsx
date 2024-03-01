@@ -7,7 +7,7 @@ interface SearchBoxProps {
 	open: boolean;
 	setOpen: (open: boolean) => void;
 }
-const SearchBox: React.FC<SearchBoxProps> = ({ open, setOpen }) => {
+export const SearchBox: React.FC<SearchBoxProps> = ({ open, setOpen }) => {
 	const [searchType, setSearchType] = useState<string>("all");
 	const [searchTerm, setSearchTerm] = useState<string>("");
 
@@ -34,7 +34,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ open, setOpen }) => {
 					options={[
 						{ value: "all", label: "All" },
 						{ value: "recipes", label: "Recipes" },
-						{ value: "user", label: "User" },
+						{ value: "users", label: "User" },
 					]}
 				/>
 				<Input
@@ -44,7 +44,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ open, setOpen }) => {
 					}}
 					suffix={
 						<Button
-							href={`/search/${searchType}?q=${searchTerm}`}
+							href={`/search/${searchType}?q=${encodeURIComponent(searchTerm)}`}
 							style={{
 								backgroundColor: AppColor.deepOrangeColor,
 							}}
@@ -59,5 +59,3 @@ const SearchBox: React.FC<SearchBoxProps> = ({ open, setOpen }) => {
 		</Modal>
 	);
 };
-
-export default SearchBox;
