@@ -6,9 +6,9 @@ import Logo from "@/assets/Icon/NestCooking.svg";
 import { showToast } from "@/utils/notify";
 import AppString from "@/utils/app-string";
 import { LoginOutlined } from "@ant-design/icons";
-import { useLoadingCallback } from "@/hooks/useLoadingCallback";
 import { Button } from "antd";
 import { SearchBox } from "..";
+import { useLoadingCallback } from "@/hooks/common";
 
 const navigation = [
 	{ name: "Home", href: "/", current: true },

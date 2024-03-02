@@ -1,11 +1,11 @@
 import { IRecipeDatasource } from "@/datasources/recipe.datasource";
-import { CreateRecipeDTO, Reaction, UpdateRecipeDTO } from "@/types/recipe";
+import { CreateRecipeDTO, UpdateRecipeDTO } from "@/types/recipe";
 import Response from "../auth.usecase/responses/response";
-import { Comment } from "@/models/comment.model";
-import { Recipe } from "@/models/recipe.model";
+import { Comment, CommentEntity } from "@/models/comment.model";
 import { ReactionDatasource } from "@/datasources/reaction.datasource";
 import { UserDatasource } from "@/datasources/user.datasource";
 import { User } from "@/models/user.model";
+import { Reaction } from "@/types/reaction";
 
 export abstract class IRecipeUseCase {
 	abstract createRecipe(data: CreateRecipeDTO): Promise<Response>;
@@ -58,41 +58,51 @@ export class RecipeUseCase implements IRecipeUseCase {
 		}
 
 		const recipe = response.data!;
-		const rootComments: Comment[] = [];
+		const rootComments: Comment = {
+			total: recipe.comments.length,
+			data: recipe.comments as CommentEntity[],
+		};
 
+		const listRootComments = [] as CommentEntity[];
 		await Promise.all(
-			(recipe as Recipe).comments.map(async (comment) => {
+			rootComments.data.map(async (comment: CommentEntity) => {
 				if (comment.parentCommentId == null) {
 					const reaction = (
 						await this.reactionDatasource.getReactionsByTargetId("comment", comment.commentId)
 					).data;
+					console.log(reaction);
 					const userData = (await this.userDatasource.getUserById(comment.userId as string)).data;
-					const newRootComments: Comment = {
+					const newRootComments: CommentEntity = {
 						...comment,
 						userId: userData as User,
 						listChildComments: [],
 						reaction: reaction as Reaction,
 					};
-					rootComments.push(newRootComments);
+
+					listRootComments.push(newRootComments);
 				}
 			})
 		);
 
-		const stack: Comment[] = [...rootComments];
+		const stack: CommentEntity[] = [
+			...listRootComments.sort(
+				(a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+			),
+		];
 
 		while (stack.length > 0) {
-			const currentComment = stack.pop() as Comment;
-			const listChildComments: Comment[] = [];
+			const currentComment = stack.pop() as CommentEntity;
+			const listChildComments: CommentEntity[] = [];
 
 			await Promise.all(
-				(recipe as Recipe).comments.map(async (comment) => {
+				recipe.comments.map(async (comment: CommentEntity) => {
 					if (comment.parentCommentId == currentComment.commentId) {
 						const reaction = (
 							await this.reactionDatasource.getReactionsByTargetId("comment", comment.commentId)
 						).data;
 						const userData = await this.userDatasource.getUserById(comment.userId as string);
 
-						const commentWithChildren: Comment = {
+						const commentWithChildren: CommentEntity = {
 							...comment,
 							userId: userData.data as User,
 							listChildComments: [],
@@ -110,7 +120,10 @@ export class RecipeUseCase implements IRecipeUseCase {
 			...response,
 			data: {
 				...response.data,
-				comments: rootComments,
+				comments: {
+					total: rootComments.total,
+					data: listRootComments,
+				},
 			},
 		};
 	}

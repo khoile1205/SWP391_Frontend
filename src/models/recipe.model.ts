@@ -1,6 +1,7 @@
-import { Category, Ingredients, Instructors, Reaction } from "@/types/recipe";
 import { ShortInfoUser } from "@/types/user";
 import { Comment } from "./comment.model";
+import { Category, Ingredients, Instructors } from "@/types/recipe";
+import { Reaction } from "@/types/reaction";
 
 export class Recipe {
 	id: string;
@@ -18,7 +19,7 @@ export class Recipe {
 	categories: Category[];
 	createdAt: Date;
 	updatedAt: Date;
-	comments: Comment[];
+	comments: Comment;
 	reaction: Reaction;
 	constructor(
 		id: string,
@@ -36,7 +37,7 @@ export class Recipe {
 		categories: Category[],
 		createdAt: Date,
 		updatedAt: Date,
-		comments: Comment[],
+		comments: Comment,
 		reaction: Reaction
 	) {
 		this.id = id;

@@ -1,20 +1,16 @@
 import { Space, Tooltip } from "antd";
 import React from "react";
 
-export const IconText = ({
-	icon: IconComponent,
-	text,
-	onClick,
-}: {
+interface Props {
+	className?: string;
 	icon: React.ComponentType;
 	text: string;
 	onClick?: () => void;
-}) => (
-	<Space onClick={onClick} className="hover:cursor-pointer">
+}
+export const IconText: React.FC<Props> = ({ className, icon, text, onClick }) => (
+	<Space onClick={onClick} className={`hover:cursor-pointer ${className}`}>
 		<Tooltip title={text}>
-			<span>
-				<IconComponent />
-			</span>
+			<span>{React.createElement(icon)}</span>
 		</Tooltip>
 		{text}
 	</Space>

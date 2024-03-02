@@ -43,7 +43,6 @@ export default function UpdateRecipesPage() {
 	// Controller
 	const handleUpdateRecipe = async (value: UpdateRecipeDTO) => {
 		setLoading(true);
-		console.log(value);
 		const response = await updateRecipeById(recipe?.id as string, value);
 
 		if (response.isSuccess) {
@@ -230,7 +229,6 @@ export default function UpdateRecipesPage() {
 											</div>
 										</div>
 									</Form.Item>
-									{console.log(values.instructors)}
 									<Form.Item name="price">
 										<div className="flex items-center">
 											<Typography.Title level={5} className="!mb-0 basis-1/2">
@@ -510,7 +508,6 @@ export default function UpdateRecipesPage() {
 									className="bg-primary w-1/2 rounded-lg p-2 text-white"
 									type="submit"
 									onClick={() => {
-										console.log(values);
 										if (!isValid) showToast("error", "Please fill in all fields");
 									}}
 								>

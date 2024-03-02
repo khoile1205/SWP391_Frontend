@@ -15,6 +15,7 @@ import { SearchDatasourceImpl } from "@/datasources/search.datasource";
 import { CommentUsecaseImpl } from "./comment/comment.usecase";
 import { CommentDatasourceImpl } from "@/datasources/comment.datasource";
 import { ReactionDatasourceImpl } from "@/datasources/reaction.datasource";
+import { ReactionUseCaseImpl } from "./reaction.usecase/reaction.usecase";
 
 const authUseCase = new AuthUseCase(new AuthDataSourceImpl(), new UserDatasourceImpl());
 const userUseCase = new UserUseCaseImpl(new UserDatasourceImpl());
@@ -27,7 +28,12 @@ const recipeUseCase = new RecipeUseCase(
 	new UserDatasourceImpl()
 );
 const searchUseCase = new SearchUseCaseImpl(new SearchDatasourceImpl());
-const commentUseCase = new CommentUsecaseImpl(new CommentDatasourceImpl());
+const commentUseCase = new CommentUsecaseImpl(
+	new CommentDatasourceImpl(),
+	new ReactionDatasourceImpl(),
+	new UserDatasourceImpl()
+);
+const reactionUseCase = new ReactionUseCaseImpl(new ReactionDatasourceImpl());
 
 export {
 	authUseCase,
@@ -38,4 +44,5 @@ export {
 	recipeUseCase,
 	searchUseCase,
 	commentUseCase,
+	reactionUseCase,
 };

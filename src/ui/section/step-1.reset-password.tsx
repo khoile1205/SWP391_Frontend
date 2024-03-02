@@ -9,7 +9,7 @@ import Link from "antd/es/typography/Link";
 import { useLoadingStore } from "@/zustand/loading.store";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useLoadingCallback } from "@/hooks/useLoadingCallback";
+import { useLoadingCallback } from "@/hooks/common";
 
 export default function Step1ResetPassword() {
 	const { verifyIdentifierResetPassword, sendEmailResetPassword } = authStore((state) => state);
