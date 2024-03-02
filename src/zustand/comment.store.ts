@@ -7,9 +7,17 @@ import { CreateCommentDTO } from "@/types/comment";
 type Action = {
 	postComment: (data: CreateCommentDTO) => Promise<Result>;
 	getParentCommentByCommentId: (commentId: string) => Promise<Result>;
+	getCommentById: (commentId: string) => Promise<Result>;
 };
 
 export const commentStore = create<Action>(() => ({
+	getCommentById: async (commentId: string) => {
+		const response = await commentUseCase.getCommentById(commentId);
+		if (response.isSuccess) {
+			return Result.success(response.message, response.data as Comment);
+		}
+		return Result.failed(response.message);
+	},
 	postComment: async (data: CreateCommentDTO) => {
 		const response = await commentUseCase.postComment(data);
 		if (response.isSuccess) {

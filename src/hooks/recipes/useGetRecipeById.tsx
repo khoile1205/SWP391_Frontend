@@ -14,7 +14,6 @@ export const useGetRecipeById = (recipeId: string | undefined) => {
 		if (!response.isSuccess) {
 			return;
 		}
-		console.log(response.data);
 		setRecipe(response.data);
 		setCheckedIngredients(Array(response.data.ingredients.length).fill(false));
 	};

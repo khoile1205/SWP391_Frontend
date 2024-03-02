@@ -65,7 +65,6 @@ export class RecipeDatasource implements IRecipeDatasource {
 		const response = await apiService.delete(`/api/recipes/favorites/remove/${recipeId}`, {});
 		const isSuccess = response.status === 200;
 		const resBody = await response.json();
-		console.log(isSuccess);
 		const message = resBody.message;
 		if (!isSuccess) return new Response(false, null, message);
 
@@ -111,7 +110,6 @@ export class RecipeDatasource implements IRecipeDatasource {
 		const response = await apiService.post("/api/recipes", data);
 		const isSuccess = response.status === 200;
 		const resBody = await response.json();
-		console.log(resBody);
 		const message = resBody.message;
 		if (!isSuccess) return new Response(false, null, message);
 

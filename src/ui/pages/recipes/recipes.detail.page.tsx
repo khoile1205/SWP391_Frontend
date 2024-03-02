@@ -32,15 +32,14 @@ import { useParams } from "react-router-dom";
 import NotFound from "../not-found.page";
 import { recipeStore } from "@/zustand/recipe.store";
 import { showToast } from "@/utils/notify";
-import userStore from "@/zustand/user.store";
 import { useGetRecipeById, useRecipeBookmark } from "@/hooks/recipes";
+import { useAuthenticateFeature } from "@/hooks/common";
 
 export default function RecipeDetailPage() {
 	// States
 	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 	const [shareModalVisible, setShareModalVisible] = useState(false);
 	const { saveFavoriteRecipe, removeFavoriteRecipe } = recipeStore((state) => state);
-	const { user } = userStore((state) => state);
 	// Hooks
 	const { recipeId } = useParams();
 	const { recipe, checkedIngredients, setCheckedIngredients } = useGetRecipeById(recipeId);
@@ -56,11 +55,7 @@ export default function RecipeDetailPage() {
 	}, []);
 
 	// Controller
-	const handleBookmarkClick = async () => {
-		if (user == null) {
-			showToast("error", "Please sign in to save your favorite recipe");
-			return;
-		}
+	const handleBookmarkClick = useAuthenticateFeature(async () => {
 		setBookmarked(!bookmarked);
 		if (!bookmarked) {
 			const response = await saveFavoriteRecipe(recipeId!);
@@ -77,7 +72,7 @@ export default function RecipeDetailPage() {
 			}
 		}
 		showToast("success", `Recipe ${bookmarked ? "unbookmarked" : "bookmarked"}`);
-	};
+	});
 
 	const handleIngredientToggle = (index: number) => {
 		const newCheckedIngredients = [...checkedIngredients];
@@ -132,7 +127,7 @@ export default function RecipeDetailPage() {
 						<Col>
 							<CommentOutlined className={"me-2 text-xl"} />
 							<Typography.Text strong className="me-5">
-								{recipe.comments.length}
+								{recipe.comments.total}
 							</Typography.Text>
 							<Divider
 								className="hidden sm:inline-block"
@@ -281,7 +276,7 @@ export default function RecipeDetailPage() {
 			</div>
 			<Divider style={{ marginTop: "20px", marginBottom: "20px" }} />
 
-			<CommentSection listComments={recipe.comments}></CommentSection>
+			<CommentSection commentData={recipe.comments} recipe={recipe}></CommentSection>
 
 			<Divider></Divider>
 

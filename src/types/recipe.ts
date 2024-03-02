@@ -30,16 +30,4 @@ export interface CreateRecipeDTO {
 	instructors: Instructors[];
 }
 
-export type Reaction = {
-	haha: number;
-	like: number;
-	favorite: number;
-};
-
-export const initializeReactionData = {
-	haha: 0,
-	like: 0,
-	favorite: 0,
-};
-
 export type UpdateRecipeDTO = Partial<CreateRecipeDTO>;

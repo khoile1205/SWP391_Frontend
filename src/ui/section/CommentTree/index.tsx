@@ -1,12 +1,14 @@
 import { CommentType } from "@/enums/comment.type.enum";
-import { Comment } from "@/models/comment.model";
-import { CreateCommentDTO } from "@/types/comment";
+import { useAuthenticateFeature } from "@/hooks/common";
+import { Comment, CommentEntity } from "@/models/comment.model";
+import { Recipe } from "@/models/recipe.model";
+import { CreateCommentDTO, initializeCommentData } from "@/types/comment";
 import { CommentComponent } from "@/ui/components";
 import AppColor from "@/utils/appColor";
+import { showToast } from "@/utils/notify";
 import { commentStore } from "@/zustand/comment.store";
 import userStore from "@/zustand/user.store";
-import { CloseCircleOutlined } from "@ant-design/icons";
-import { Form, Typography, List, Button, Divider } from "antd";
+import { Form, Typography, List, Button } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import Link from "antd/es/typography/Link";
 import { useFormik } from "formik";
@@ -14,33 +16,49 @@ import { useState } from "react";
 import * as Yup from "yup";
 
 interface CommentProps {
-	listComments: Comment[];
+	commentData: Comment;
+	recipe: Recipe;
 }
 
 const commentRecipeValidationSchema = Yup.object().shape({
 	comment: Yup.string().required("Comment is required"),
 });
 
-const renderComments = (comment: Comment, level: number) => {
-	const currentLevel = level;
-	return (
-		<div key={comment.commentId}>
-			<CommentComponent comment={comment} level={level} />
-			{comment.listChildComments && comment.listChildComments.length > 0 && (
-				<div>
-					{comment.listChildComments.map((child) => renderComments(child, currentLevel + 1))}
-				</div>
-			)}
-		</div>
-	);
-};
-export const CommentSection: React.FC<CommentProps> = ({ listComments }) => {
+// const renderComments = (
+// 	comment: CommentEntity,
+// 	level: number,
+// 	replyingTo: string | null,
+// 	setReplyingTo: (commentId: string | null) => void
+// ) => {
+// 	const currentLevel = level;
+// 	return (
+// 		<>
+// 			<div key={comment.commentId}>
+// 				<CommentComponent
+// 					comment={comment}
+// 					level={level}
+// 					replyingTo={replyingTo}
+// 					setReplyingTo={setReplyingTo}
+// 				/>
+// 				{comment.listChildComments && comment.listChildComments.length > 0 && (
+// 					<div>
+// 						{comment.listChildComments.map((child) =>
+// 							renderComments(child, currentLevel + 1, replyingTo, setReplyingTo)
+// 						)}
+// 					</div>
+// 				)}
+// 			</div>
+// 		</>
+// 	);
+// };
+export const CommentSection: React.FC<CommentProps> = ({ commentData, recipe }) => {
+	const [visibleComments, setVisibleComments] = useState<CommentEntity[]>(commentData.data);
+	const [commentLength, setCommentLength] = useState<number>(commentData.total);
 	const { user } = userStore((state) => state);
 	const [displayedComments, setDisplayedComments] = useState<number>(10);
 	const [replyingTo, setReplyingTo] = useState<string | null>(null);
-	const [replyValue, setReplyValue] = useState("");
+
 	const { postComment } = commentStore((state) => state);
-	// const [likedComments, setLikedComments] = useState<number[]>([]);
 
 	const commentFormik = useFormik({
 		initialValues: {
@@ -52,58 +70,30 @@ export const CommentSection: React.FC<CommentProps> = ({ listComments }) => {
 		validationSchema: commentRecipeValidationSchema,
 	});
 
-	// const handleLikeButtonClick = (index: number) => {
-	// 	const updatedComments = [...listComments];
-	// 	const updatedLikes = [...likedComments];
-	// 	updatedComments[index] = {
-	// 		...updatedComments[index],
-	// 		likes: updatedComments[index].likes === 0 ? 1 : 0,
-	// 	};
-	// 	const indexOfComment = likedComments.indexOf(index);
-	// 	if (indexOfComment === -1) {
-	// 		updatedLikes.push(index);
-	// 	} else {
-	// 		updatedLikes.splice(indexOfComment, 1);
-	// 	}
-	// 	// setComments(updatedComments);
-	// 	setLikedComments(updatedLikes);
-	// 	// showToast(
-	// 	// 	"success",
-	// 	// 	updatedComments[index].likes === 1 ? "You liked this comment!" : "You unliked this comment!"
-	// 	// );
-	// };
-
-	// const handleReplyButtonClick = (index: number) => {
-	// 	setReplyingTo(index);
-	// 	setReplyValue("");
-	// };
-
-	const handlePostComment = async (value: string, type: CommentType) => {
+	const handlePostComment = useAuthenticateFeature(async (value: string, type: CommentType) => {
+		// Set data
 		const data: CreateCommentDTO = {
 			parentCommentId: null,
-			content: value,
-			recipeId: listComments[0].parentCommentId as string,
+			content: value.trim(),
+			recipeId: recipe.id,
 			type,
 		};
+
+		// Fetch API
 		const response = await postComment(data);
-		console.log(response);
-		// if (value.trim() !== "") {
-		// 	if (replyingTo !== null) {
-		// 		const updatedComments = [...listComments];
-		// 		updatedComments.splice(replyingTo + 1, 0, newComment);
-		// 		// setComments(updatedComments);
-		// 		setReplyingTo(null);
-		// 		setReplyValue("");
-		// 		showToast("success", "Your reply has been posted!");
-		// 	} else {
-		// 		// setComments([...listComments, newComment]);
-		// 		setReplyValue("");
-		// 		showToast("success", "Your reply has been posted!");
-		// 	}
-		// } else {
-		// 	// message.error("Please enter a comment!");
-		// }
-	};
+
+		// Handle result
+		if (response.isSuccess) {
+			commentFormik.resetForm();
+			const newComment: CommentEntity = initializeCommentData({
+				commentData: response.data,
+				user: user!,
+			});
+			setCommentLength((prev) => prev + 1);
+			setVisibleComments((prev) => [...prev, newComment]);
+			showToast("success", "Your comment has been posted!");
+		}
+	});
 
 	const handleLoadMoreComments = () => {
 		setDisplayedComments((prev) => prev + 10);
@@ -111,13 +101,13 @@ export const CommentSection: React.FC<CommentProps> = ({ listComments }) => {
 	return (
 		<>
 			<Typography.Title className={"mb-10 font-playfair !text-5xl"}>
-				Comments ({listComments.length})
+				Comments ({commentLength})
 			</Typography.Title>
 			<List
 				itemLayout="vertical"
-				dataSource={listComments.slice(0, displayedComments)}
+				dataSource={visibleComments.slice(0, displayedComments)}
 				loadMore={
-					listComments.length > displayedComments && (
+					visibleComments.length > displayedComments && (
 						<div className="mt-10 text-center">
 							<Button
 								type="primary"
@@ -138,46 +128,22 @@ export const CommentSection: React.FC<CommentProps> = ({ listComments }) => {
 				}
 				renderItem={(comment) => (
 					<>
-						{<CommentComponent comment={comment} level={0}></CommentComponent>}
-						{comment.listChildComments.length > 0 &&
-							comment.listChildComments.map((comment) => renderComments(comment, 1))}
-						{replyingTo === comment.commentId && (
-							<div style={{ marginLeft: "60px", marginTop: "10px" }}>
-								<TextArea
-									placeholder="Reply to this comment..."
-									autoSize={{ minRows: 2, maxRows: 6 }}
-									value={replyValue}
-									onChange={(e) => setReplyValue(e.target.value)}
-								/>
-								<div style={{ marginTop: "10px", display: "flex", justifyContent: "flex-end" }}>
-									<Button
-										type="text"
-										icon={<CloseCircleOutlined />}
-										size="large"
-										onClick={() => setReplyingTo(null)}
-										style={{
-											background: "transparent",
-											color: "#1890ff",
-											border: "none",
-											fontSize: "16px",
-										}}
-									>
-										Cancel
-									</Button>
-									<Button
-										type="primary"
-										// onClick={() => handlePostComment(replyValue)}
-										style={{ background: "#1890ff" }}
-									>
-										Send
-									</Button>
-								</div>
-							</div>
-						)}
+						{
+							<CommentComponent
+								comment={comment}
+								level={0}
+								replyingTo={replyingTo}
+								setReplyingTo={setReplyingTo}
+							></CommentComponent>
+						}
+						{/* {comment.listChildComments &&
+							comment.listChildComments.map((comment) =>
+								renderComments(comment, 1, replyingTo, setReplyingTo)
+							)} */}
 					</>
 				)}
 			/>
-			{listComments.length <= displayedComments && <Divider></Divider>}
+			{/* {visibleComments.length <= displayedComments && <Divider></Divider>} */}
 			<div>
 				<div className="block items-center justify-between sm:flex">
 					<Typography.Title level={2} className={"mb-10 font-playfair"}>
