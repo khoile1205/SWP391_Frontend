@@ -1,15 +1,8 @@
 import { CommentEntity } from "@/models/comment.model";
 import { Avatar, Button, Divider, Flex, Form, List, Space, Typography } from "antd";
 import React, { useMemo, useState } from "react";
-import { IconText } from "..";
-import {
-	CloseCircleOutlined,
-	HeartOutlined,
-	LikeOutlined,
-	MessageOutlined,
-	SendOutlined,
-	SmileOutlined,
-} from "@ant-design/icons";
+import { IconText, ReactionButton } from "..";
+import { CloseCircleOutlined, MessageOutlined, SendOutlined } from "@ant-design/icons";
 import { User } from "@/models/user.model";
 import moment from "moment";
 import Link from "antd/es/typography/Link";
@@ -43,13 +36,33 @@ export const CommentComponent: React.FC<CommentProps> = ({
 	// State local
 	const [numberOfReplies, setNumberOfReplies] = useState<number>(comment.listChildComments.length);
 	const [visibleReplies, setVisibleReplies] = useState<CommentEntity[]>([]);
-	const [reaction, setReaction] = useState<Reaction>(comment.reaction);
+	const [reactions, setReactions] = useState<Reaction>(comment.reactions);
 	const [replying, setReplying] = useState(false);
 	const [displayReplies, setDisplayReplies] = useState<number>(1);
+	const [isReacted, setIsReacted] = useState<Record<keyof Reaction, boolean>>({
+		favorite: false,
+		haha: false,
+		like: false,
+	});
 
+	// Zustand store
+	const { postReaction, removeReaction } = reactionStore((state) => state);
+	const { postComment } = commentStore((state) => state);
+	const { user } = userStore((state) => state);
+
+	// Hooks
 	useEffectOnce(() => {
 		if (level <= 1) {
 			setDisplayReplies(2);
+		}
+	});
+	useEffectOnce(() => {
+		if (user && comment) {
+			setIsReacted({
+				favorite: comment.reactions.favorite.includes(user.id),
+				haha: comment.reactions.haha.includes(user.id),
+				like: comment.reactions.like.includes(user.id),
+			});
 		}
 	});
 	// Memorize state
@@ -67,11 +80,6 @@ export const CommentComponent: React.FC<CommentProps> = ({
 		}
 	}, []);
 
-	// Zustand store
-	const { postReaction } = reactionStore((state) => state);
-	const { postComment } = commentStore((state) => state);
-	const { user } = userStore((state) => state);
-
 	// Handle event
 	const handleReplyButtonClick = () => {
 		// If comment is at level more than 2, directly show the replies
@@ -88,17 +96,36 @@ export const CommentComponent: React.FC<CommentProps> = ({
 
 	// Controllers
 	const handleReactComment = useAuthenticateFeature(async (type: Reactions) => {
-		const result = await postReaction({
-			reaction: type,
-			targetID: comment.commentId,
-			type: "comment",
-		});
+		let result;
+		if ((isReacted as any)[Reactions[type]]) {
+			// If user already reacted, then remove the reaction
+			result = await removeReaction({
+				reaction: type,
+				targetID: comment.commentId,
+				type: "comment",
+			});
+		} else {
+			// If user has not reacted, then add the reaction
+			result = await postReaction({
+				reaction: type,
+				targetID: comment.commentId,
+				type: "comment",
+			});
+		}
 
 		if (result.isSuccess) {
-			setReaction((prev) => ({
+			showToast("success", result.message!);
+			setReactions((prev) => ({
 				...prev,
-				[Reactions[type]]: (prev as any)[Reactions[type]] + 1,
+				[Reactions[type]]: !(isReacted as any)[Reactions[type]]
+					? ((prev as any)[Reactions[type]] as string[]).concat(user?.id as string)
+					: ((prev as any)[Reactions[type]] as string[]).filter(
+							(userReacted: any) => userReacted != user?.id
+						),
 			}));
+			setIsReacted((prev) => ({ ...prev, [Reactions[type]]: !(prev as any)[Reactions[type]] }));
+		} else {
+			showToast("error", result.message!);
 		}
 	});
 
@@ -152,23 +179,23 @@ export const CommentComponent: React.FC<CommentProps> = ({
 						text={`Reply (${numberOfReplies})`}
 						key="list-vertical-star-o"
 					/>,
-					<IconText
-						icon={LikeOutlined}
+					<ReactionButton
+						reactionType={Reactions.like}
+						count={reactions.like.length}
+						isReacted={isReacted.like}
 						onClick={() => handleReactComment(Reactions.like)}
-						text={reaction.like.toString()}
-						key="list-vertical-like-o"
 					/>,
-					<IconText
-						icon={HeartOutlined}
+					<ReactionButton
+						reactionType={Reactions.favorite}
+						count={reactions.favorite.length}
+						isReacted={isReacted.favorite}
 						onClick={() => handleReactComment(Reactions.favorite)}
-						text={reaction.favorite.toString()}
-						key="list-vertical-favorite-o"
 					/>,
-					<IconText
-						icon={SmileOutlined}
+					<ReactionButton
+						reactionType={Reactions.haha}
+						count={reactions.haha.length}
+						isReacted={isReacted.haha}
 						onClick={() => handleReactComment(Reactions.haha)}
-						text={reaction.haha.toString()}
-						key="list-vertical-haha-o"
 					/>,
 				]}
 			>

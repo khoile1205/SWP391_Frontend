@@ -39,6 +39,7 @@ export default class AppString {
 	static readonly followSuccessMessage = "Followed successfully";
 	static readonly unfollowSuccessMessage = "Unfollowed successfully";
 	static readonly commentSuccessMessage = "Comment successfully";
-	static readonly postReactionSuccessMessage = "Comment successfully";
+	static readonly postReactionSuccessMessage = "React successfully";
+	static readonly removeReactionSuccessMessage = "Remove react successfully";
 	static readonly somthingWentWrongMessage = "Something went wrong. Please try again";
 }

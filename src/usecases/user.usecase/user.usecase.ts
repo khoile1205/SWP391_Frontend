@@ -4,6 +4,8 @@ import { ChangePasswordType, UpdateUserInformationType } from "@/types/user";
 import { AppConstant } from "@/utils/constant";
 import Cookies from "js-cookie";
 import Response from "../auth.usecase/responses/response";
+import { ReactionDatasource } from "@/datasources/reaction.datasource";
+import { ReactionType } from "@/types/reaction";
 abstract class UserUseCase {
 	abstract getUserProfile(): Promise<User | null>;
 	abstract changePassword(data: ChangePasswordType): Promise<Response>;
@@ -13,10 +15,17 @@ abstract class UserUseCase {
 	abstract getFollowingByUserId(userId: string): Promise<Response>;
 	abstract followUser(userId: string): Promise<Response>;
 	abstract unfollowUser(userId: string): Promise<Response>;
+	abstract getUserReactionByType(type: ReactionType): Promise<Response>;
 }
 
 class UserUseCaseImpl implements UserUseCase {
-	constructor(private readonly userDatasource: UserDatasource) {}
+	constructor(
+		private readonly userDatasource: UserDatasource,
+		private readonly reactionDatasource: ReactionDatasource
+	) {}
+	async getUserReactionByType(type: ReactionType): Promise<Response> {
+		return await this.reactionDatasource.getUserReactionByType(type);
+	}
 	async unfollowUser(userId: string): Promise<Response> {
 		return await this.userDatasource.unfollowUser(userId);
 	}

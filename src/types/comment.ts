@@ -20,5 +20,5 @@ export const initializeCommentData = ({
 	...commentData,
 	listChildComments: [],
 	userId: user ?? commentData.userId,
-	reaction: initializeReactionData,
+	reactions: initializeReactionData,
 });

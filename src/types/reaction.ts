@@ -1,20 +1,20 @@
 import { Reactions } from "@/enums/reaction.enum";
 
 export type Reaction = {
-	haha: number;
-	like: number;
-	favorite: number;
+	haha: string[];
+	like: string[];
+	favorite: string[];
 };
 
 export const initializeReactionData = {
-	haha: 0,
-	like: 0,
-	favorite: 0,
+	haha: [],
+	like: [],
+	favorite: [],
 };
 
 export type ReactionType = "recipe" | "comment";
 
-export type PostReactionDTO = {
+export type SendRequestReactionDTO = {
 	reaction: Reactions;
 	targetID: string;
 	type: ReactionType;

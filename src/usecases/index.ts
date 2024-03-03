@@ -18,7 +18,7 @@ import { ReactionDatasourceImpl } from "@/datasources/reaction.datasource";
 import { ReactionUseCaseImpl } from "./reaction.usecase/reaction.usecase";
 
 const authUseCase = new AuthUseCase(new AuthDataSourceImpl(), new UserDatasourceImpl());
-const userUseCase = new UserUseCaseImpl(new UserDatasourceImpl());
+const userUseCase = new UserUseCaseImpl(new UserDatasourceImpl(), new ReactionDatasourceImpl());
 const fileUseCase = new FileUseCaseImpl(new FileDatasourceImpl());
 const categoriesUsecase = new CategoriesUsecaseImpl(new CategoriesDatasourceImpl());
 const becomeChefRequestUseCase = new BecomeChefRequestUseCase(new BecomeChefRequestDatasource());

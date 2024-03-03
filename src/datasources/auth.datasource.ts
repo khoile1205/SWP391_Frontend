@@ -107,7 +107,6 @@ class AuthDataSourceImpl implements AuthDataSource {
 		const isSuccess = res.status === 200;
 		const resBody = await res.json();
 		const message = resBody.message;
-		console.log(resBody);
 		if (!isSuccess) {
 			return new Response(false, null, message);
 		}

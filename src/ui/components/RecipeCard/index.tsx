@@ -9,6 +9,8 @@ import { useNavigate } from "react-router-dom";
 import userStore from "@/zustand/user.store";
 import { showToast } from "@/utils/notify";
 import { useRecipeBookmark } from "@/hooks/recipes";
+import { useAuthenticateFeature } from "@/hooks/common";
+import { useEffect, useState } from "react";
 
 interface RecipeCardProps {
 	recipe: Recipe;
@@ -35,11 +37,21 @@ const ShareMenu: React.FC<ShareMenuProps> = ({ recipeId }) => (
 );
 
 export const RecipeCard = ({ recipe }: RecipeCardProps) => {
+	const [isReacted, setIsReacted] = useState<boolean>(false);
 	const { bookmarked, setBookmarked } = useRecipeBookmark(recipe.id);
 	const { saveFavoriteRecipe, removeFavoriteRecipe } = recipeStore((state) => state);
-	const { user } = userStore((state) => state);
+	const { user, userRecipeReaction } = userStore((state) => state);
 	const navigator = useNavigate();
 
+	useEffect(() => {
+		if (userRecipeReaction && user) {
+			setIsReacted(
+				userRecipeReaction.favorite.includes(recipe.id) ||
+					userRecipeReaction.haha.includes(recipe.id) ||
+					userRecipeReaction.like.includes(recipe.id)
+			);
+		}
+	}, [recipe.id, user, userRecipeReaction]);
 	const handleClickFavourite = () => {
 		if (user == null) {
 			showToast("error", "Please sign in to save your favorite recipe");
@@ -56,9 +68,9 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 			setBookmarked(true);
 		}
 	};
-	const handleReactRecipe = () => {
-		console.log("React Recipe");
-	};
+	const handleReactRecipe = useAuthenticateFeature(async () => {
+		console.log(true);
+	});
 	return (
 		<Card
 			bordered={false}
@@ -66,7 +78,7 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 				<HeartOutlined
 					key="react"
 					onClick={handleReactRecipe}
-					className="hover:!text-primary text-red-500"
+					className={`hover:!text-primary  ${isReacted ? "!text-primary" : ""}`}
 				/>,
 				<StarOutlined
 					key="save"

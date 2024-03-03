@@ -5,7 +5,6 @@ import { CommentEntity } from "@/models/comment.model";
 import { ReactionDatasource } from "@/datasources/reaction.datasource";
 import { UserDatasource } from "@/datasources/user.datasource";
 import { User } from "@/models/user.model";
-import { Reaction, initializeReactionData } from "@/types/reaction";
 
 export abstract class CommentUsecase {
 	abstract getParentCommentByCommentId(id: string): Promise<Response>;
@@ -42,7 +41,7 @@ export class CommentUsecaseImpl implements CommentUsecase {
 			await Promise.all(
 				currentComment.listChildComments.map(async (comment) => {
 					if (comment.parentCommentId == currentComment.commentId) {
-						const reaction = (
+						const reactions = (
 							await this.reactionDatasource.getReactionsByTargetId("comment", comment.commentId)
 						).data;
 						const userData = await this.userDatasource.getUserById(comment.userId as string);
@@ -51,7 +50,7 @@ export class CommentUsecaseImpl implements CommentUsecase {
 							...comment,
 							userId: userData.data as User,
 							listChildComments: [],
-							reaction: { ...initializeReactionData, ...(reaction as Reaction) },
+							reactions,
 						};
 						listChildComments.push(commentWithChildren);
 						stack.push(commentWithChildren);

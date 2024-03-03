@@ -4,4 +4,4 @@ export * from "./useGetRecipesByUserIdWithPagination";
 export * from "./useGetRecipesByUserId";
 export * from "./useGetRecipeById";
 export * from "./useRecipeBookmark";
-// export * from "./useGetRecipeWithPagination";
+export * from "./useGetRelatedRecipes";
