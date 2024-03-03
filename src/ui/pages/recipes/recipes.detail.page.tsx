@@ -22,6 +22,7 @@ import {
 	ClockCircleOutlined,
 	TeamOutlined,
 	StarOutlined,
+	WarningOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import Pasta from "@/assets/Icon/pasta.jpg";
@@ -41,6 +42,7 @@ import userStore from "@/zustand/user.store";
 import { useEffectOnce } from "usehooks-ts";
 import { reactionStore } from "@/zustand/reaction.store";
 import { Recipe } from "@/models/recipe.model";
+import { reportStore } from "@/zustand/report.store";
 
 // Content Component - Handles the main content of the recipe
 const RecipeContent: React.FC<{
@@ -48,136 +50,151 @@ const RecipeContent: React.FC<{
 	bookmarked: boolean;
 	handleBookmarkClick: () => void;
 	setShareModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ recipe, bookmarked, handleBookmarkClick, setShareModalVisible }) => (
-	<>
-		<Flex align="start" justify="space-between">
-			<div className="text-start">
-				<Typography.Title className={"mb-10 font-playfair !text-5xl"}>
-					{recipe.title}
-				</Typography.Title>
-				<div className="mb-5 mr-5 mt-5 block items-center justify-start space-y-5 sm:flex sm:space-y-0">
-					<Col>
-						<Typography.Link href={`/user/${recipe.user.id}`}>
-							<Avatar
-								size={"default"}
-								icon={<UserOutlined />}
-								style={{ marginRight: "10px" }}
-								src={recipe.user.avatarUrl}
+}> = ({ recipe, bookmarked, handleBookmarkClick, setShareModalVisible }) => {
+	const { setReportModalState } = reportStore((state) => state);
+	const handleReportClick = () => {
+		setReportModalState({ targetId: recipe.id, type: "recipe", open: true });
+	};
+	return (
+		<>
+			<Flex align="start" justify="space-between">
+				<div className="text-start">
+					<Typography.Title className={"mb-10 font-playfair !text-5xl"}>
+						{recipe.title}
+					</Typography.Title>
+					<div className="mb-5 mr-5 mt-5 block items-center justify-start space-y-5 sm:flex sm:space-y-0">
+						<Col>
+							<Typography.Link href={`/user/${recipe.user.id}`}>
+								<Avatar
+									size={"default"}
+									icon={<UserOutlined />}
+									style={{ marginRight: "10px" }}
+									src={recipe.user.avatarUrl}
+								/>
+								<Typography.Text strong className="me-5 truncate">
+									{recipe.user.firstName + " " + recipe.user.lastName}
+								</Typography.Text>
+							</Typography.Link>
+							<Divider
+								className="hidden sm:inline-block"
+								type="vertical"
+								style={{ height: "20px", marginRight: "10px" }}
 							/>
-							<Typography.Text strong className="me-5 truncate">
-								{recipe.user.firstName + " " + recipe.user.lastName}
+						</Col>
+						<Col>
+							<CalendarOutlined className={"me-2 text-xl"} />
+							<Typography.Text strong className="me-5">
+								{moment(recipe.createdAt).format("ll")}
 							</Typography.Text>
-						</Typography.Link>
-						<Divider
-							className="hidden sm:inline-block"
-							type="vertical"
-							style={{ height: "20px", marginRight: "10px" }}
-						/>
-					</Col>
-					<Col>
-						<CalendarOutlined className={"me-2 text-xl"} />
-						<Typography.Text strong className="me-5">
-							{moment(recipe.createdAt).format("ll")}
-						</Typography.Text>
-						<Divider
-							className="hidden sm:inline-block"
-							type="vertical"
-							style={{ height: "20px", marginRight: "10px" }}
-						/>
-					</Col>
-					<Col>
-						<CommentOutlined className={"me-2 text-xl"} />
-						<Typography.Text strong className="me-5">
-							{recipe.comments.total}
-						</Typography.Text>
-						<Divider
-							className="hidden sm:inline-block"
-							type="vertical"
-							style={{ height: "20px", marginRight: "10px" }}
-						/>
-					</Col>
-				</div>
-			</div>
-			<div className="flex flex-col space-x-0 space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
-				<Tooltip title="Share">
-					<Button
-						type="text"
-						icon={<ShareAltOutlined className="!text-xl" />}
-						onClick={() => setShareModalVisible(true)}
-					/>
-				</Tooltip>
-				<Tooltip title={bookmarked ? "Unbookmark" : "Bookmark"}>
-					<Button
-						type="text"
-						icon={
-							<BookOutlined
-								className="!text-xl"
-								style={{
-									fontSize: "36px",
-									color: bookmarked ? AppColor.deepOrangeColor : "#000",
-								}}
+							<Divider
+								className="hidden sm:inline-block"
+								type="vertical"
+								style={{ height: "20px", marginRight: "10px" }}
 							/>
-						}
-						onClick={handleBookmarkClick}
+						</Col>
+						<Col>
+							<CommentOutlined className={"me-2 text-xl"} />
+							<Typography.Text strong className="me-5">
+								{recipe.comments.total}
+							</Typography.Text>
+							<Divider
+								className="hidden sm:inline-block"
+								type="vertical"
+								style={{ height: "20px", marginRight: "10px" }}
+							/>
+						</Col>
+					</div>
+				</div>
+				<div className="flex flex-col space-x-0 space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
+					<Tooltip title="Share">
+						<Button
+							type="text"
+							icon={<ShareAltOutlined className="!text-xl" />}
+							onClick={() => setShareModalVisible(true)}
+						/>
+					</Tooltip>
+					<Tooltip title={bookmarked ? "Unbookmark" : "Bookmark"}>
+						<Button
+							type="text"
+							icon={
+								<BookOutlined
+									className="!text-xl"
+									style={{
+										fontSize: "36px",
+										color: bookmarked ? AppColor.deepOrangeColor : "#000",
+									}}
+								/>
+							}
+							onClick={handleBookmarkClick}
+						/>
+					</Tooltip>
+					<Tooltip title="Report">
+						<Button
+							type="text"
+							icon={<WarningOutlined className="!text-xl" />}
+							onClick={handleReportClick}
+						/>
+					</Tooltip>
+				</div>
+			</Flex>
+			<Typography.Paragraph className="font-inter text-lg">
+				{recipe.description}
+			</Typography.Paragraph>
+			<img
+				src={recipe.thumbnailUrl ?? Pasta}
+				alt="Recipe"
+				className="rounded-xl"
+				style={{
+					width: "100%",
+					height: "auto",
+					border: "none",
+					boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+				}}
+			/>
+			<div className="mr-5 mt-5 block items-center justify-start space-y-5 sm:flex sm:space-y-0">
+				<Col>
+					<ClockCircleOutlined style={{ marginRight: "10px", fontSize: "24px" }} />
+					<Typography.Text strong className="me-5">
+						Prep Time: {recipe.cookingTime} minutes
+					</Typography.Text>
+					<Divider
+						className="hidden sm:inline-block"
+						type="vertical"
+						style={{ height: "20px", marginRight: "10px" }}
 					/>
-				</Tooltip>
+				</Col>
+				<Col>
+					<TeamOutlined style={{ marginRight: "10px", fontSize: "24px" }} />
+					<Typography.Text strong className="me-5">
+						Servings: {recipe.portion} peoples
+					</Typography.Text>
+					<Divider
+						className="hidden sm:inline-block"
+						type="vertical"
+						style={{ height: "20px", marginRight: "10px" }}
+					/>
+				</Col>
+				<Col>
+					<StarOutlined style={{ marginRight: "10px", fontSize: "24px" }} />
+					<Typography.Text strong className="me-5">
+						Difficult:
+					</Typography.Text>
+					<Rate
+						disabled
+						allowHalf
+						defaultValue={recipe.difficult}
+						style={{ color: AppColor.deepOrangeColor }}
+					/>
+					<Divider
+						className="hidden sm:inline-block"
+						type="vertical"
+						style={{ height: "20px", marginRight: "10px" }}
+					/>
+				</Col>
 			</div>
-		</Flex>
-		<Typography.Paragraph className="font-inter text-lg">{recipe.description}</Typography.Paragraph>
-		<img
-			src={recipe.thumbnailUrl ?? Pasta}
-			alt="Recipe"
-			className="rounded-xl"
-			style={{
-				width: "100%",
-				height: "auto",
-				border: "none",
-				boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-			}}
-		/>
-		<div className="mr-5 mt-5 block items-center justify-start space-y-5 sm:flex sm:space-y-0">
-			<Col>
-				<ClockCircleOutlined style={{ marginRight: "10px", fontSize: "24px" }} />
-				<Typography.Text strong className="me-5">
-					Prep Time: {recipe.cookingTime} minutes
-				</Typography.Text>
-				<Divider
-					className="hidden sm:inline-block"
-					type="vertical"
-					style={{ height: "20px", marginRight: "10px" }}
-				/>
-			</Col>
-			<Col>
-				<TeamOutlined style={{ marginRight: "10px", fontSize: "24px" }} />
-				<Typography.Text strong className="me-5">
-					Servings: {recipe.portion} peoples
-				</Typography.Text>
-				<Divider
-					className="hidden sm:inline-block"
-					type="vertical"
-					style={{ height: "20px", marginRight: "10px" }}
-				/>
-			</Col>
-			<Col>
-				<StarOutlined style={{ marginRight: "10px", fontSize: "24px" }} />
-				<Typography.Text strong className="me-5">
-					Difficult:
-				</Typography.Text>
-				<Rate
-					disabled
-					allowHalf
-					defaultValue={recipe.difficult}
-					style={{ color: AppColor.deepOrangeColor }}
-				/>
-				<Divider
-					className="hidden sm:inline-block"
-					type="vertical"
-					style={{ height: "20px", marginRight: "10px" }}
-				/>
-			</Col>
-		</div>
-	</>
-);
+		</>
+	);
+};
 
 // Ingredients Component - Displays the list of ingredients
 const RecipeIngredients: React.FC<{
