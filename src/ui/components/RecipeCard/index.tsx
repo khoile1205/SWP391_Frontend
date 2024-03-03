@@ -11,6 +11,8 @@ import { showToast } from "@/utils/notify";
 import { useRecipeBookmark } from "@/hooks/recipes";
 import { useAuthenticateFeature } from "@/hooks/common";
 import { useEffect, useState } from "react";
+import { Reactions } from "@/enums/reaction.enum";
+import { reactionStore } from "@/zustand/reaction.store";
 
 interface RecipeCardProps {
 	recipe: Recipe;
@@ -38,9 +40,14 @@ const ShareMenu: React.FC<ShareMenuProps> = ({ recipeId }) => (
 
 export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 	const [isReacted, setIsReacted] = useState<boolean>(false);
-	const { bookmarked, setBookmarked } = useRecipeBookmark(recipe.id);
+
+	// Zustand store
 	const { saveFavoriteRecipe, removeFavoriteRecipe } = recipeStore((state) => state);
 	const { user, userRecipeReaction } = userStore((state) => state);
+	const { removeReaction, postReaction } = reactionStore((state) => state);
+
+	// Hooks
+	const { bookmarked, setBookmarked } = useRecipeBookmark(recipe.id);
 	const navigator = useNavigate();
 
 	useEffect(() => {
@@ -68,8 +75,34 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 			setBookmarked(true);
 		}
 	};
+	// const handleReactRecipe = useAuthenticateFeature(async () => {
+	// 	console.log(true);
+
+	// });
 	const handleReactRecipe = useAuthenticateFeature(async () => {
-		console.log(true);
+		let result;
+		if (isReacted) {
+			// If user already reacted, then remove the reaction
+			result = await removeReaction({
+				reaction: Reactions.favorite,
+				targetID: recipe?.id as string,
+				type: "recipe",
+			});
+		} else {
+			// If user has not reacted, then add the reaction
+			result = await postReaction({
+				reaction: Reactions.favorite,
+				targetID: recipe?.id as string,
+				type: "recipe",
+			});
+		}
+
+		if (result.isSuccess) {
+			showToast("success", result.message!);
+			setIsReacted((prev) => !prev);
+		} else {
+			showToast("error", result.message!);
+		}
 	});
 	return (
 		<Card
