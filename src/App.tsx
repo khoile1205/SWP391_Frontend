@@ -7,6 +7,7 @@ import { useLoadingStore } from "./zustand/loading.store";
 import { Loading } from "./ui/components/Loading";
 import MainRoutes from "./routes/index";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import CreateReportModal from "./ui/section/ReportModal";
 
 i18nInit();
 
@@ -20,6 +21,7 @@ function App() {
 				<div className="mt-2 px-4 sm:px-0">
 					<BrowserRouter>
 						<MainRoutes />
+						<CreateReportModal></CreateReportModal>
 					</BrowserRouter>
 				</div>
 			</div>

@@ -42,4 +42,5 @@ export default class AppString {
 	static readonly postReactionSuccessMessage = "React successfully";
 	static readonly removeReactionSuccessMessage = "Remove react successfully";
 	static readonly somthingWentWrongMessage = "Something went wrong. Please try again";
+	static readonly sendReportSuccessMessage = "Send report created successfully";
 }

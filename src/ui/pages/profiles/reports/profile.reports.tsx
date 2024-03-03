@@ -1,52 +1,18 @@
-import { Table, Pagination, Button, Input, Tooltip } from "antd";
-import { EyeOutlined, UserOutlined, BookOutlined, MessageOutlined } from "@ant-design/icons";
-
-interface Report {
-	id: number;
-	title: string;
-	type: "user" | "recipe" | "comment";
-	status: "pending" | "reject" | "accept";
-	createdAt: Date;
-}
-
-const reports: Report[] = [
-	{
-		id: 1,
-		title: "Test Report",
-		type: "user",
-		status: "pending",
-		createdAt: new Date("2023-12-21T11:00:00"),
-	},
-	{
-		id: 2,
-		title: "Test Report",
-		type: "recipe",
-		status: "reject",
-		createdAt: new Date("2023-12-21T11:00:00"),
-	},
-	{
-		id: 3,
-		title: "Test Report",
-		type: "comment",
-		status: "accept",
-		createdAt: new Date("2023-12-21T11:00:00"),
-	},
-	{
-		id: 4,
-		title: "Test Report",
-		type: "user",
-		status: "pending",
-		createdAt: new Date("2023-12-21T11:00:00"),
-	},
-];
+import { Table, Tooltip, Flex, Select, Typography } from "antd";
+import { CoffeeOutlined, CommentOutlined, UserOutlined } from "@ant-design/icons";
+import { Report } from "@/models/report.model";
+import { ActionStatus } from "@/enums";
+import { useGetUserReports } from "@/hooks/profiles";
+import { useState } from "react";
+import { ReportType } from "@/enums/report.type.enum";
 
 const renderStatusColor = (status: Report["status"]): string => {
 	switch (status) {
-		case "pending":
+		case ActionStatus.PENDING:
 			return "orange";
-		case "reject":
+		case ActionStatus.REJECTED:
 			return "red";
-		case "accept":
+		case ActionStatus.ACCEPTED:
 			return "green";
 		default:
 			return "black";
@@ -54,22 +20,21 @@ const renderStatusColor = (status: Report["status"]): string => {
 };
 
 const renderReportTypeIcon = (type: Report["type"]) => {
-	switch (type) {
-		case "user":
-			return <UserOutlined />;
-		case "recipe":
-			return <BookOutlined />;
-		case "comment":
-			return <MessageOutlined />;
-		default:
-			return null;
-	}
+	const iconMap: Record<Partial<Report["type"]>, React.ReactNode> = {
+		user: <UserOutlined />,
+		recipe: <CoffeeOutlined />,
+		comment: <CommentOutlined />,
+	};
+	return iconMap[type] ? (
+		<Tooltip title={type.charAt(0).toUpperCase() + type.slice(1)}>{iconMap[type]}</Tooltip>
+	) : null;
 };
 
 export default function ProfileReports() {
-	const handleViewDetail = (id: number) => {
-		console.log("View details of report with ID:", id);
-	};
+	// Local state
+	const [pageSize, setPageSize] = useState<number>(5);
+
+	const { reports } = useGetUserReports();
 
 	type Column<T> = {
 		title: string;
@@ -82,18 +47,19 @@ export default function ProfileReports() {
 
 	const columns: Column<Report>[] = [
 		{
-			title: "ID",
-			dataIndex: "id",
-			align: "center",
-			width: 50,
-			sorter: (a, b) => a.id - b.id,
-		},
-		{
 			title: "Title",
 			dataIndex: "title",
 			render: (_text: string, record: Report) => (
 				<Tooltip title={record.title}>{record.title}</Tooltip>
 			),
+			align: "center",
+		},
+		{
+			title: "Content",
+			dataIndex: "content",
+			render: (_text: string, record: Report) => <Typography>{record.content}</Typography>,
+			align: "center",
+			sorter: (a, b) => a.type.localeCompare(b.type),
 		},
 		{
 			title: "Type",
@@ -101,6 +67,18 @@ export default function ProfileReports() {
 			render: (type: Report["type"]) => renderReportTypeIcon(type),
 			align: "center",
 			sorter: (a, b) => a.type.localeCompare(b.type),
+		},
+		{
+			title: "Target",
+			dataIndex: "targetId",
+			render: (_text: string, record: Report) => (
+				<Typography.Link
+					href={`/${record.type == ReportType.RECIPE ? `${record.type}s` : `${record.type}`}/${record.targetId}`}
+				>
+					Link here
+				</Typography.Link>
+			),
+			align: "center",
 		},
 		{
 			title: "Status",
@@ -115,47 +93,43 @@ export default function ProfileReports() {
 			title: "Created At",
 			dataIndex: "createdAt",
 			align: "center",
-			render: (createdAt: Date) => <span>{createdAt.toLocaleDateString("en-US")}</span>,
-			sorter: (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-		},
-		{
-			title: "Actions",
-			align: "center",
-			render: (_text: any, record: Report) => (
-				<Button
-					type="text"
-					icon={<EyeOutlined style={{ fontSize: "16px", color: "#1890ff" }} />}
-					onClick={() => handleViewDetail(record.id)}
-				/>
-			),
+			render: (createdAt: Date) => <span>{new Date(createdAt).toLocaleDateString("en-US")}</span>,
+			sorter: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
 		},
 	];
 
 	return (
-		<div className="flex flex-col items-center justify-center px-4 py-8 lg:px-8">
-			<h2 className="mb-4 text-2xl font-bold text-gray-900">View Reports</h2>
-			<div className="mb-4">
-				<Input
-					type="text"
-					placeholder="Search reports..."
-					className="focus:border-blue-500 rounded-md border-gray-300 px-3 py-2 focus:outline-none"
-				/>
-			</div>
+		<div className=" px-4 py-8 lg:px-8">
+			<h2 className="mb-4 text-center text-2xl font-bold text-gray-900">View Reports</h2>
+			<Flex justify="flex-end" align="center" className="mb-5 space-x-3 text-end">
+				<Typography>Rows per page: </Typography>
+				<Select
+					defaultValue={pageSize}
+					options={[
+						{
+							label: 5,
+							value: 5,
+						},
+						{
+							label: 10,
+							value: 10,
+						},
+						{
+							label: 15,
+							value: 15,
+						},
+					]}
+					onChange={(value: number) => setPageSize(value)}
+				></Select>
+			</Flex>
 			<Table
 				columns={columns}
 				dataSource={reports}
-				// pagination={{ defaultPageSize: 5, showSizeChanger: false }}
+				pagination={{ defaultPageSize: 1, showSizeChanger: false, pageSize: pageSize }}
 				bordered
 				className="rounded-lg shadow-md"
 				rowClassName={(_, index) => (index % 2 === 0 ? "even-row" : "odd-row")}
 				scroll={{ y: 400 }}
-			/>
-			<Pagination
-				defaultCurrent={1}
-				total={reports.length}
-				pageSize={5}
-				showQuickJumper
-				style={{ marginTop: "16px", textAlign: "center" }}
 			/>
 		</div>
 	);
