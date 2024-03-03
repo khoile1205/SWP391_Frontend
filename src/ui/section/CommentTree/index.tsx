@@ -100,7 +100,7 @@ export const CommentSection: React.FC<CommentProps> = ({ commentData, recipe }) 
 	};
 	return (
 		<>
-			<Typography.Title className={"mb-10 font-playfair !text-5xl"}>
+			<Typography.Title level={1} className={"mb-10 font-playfair"}>
 				Comments ({commentLength})
 			</Typography.Title>
 			<List

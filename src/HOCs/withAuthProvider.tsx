@@ -1,5 +1,6 @@
 import { useUserAuthentication } from "@/hooks/auth";
 import { useCategories } from "@/hooks/category";
+import { useInitializeUserReaction } from "@/hooks/user/useInitializeUserReaction";
 import { FunctionComponent, ComponentType } from "react";
 import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -8,7 +9,7 @@ export function withAuthProvider(WrappedComponent: ComponentType) {
 	const AuthProvider: FunctionComponent = (props) => {
 		useCategories();
 		useUserAuthentication();
-
+		useInitializeUserReaction();
 		return (
 			<>
 				<ToastContainer

@@ -7,9 +7,11 @@ import { OAuth2SignInData, SignInInformation, SignUpInformation } from "@/types/
 import { ChangePasswordType, UpdateUserInformationType } from "@/types/user";
 import { handleUseCase } from "./commons/handle.usecase";
 import Response from "@/usecases/auth.usecase/responses/response";
+import { Reaction, ReactionType } from "@/types/reaction";
 
 type UserStore = {
 	user: User | null;
+	userRecipeReaction: Reaction | null;
 	error: ErrorState | null;
 	updateUser: (user: User | null) => void;
 	login: (data: SignInInformation) => Promise<Result>;
@@ -26,11 +28,22 @@ type UserStore = {
 	getFollowingByUserId(userId: string): Promise<Result>;
 	followUser(userId: string): Promise<Result>;
 	unfollowUser(userId: string): Promise<Result>;
+	getUserReactionByType(type: ReactionType): Promise<Result>;
 };
 
 const userStore = create<UserStore>()((set, get) => ({
 	user: null,
 	error: null,
+	userRecipeReaction: null,
+	getUserReactionByType: async (type: ReactionType) => {
+		const result = await handleUseCase(userUseCase.getUserReactionByType(type));
+		if (result.isSuccess) {
+			set(() => ({
+				userRecipeReaction: result.data as Reaction,
+			}));
+		}
+		return result;
+	},
 	updateUser: (user: User | null) => set(() => ({ user: user })),
 	handleSignIn: async (signInMethod: () => Promise<Response>) => {
 		const { message = "", data, isSuccess } = await signInMethod();

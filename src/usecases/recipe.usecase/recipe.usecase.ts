@@ -67,16 +67,16 @@ export class RecipeUseCase implements IRecipeUseCase {
 		await Promise.all(
 			rootComments.data.map(async (comment: CommentEntity) => {
 				if (comment.parentCommentId == null) {
-					const reaction = (
+					const reactions = (
 						await this.reactionDatasource.getReactionsByTargetId("comment", comment.commentId)
 					).data;
-					console.log(reaction);
+					console.log(reactions);
 					const userData = (await this.userDatasource.getUserById(comment.userId as string)).data;
 					const newRootComments: CommentEntity = {
 						...comment,
 						userId: userData as User,
 						listChildComments: [],
-						reaction: reaction as Reaction,
+						reactions: reactions as Reaction,
 					};
 
 					listRootComments.push(newRootComments);
@@ -97,7 +97,7 @@ export class RecipeUseCase implements IRecipeUseCase {
 			await Promise.all(
 				recipe.comments.map(async (comment: CommentEntity) => {
 					if (comment.parentCommentId == currentComment.commentId) {
-						const reaction = (
+						const reactions = (
 							await this.reactionDatasource.getReactionsByTargetId("comment", comment.commentId)
 						).data;
 						const userData = await this.userDatasource.getUserById(comment.userId as string);
@@ -106,7 +106,7 @@ export class RecipeUseCase implements IRecipeUseCase {
 							...comment,
 							userId: userData.data as User,
 							listChildComments: [],
-							reaction: reaction as Reaction,
+							reactions: reactions as Reaction,
 						};
 						listChildComments.push(commentWithChildren);
 						stack.push(commentWithChildren);
@@ -124,6 +124,7 @@ export class RecipeUseCase implements IRecipeUseCase {
 					total: rootComments.total,
 					data: listRootComments,
 				},
+				reactions: response.data?.reactions,
 			},
 		};
 	}

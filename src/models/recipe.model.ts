@@ -20,7 +20,7 @@ export class Recipe {
 	createdAt: Date;
 	updatedAt: Date;
 	comments: Comment;
-	reaction: Reaction;
+	reactions: Reaction;
 	constructor(
 		id: string,
 		user: ShortInfoUser,
@@ -38,7 +38,7 @@ export class Recipe {
 		createdAt: Date,
 		updatedAt: Date,
 		comments: Comment,
-		reaction: Reaction
+		reactions: Reaction
 	) {
 		this.id = id;
 		this.user = user;
@@ -56,6 +56,6 @@ export class Recipe {
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 		this.comments = comments;
-		this.reaction = reaction;
+		this.reactions = reactions;
 	}
 }

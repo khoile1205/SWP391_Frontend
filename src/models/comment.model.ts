@@ -10,7 +10,7 @@ export class CommentEntity {
 	type: CommentType;
 	userId: string | User;
 	listChildComments: CommentEntity[] | any[];
-	reaction: Reaction;
+	reactions: Reaction;
 	createdAt: Date;
 	updatedAt: Date;
 	constructor(
@@ -21,7 +21,7 @@ export class CommentEntity {
 		type: CommentType,
 		listChildComments: CommentEntity[] | any[],
 		userId: string | User,
-		reaction: Reaction,
+		reactions: Reaction,
 		createdAt: Date,
 		updatedAt: Date
 	) {
@@ -32,7 +32,7 @@ export class CommentEntity {
 		this.type = type;
 		this.listChildComments = listChildComments;
 		this.userId = userId;
-		this.reaction = reaction;
+		this.reactions = reactions;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 	}
