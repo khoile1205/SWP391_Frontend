@@ -36,9 +36,33 @@ const createRecipeValidationSchema = (user: User) =>
 			.required("Cooking time is required")
 			.min(1, "Cooking time must be greater than 0")
 			.max(999, "Cooking time must be less than 999"),
-		price:
+		isPrivate: Yup.boolean(),
+		recipePrice:
 			user?.role === Roles.CHEF
-				? Yup.number().required("Price is required").min(1, "Price must be greater than 0")
+				? Yup.number().test(
+						"is-private",
+						"Recipe price is required when private is true",
+						function () {
+							if (this.resolve(Yup.ref("isPrivate")) === true) {
+								return this.parent.recipePrice !== undefined && this.parent.recipePrice > 0;
+							}
+							return true;
+						}
+					)
+				: Yup.number(),
+		isAvailableForBooking: Yup.boolean(),
+		bookingPrice:
+			user?.role === Roles.CHEF
+				? Yup.number().test(
+						"is-available-for-booking",
+						"Booking price is required when available for booking",
+						function () {
+							if (this.resolve(Yup.ref("isAvailableForBooking")) === true) {
+								return this.parent.bookingPrice !== undefined && this.parent.bookingPrice > 0;
+							}
+							return true;
+						}
+					)
 				: Yup.number(),
 		categories: Yup.array()
 			.required("Categories is required")

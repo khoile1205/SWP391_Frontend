@@ -12,7 +12,9 @@ export class Recipe {
 	isPrivate: boolean;
 	portion: number;
 	cookingTime: number;
-	price: number;
+	recipePrice: number;
+	isAvailableForBooking: boolean;
+	bookingPrice: number;
 	difficult: number;
 	instructors: Instructors[];
 	ingredients: Ingredients[];
@@ -28,9 +30,11 @@ export class Recipe {
 		description: string,
 		thumbnailUrl: string,
 		isPrivate: boolean,
+		recipePrice: number,
 		portion: number,
+		isAvailableForBooking: boolean,
+		bookingPrice: number,
 		cookingTime: number,
-		price: number,
 		difficult: number,
 		instructors: Instructors[],
 		ingredients: Ingredients[],
@@ -48,7 +52,9 @@ export class Recipe {
 		this.isPrivate = isPrivate;
 		this.portion = portion;
 		this.cookingTime = cookingTime;
-		this.price = price;
+		this.recipePrice = recipePrice;
+		this.isAvailableForBooking = isAvailableForBooking;
+		this.bookingPrice = bookingPrice;
 		this.difficult = difficult;
 		this.instructors = instructors;
 		this.ingredients = ingredients;

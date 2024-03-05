@@ -15,7 +15,7 @@ import {
 	CameraOutlined,
 	EyeOutlined,
 } from "@ant-design/icons";
-import { Button, Flex, Form, Input, Modal, Radio, Rate, Select, Typography } from "antd";
+import { Button, Col, Flex, Form, Input, Modal, Radio, Rate, Row, Select, Typography } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { Field, FieldArray, Formik, FormikErrors } from "formik";
 import { useState } from "react";
@@ -65,7 +65,9 @@ export default function UpdateRecipesPage() {
 					portion: recipe.portion,
 					cookingTime: recipe.cookingTime,
 					isPrivate: recipe.isPrivate,
-					price: recipe.price,
+					recipePrice: recipe.recipePrice,
+					isAvailableForBooking: recipe.isAvailableForBooking,
+					bookingPrice: recipe.bookingPrice,
 					difficult: recipe.difficult,
 					categories: recipe.categories.map((category) => category.id),
 					ingredients: recipe.ingredients,
@@ -208,49 +210,6 @@ export default function UpdateRecipesPage() {
 									</div>
 								</div>
 							</Form.Item>
-							{user?.role == Roles.CHEF && (
-								<>
-									<Form.Item name="isPrivate">
-										<div className="flex items-center">
-											<Typography.Title level={5} className="!mb-0 basis-1/2">
-												Private
-											</Typography.Title>
-											<div className="w-full">
-												<Radio.Group
-													optionType="button"
-													name="isPrivate"
-													defaultValue={values.isPrivate}
-													onChange={(e) => setFieldValue("isPrivate", e.target.value)}
-													onBlur={handleBlur}
-												>
-													<Radio.Button value={true}>Yes</Radio.Button>
-													<Radio.Button value={false}>No</Radio.Button>
-												</Radio.Group>
-											</div>
-										</div>
-									</Form.Item>
-									<Form.Item name="price">
-										<div className="flex items-center">
-											<Typography.Title level={5} className="!mb-0 basis-1/2">
-												Price
-											</Typography.Title>
-											<div className="w-full">
-												<Input
-													type="number"
-													{...getFieldProps("price")}
-													className="w-full rounded-md border border-gray-300"
-													defaultValue={values.price}
-													placeholder="100"
-												/>
-												{errors.price && touched.price && (
-													<Typography className="ms-1 mt-2 text-red-500">{errors.price}</Typography>
-												)}
-											</div>
-										</div>
-									</Form.Item>
-								</>
-							)}
-
 							<Form.Item name="difficult">
 								<div className="flex items-center">
 									<Typography.Title level={5} className="!mb-0 basis-1/2">
@@ -296,6 +255,105 @@ export default function UpdateRecipesPage() {
 								</div>
 							</Form.Item>
 						</div>
+						{user?.role == Roles.CHEF && (
+							<div className="space-y-1 bg-gray-50 p-6">
+								<Typography.Title level={3}>For Chef:</Typography.Title>
+								<Row>
+									<Col span={12}>
+										<Form.Item name="isPrivate">
+											<div className="flex items-center">
+												<Typography.Title level={5} className="!mb-0 basis-1/2">
+													Private
+												</Typography.Title>
+												<div className="w-full">
+													<Radio.Group
+														optionType="button"
+														name="isPrivate"
+														defaultValue={values.isPrivate}
+														onChange={(e) => setFieldValue("isPrivate", e.target.value)}
+														onBlur={handleBlur}
+													>
+														<Radio.Button value={true}>Yes</Radio.Button>
+														<Radio.Button value={false}>No</Radio.Button>
+													</Radio.Group>
+												</div>
+											</div>
+										</Form.Item>
+									</Col>
+									<Col span={12}>
+										<Form.Item name="recipePrice">
+											<div className="flex items-start">
+												<Typography.Title level={5} className="!mb-0 mt-2 basis-1/2">
+													Price
+												</Typography.Title>
+												<div className="w-full">
+													<Input
+														type="number"
+														{...getFieldProps("recipePrice")}
+														className="w-full rounded-md border border-gray-300"
+														defaultValue={values.recipePrice}
+														placeholder="100"
+														disabled={!values.isPrivate}
+													/>
+													{errors.recipePrice && touched.recipePrice && (
+														<Typography className="ms-1 mt-2 text-red-500">
+															{errors.recipePrice}
+														</Typography>
+													)}
+												</div>
+											</div>
+										</Form.Item>
+									</Col>
+								</Row>
+								<Row>
+									<Col span={12}>
+										<Form.Item name="isAvailableForBooking">
+											<div className="flex items-center">
+												<Typography.Title level={5} className="!mb-0 basis-1/2">
+													Available Booking:
+												</Typography.Title>
+												<div className="w-full">
+													<Radio.Group
+														optionType="button"
+														name="isAvailableForBooking"
+														defaultValue={values.isAvailableForBooking}
+														onChange={(e) => setFieldValue("isAvailableForBooking", e.target.value)}
+														onBlur={handleBlur}
+													>
+														<Radio.Button value={true}>Yes</Radio.Button>
+														<Radio.Button value={false}>No</Radio.Button>
+													</Radio.Group>
+												</div>
+											</div>
+										</Form.Item>
+									</Col>
+									<Col span={12}>
+										<Form.Item name="bookingPrice">
+											<div className="flex items-start">
+												<Typography.Title level={5} className="!mb-0 mt-2 basis-1/2">
+													Booking Price
+												</Typography.Title>
+												<div className="w-full">
+													<Input
+														type="number"
+														{...getFieldProps("bookingPrice")}
+														className="w-full rounded-md border border-gray-300"
+														defaultValue={values.bookingPrice}
+														placeholder="100"
+														disabled={!values.isAvailableForBooking}
+													/>
+													{errors.bookingPrice && touched.bookingPrice && (
+														<Typography className="ms-1 mt-2 text-red-500">
+															{errors.bookingPrice}
+														</Typography>
+													)}
+												</div>
+											</div>
+										</Form.Item>
+									</Col>
+								</Row>
+							</div>
+						)}
 						<div className="space-y-3 bg-gray-50 p-6">
 							<Typography.Title level={3}>Ingredients</Typography.Title>
 							<FieldArray name="ingredients">

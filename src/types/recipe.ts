@@ -21,7 +21,9 @@ export interface CreateRecipeDTO {
 	description: string;
 	thumbnailUrl?: string;
 	isPrivate: boolean;
-	price: number;
+	recipePrice: number;
+	isAvailableForBooking: boolean;
+	bookingPrice: number;
 	difficult: number;
 	cookingTime: number;
 	portion: number;
