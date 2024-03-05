@@ -7,17 +7,9 @@ import { useEffect, useState } from "react";
 import { recipeStore } from "@/zustand/recipe.store";
 import { showToast } from "@/utils/notify";
 import { useGetRecipesByUserIdWithPagination } from "@/hooks/recipes";
+import { Column } from "@/types/@override/Table";
 
-type Column<T> = {
-	title: string;
-	dataIndex?: keyof T;
-	align?: "center" | "left" | "right";
-	width?: string;
-	render?: (text: any, record: T) => JSX.Element | null;
-	sorter?: (a: T, b: T) => number;
-};
-
-export default function ProfileRecipes() {
+export default function AdminReportPage() {
 	const { user } = userStore((state) => state);
 	const { deleteRecipeById } = recipeStore((state) => state);
 	const { visibleRecipes } = useGetRecipesByUserIdWithPagination(user?.id);

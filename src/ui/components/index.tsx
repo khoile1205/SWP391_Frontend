@@ -17,3 +17,6 @@ export * from "./ConfirmModal";
 export * from "./UserProfileLayout";
 export * from "./Comment";
 export * from "./ReactionButton";
+export * from "./ColCard";
+export * from "./NotificationComponent";
+export * from "./LineChart";
