@@ -33,3 +33,10 @@ export interface CreateRecipeDTO {
 }
 
 export type UpdateRecipeDTO = Partial<CreateRecipeDTO>;
+
+export type PurchaseRecipesDTO = {
+	orderType: string;
+	amount: 0;
+	orderDescription: string;
+	name: string;
+};

@@ -11,6 +11,8 @@ import {
 	Flex,
 	Col,
 	Image,
+	Modal,
+	Row,
 } from "antd";
 import {
 	UserOutlined,
@@ -23,6 +25,9 @@ import {
 	TeamOutlined,
 	StarOutlined,
 	WarningOutlined,
+	LockOutlined,
+	CreditCardOutlined,
+	WalletOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import Pasta from "@/assets/Icon/pasta.jpg";
@@ -43,6 +48,12 @@ import { useEffectOnce } from "usehooks-ts";
 import { reactionStore } from "@/zustand/reaction.store";
 import { Recipe } from "@/models/recipe.model";
 import { reportStore } from "@/zustand/report.store";
+import VnPayLogo from "@/assets/Icon/vnpay-seeklogo.svg";
+import { paymentStore } from "@/zustand/payment.store";
+import { CreatePaymentDTO, PurchaseRecipePaymentType } from "@/types/payment";
+import { User } from "@/models/user.model";
+import { PaymentType } from "@/enums/payment.type.enum";
+import Result from "@/zustand/commons/result";
 
 // Content Component - Handles the main content of the recipe
 const RecipeContent: React.FC<{
@@ -207,25 +218,26 @@ const RecipeIngredients: React.FC<{
 			Ingredients
 		</Typography.Title>
 		<ul className="space-y-5">
-			{recipe.ingredients.map((ingredient, index) => (
-				<List.Item className="ms-5 flex items-center" key={index}>
-					<div
-						className="me-5 flex h-6 w-6 items-center justify-center rounded-full hover:cursor-pointer"
-						style={{
-							border: `2px solid ${checkedIngredients[index] ? AppColor.deepOrangeColor : "black"}`,
-							background: checkedIngredients[index] ? "white" : "none",
-						}}
-						onClick={() => handleIngredientToggle(index)}
-					>
-						{checkedIngredients[index] && <CheckOutlined style={{ color: "orange" }} />}
-					</div>
-					<Typography.Text
-						className={`font-inter text-lg font-medium ${checkedIngredients[index] ? "text-gray-500 line-through" : "none"}`}
-					>
-						{ingredient.name + " " + ingredient.amount}
-					</Typography.Text>
-				</List.Item>
-			))}
+			{recipe.ingredients &&
+				recipe.ingredients.map((ingredient, index) => (
+					<List.Item className="ms-5 flex items-center" key={index}>
+						<div
+							className="me-5 flex h-6 w-6 items-center justify-center rounded-full hover:cursor-pointer"
+							style={{
+								border: `2px solid ${checkedIngredients[index] ? AppColor.deepOrangeColor : "black"}`,
+								background: checkedIngredients[index] ? "white" : "none",
+							}}
+							onClick={() => handleIngredientToggle(index)}
+						>
+							{checkedIngredients[index] && <CheckOutlined style={{ color: "orange" }} />}
+						</div>
+						<Typography.Text
+							className={`font-inter text-lg font-medium ${checkedIngredients[index] ? "text-gray-500 line-through" : "none"}`}
+						>
+							{ingredient.name + " " + ingredient.amount}
+						</Typography.Text>
+					</List.Item>
+				))}
 		</ul>
 	</div>
 );
@@ -237,33 +249,34 @@ const RecipeInstructions: React.FC<{ recipe: Recipe }> = ({ recipe }) => (
 			Instructions
 		</Typography.Title>
 		<ol style={{ paddingLeft: "20px", fontSize: "20px", fontFamily: "Arial, sans-serif" }}>
-			{recipe.instructors.map((instructor, index) => (
-				<li key={index} style={{ marginBottom: "25px" }}>
-					<div>
-						<Typography.Text
-							className={`text-md me-3 rounded-full px-2 py-1 font-inter font-medium text-white`}
-							style={{ backgroundColor: AppColor.deepOrangeColor }}
-						>
-							{index + 1}
-						</Typography.Text>
-						<Typography.Text className={`font-inter text-lg font-medium`}>
-							{instructor.description}
-						</Typography.Text>
-					</div>
-					<div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-						{instructor.imageUrls &&
-							instructor.imageUrls.map((imageUrl, index) => (
-								<div key={index} className="aspect-w-1 aspect-h-1">
-									<Image
-										className="h-full w-full rounded-lg object-cover"
-										src={imageUrl}
-										alt={`Step ${index + 1}`}
-									/>
-								</div>
-							))}
-					</div>
-				</li>
-			))}
+			{recipe.instructors &&
+				recipe.instructors.map((instructor, index) => (
+					<li key={index} style={{ marginBottom: "25px" }}>
+						<div>
+							<Typography.Text
+								className={`text-md me-3 rounded-full px-2 py-1 font-inter font-medium text-white`}
+								style={{ backgroundColor: AppColor.deepOrangeColor }}
+							>
+								{index + 1}
+							</Typography.Text>
+							<Typography.Text className={`font-inter text-lg font-medium`}>
+								{instructor.description}
+							</Typography.Text>
+						</div>
+						<div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+							{instructor.imageUrls &&
+								instructor.imageUrls.map((imageUrl, index) => (
+									<div key={index} className="aspect-w-1 aspect-h-1">
+										<Image
+											className="h-full w-full rounded-lg object-cover"
+											src={imageUrl}
+											alt={`Step ${index + 1}`}
+										/>
+									</div>
+								))}
+						</div>
+					</li>
+				))}
 		</ol>
 	</div>
 );
@@ -309,9 +322,154 @@ const RelatedRecipesSection: React.FC<{ relatedRecipes: Recipe[] }> = ({ related
 	</div>
 );
 
+// Private Recipe Section - Displays the section for private recipes
+interface RecipePrivatelySectionProps {
+	onClick: () => Promise<void>;
+}
+const RecipePrivatelySection: React.FC<RecipePrivatelySectionProps> = ({ onClick }) => (
+	<div className="flex h-96 flex-col items-center justify-center">
+		<LockOutlined style={{ fontSize: "48px", color: "#faad14" }} />
+		<Typography.Title level={3} className="mt-4 text-center">
+			Unlock This Delicious Recipe
+		</Typography.Title>
+		<Typography.Paragraph className="text-center text-gray-600">
+			This recipe is private and requires payment to access. Enjoy exclusive flavors with a one-time
+			purchase.
+		</Typography.Paragraph>
+		<Button icon={<CreditCardOutlined />} className="bg-primary mt-4 text-white" onClick={onClick}>
+			Pay Now
+		</Button>
+	</div>
+);
+
+interface SelectPaymentMethodModalProps {
+	user: User | null;
+	modalVisible: boolean;
+	setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	recipe: Recipe;
+	handlePayment: ({
+		data,
+		typeTransaction,
+		recipeId,
+	}: {
+		data: CreatePaymentDTO;
+		typeTransaction: PurchaseRecipePaymentType;
+		recipeId: string;
+	}) => Promise<Result>;
+}
+const SelectPaymentMethodModal: React.FC<SelectPaymentMethodModalProps> = ({
+	user,
+	modalVisible,
+	setModalVisible,
+	handlePayment,
+	recipe,
+}) => {
+	const handlePaymentByWallet = async (data: any) => {
+		// Add your logic to handle payment by wallet
+		if (user && user.balance < recipe.recipePrice) {
+			showToast("error", "You do not have enough balance to make this payment");
+			return;
+		}
+		const response = await handlePayment({ ...data });
+		if (response.isSuccess) {
+			showToast("success", response.message!);
+			setModalVisible(false);
+		} else {
+			showToast("error", response.message!);
+		}
+	};
+	const handlePaymentByVnPay = async (data: any) => {
+		// Add your logic to handle payment by wallet
+		const response = await handlePayment({ ...data });
+		if (response.isSuccess) {
+			window.location.href = response.data;
+		}
+	};
+
+	const handlePaymentMethod = useAuthenticateFeature(async (method: "Wallet" | "VnPay") => {
+		const data = {
+			data: {
+				amount: recipe.recipePrice,
+				name: user?.firstName + " " + user?.lastName,
+				orderDescription: "Purchase recipe",
+				orderType: PaymentType.PURCHASEDRECIPE,
+			},
+			recipeId: recipe.id,
+			typeTransaction: method,
+		};
+		if (method === "Wallet") {
+			handlePaymentByWallet(data);
+		} else {
+			handlePaymentByVnPay(data);
+		}
+		// Add your logic to handle the selected payment method
+	});
+	return (
+		<div className="flex h-96 flex-col items-center justify-center">
+			{/* Payment Modal */}
+			<Modal
+				title="Select Payment Method"
+				visible={modalVisible}
+				onCancel={() => setModalVisible(false)}
+				footer={null}
+				width={400}
+			>
+				{/* Display the recipe price and user balance */}
+				<div className="mb-4">
+					<Typography.Text strong style={{}}>
+						Recipe Price:{" "}
+					</Typography.Text>
+					<Typography.Text strong style={{ color: "#1890FF" }}>
+						${recipe.recipePrice}
+					</Typography.Text>
+				</div>
+				<div className="mb-4">
+					<Typography.Text strong style={{}}>
+						User Balance:{" "}
+					</Typography.Text>
+					<Typography.Text
+						strong
+						style={{ color: user && user.balance < recipe.bookingPrice ? "#FF0000" : "#52C41A" }}
+					>
+						${user?.balance}
+					</Typography.Text>
+				</div>
+
+				<Row gutter={[16, 16]} justify="center">
+					<Col span={24}>
+						<Button
+							type="primary"
+							icon={<WalletOutlined className="me-3" />}
+							className="text-primary"
+							block
+							size="large"
+							onClick={() => handlePaymentMethod("Wallet")}
+							disabled={user != null && user.balance < recipe.recipePrice}
+						>
+							NestCooking Wallet
+						</Button>
+					</Col>
+					<Col span={24}>
+						<Button
+							type="primary"
+							block
+							icon={<img src={VnPayLogo} alt="VnPay" className="me-3 w-8" />}
+							size="large"
+							className="text-primary"
+							onClick={() => handlePaymentMethod("VnPay")}
+						>
+							VNPay
+						</Button>
+					</Col>
+				</Row>
+			</Modal>
+		</div>
+	);
+};
 // Main Recipe Detail Component
 export default function RecipeDetailPage() {
 	// States
+	const [paymentModalVisible, setPaymentModalVisible] = useState<boolean>(false);
 	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 	const [shareModalVisible, setShareModalVisible] = useState(false);
 	const [isReacted, setIsReacted] = useState<Record<keyof Reaction, boolean>>({
@@ -326,7 +484,7 @@ export default function RecipeDetailPage() {
 	});
 
 	// Zustand store
-	const { user } = userStore((state) => state);
+	const { user, listUserPurcharseRecipe } = userStore((state) => state);
 	const { saveFavoriteRecipe, removeFavoriteRecipe } = recipeStore((state) => state);
 	const { postReaction, removeReaction } = reactionStore((state) => state);
 	// Hooks
@@ -334,7 +492,7 @@ export default function RecipeDetailPage() {
 	const { recipe, checkedIngredients, setCheckedIngredients } = useGetRecipeById(recipeId);
 	const { bookmarked, setBookmarked } = useRecipeBookmark(recipeId);
 	const { relatedRecipes } = useGetRelatedRecipes(recipe!);
-
+	const { payRecipe } = paymentStore((state) => state);
 	// useEffect to handle resizing of the window
 	useEffectOnce(() => {
 		const handleResize = () => {
@@ -420,7 +578,9 @@ export default function RecipeDetailPage() {
 		},
 		[checkedIngredients, setCheckedIngredients]
 	);
-
+	const handleOpenModalPayment = useAuthenticateFeature(async () => {
+		setPaymentModalVisible(true);
+	});
 	// Render the recipe content, ingredients, instructions, reactions, and related recipes
 	return recipe ? (
 		<div
@@ -442,32 +602,37 @@ export default function RecipeDetailPage() {
 			{/* Divider */}
 			<Divider style={{ marginTop: "20px", marginBottom: "20px" }} />
 
-			{/* Render RecipeIngredients and RecipeInstructions components */}
-			<div className="block space-y-3 sm:flex sm:space-y-0">
-				<RecipeIngredients
-					recipe={recipe}
-					checkedIngredients={checkedIngredients}
-					handleIngredientToggle={handleIngredientToggle}
-				/>
-				<RecipeInstructions recipe={recipe}></RecipeInstructions>
-			</div>
+			{!recipe.isPrivate || (recipe.isPrivate && listUserPurcharseRecipe.includes(recipe.id)) ? (
+				<>
+					{/* Render RecipeIngredients and RecipeInstructions components */}
+					<div className="block space-y-3 sm:flex sm:space-y-0">
+						<RecipeIngredients
+							recipe={recipe}
+							checkedIngredients={checkedIngredients}
+							handleIngredientToggle={handleIngredientToggle}
+						/>
+						<RecipeInstructions recipe={recipe}></RecipeInstructions>
+					</div>
 
-			{/* Divider */}
-			<Divider></Divider>
+					{/* Divider */}
+					<Divider></Divider>
 
-			{/* Render RecipeReactions component */}
-			<RecipeReactions
-				reactions={reactions}
-				isReacted={isReacted}
-				handleReactRecipe={handleReactRecipe}
-			/>
+					{/* Render RecipeReactions component */}
+					<RecipeReactions
+						reactions={reactions}
+						isReacted={isReacted}
+						handleReactRecipe={handleReactRecipe}
+					/>
 
-			{/* Divider */}
-			<Divider style={{ marginTop: "20px", marginBottom: "20px" }} />
+					{/* Divider */}
+					<Divider style={{ marginTop: "20px", marginBottom: "20px" }} />
 
-			{/* Render CommentSection component */}
-			<CommentSection commentData={recipe.comments} recipe={recipe}></CommentSection>
-
+					{/* Render CommentSection component */}
+					<CommentSection commentData={recipe.comments} recipe={recipe}></CommentSection>
+				</>
+			) : (
+				<RecipePrivatelySection onClick={handleOpenModalPayment}></RecipePrivatelySection>
+			)}
 			{/* Divider */}
 			<Divider></Divider>
 
@@ -479,6 +644,15 @@ export default function RecipeDetailPage() {
 				shareModalVisible={shareModalVisible}
 				setShareModalVisible={setShareModalVisible}
 				url={`${import.meta.env.VITE_URL}${window.location.pathname}`}
+			/>
+
+			{/* Render SelectPaymentMethodModal component */}
+			<SelectPaymentMethodModal
+				recipe={recipe}
+				user={user}
+				modalVisible={paymentModalVisible}
+				setModalVisible={setPaymentModalVisible}
+				handlePayment={payRecipe}
 			/>
 		</div>
 	) : (

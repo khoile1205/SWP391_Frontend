@@ -38,6 +38,7 @@ const SearchAllPage = Loadable(lazy(() => import("@/ui/pages/search/search.all.p
 
 // render - booking page
 const BookingPage = Loadable(lazy(() => import("@/ui/pages/booking/booking.page")));
+const PaymentTransactionPage = Loadable(lazy(() => import("@/ui/pages/payment/payment")));
 
 const MainRoutes: RouteObject[] = [
 	{
@@ -145,6 +146,10 @@ const MainRoutes: RouteObject[] = [
 	{
 		path: "booking",
 		element: <BookingPage></BookingPage>,
+	},
+	{
+		path: "payment/callback",
+		element: <PaymentTransactionPage></PaymentTransactionPage>,
 	},
 	{
 		path: "*",

@@ -43,4 +43,12 @@ export default class AppString {
 	static readonly removeReactionSuccessMessage = "Remove react successfully";
 	static readonly somthingWentWrongMessage = "Something went wrong. Please try again";
 	static readonly sendReportSuccessMessage = "Send report created successfully";
+	static readonly createTransactionURLErrorMessage =
+		"Error to create transaction URL. Please try again";
+	static readonly createTransactionSuccessMessage = "Transaction created successfully";
+	static readonly createTransactionErrorMessage = "Error to create transaction. Please try again";
+	static readonly createPaymentSuccessMessage = "Payment created successfully";
+	static readonly createPaymentErrorMessage = "Error to create payment. Please try again";
+	static readonly paymentSuccessMessage = "Payment successfully";
+	static readonly paymentErrorMessage = "Error to payment. Please try again";
 }

@@ -12,6 +12,7 @@ import { Reaction, ReactionType } from "@/types/reaction";
 type UserStore = {
 	user: User | null;
 	userRecipeReaction: Reaction | null;
+	listUserPurcharseRecipe: string[];
 	error: ErrorState | null;
 	updateUser: (user: User | null) => void;
 	login: (data: SignInInformation) => Promise<Result>;
@@ -29,12 +30,27 @@ type UserStore = {
 	followUser(userId: string): Promise<Result>;
 	unfollowUser(userId: string): Promise<Result>;
 	getUserReactionByType(type: ReactionType): Promise<Result>;
+	getListPurchaseRecipe(): Promise<Result>;
+	getUserTransaction(): Promise<Result>;
 };
 
 const userStore = create<UserStore>()((set, get) => ({
 	user: null,
 	error: null,
 	userRecipeReaction: null,
+	listUserPurcharseRecipe: [],
+	getListPurchaseRecipe: async () => {
+		const result = await handleUseCase(userUseCase.getListPurchaseRecipeByUserId());
+		if (result.isSuccess) {
+			set(() => ({
+				listUserPurcharseRecipe: result.data as string[],
+			}));
+		}
+		return result;
+	},
+	getUserTransaction: async () => {
+		return await handleUseCase(userUseCase.getUserTransaction());
+	},
 	getUserReactionByType: async (type: ReactionType) => {
 		const result = await handleUseCase(userUseCase.getUserReactionByType(type));
 		if (result.isSuccess) {
