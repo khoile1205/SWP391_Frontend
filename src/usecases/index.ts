@@ -18,9 +18,17 @@ import { ReactionDatasourceImpl } from "@/datasources/reaction.datasource";
 import { ReactionUseCaseImpl } from "./reaction.usecase/reaction.usecase";
 import { ReportDatasourceImpl } from "@/datasources/report.datasource";
 import { ReportUseCaseImpl } from "./report.usecase/report.usecase";
+import { PaymentDatasourceImpl } from "@/datasources/payment.datasource";
+import { PaymentUsecaseImpl } from "./payment.usecase/payment.usecase";
+import { TransactionDatasourceImpl } from "@/datasources/transaction.datasource";
 
 const authUseCase = new AuthUseCase(new AuthDataSourceImpl(), new UserDatasourceImpl());
-const userUseCase = new UserUseCaseImpl(new UserDatasourceImpl(), new ReactionDatasourceImpl());
+const userUseCase = new UserUseCaseImpl(
+	new UserDatasourceImpl(),
+	new ReactionDatasourceImpl(),
+	new RecipeDatasource(),
+	new TransactionDatasourceImpl()
+);
 const fileUseCase = new FileUseCaseImpl(new FileDatasourceImpl());
 const categoriesUsecase = new CategoriesUsecaseImpl(new CategoriesDatasourceImpl());
 const becomeChefRequestUseCase = new BecomeChefRequestUseCase(new BecomeChefRequestDatasource());
@@ -37,7 +45,7 @@ const commentUseCase = new CommentUsecaseImpl(
 );
 const reactionUseCase = new ReactionUseCaseImpl(new ReactionDatasourceImpl());
 const reportUseCase = new ReportUseCaseImpl(new ReportDatasourceImpl());
-
+const paymentUsecase = new PaymentUsecaseImpl(new PaymentDatasourceImpl());
 export {
 	authUseCase,
 	userUseCase,
@@ -49,4 +57,5 @@ export {
 	commentUseCase,
 	reactionUseCase,
 	reportUseCase,
+	paymentUsecase,
 };

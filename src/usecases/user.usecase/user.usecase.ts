@@ -6,6 +6,9 @@ import Cookies from "js-cookie";
 import Response from "../auth.usecase/responses/response";
 import { ReactionDatasource } from "@/datasources/reaction.datasource";
 import { ReactionType } from "@/types/reaction";
+import { RecipeDatasource } from "@/datasources/recipe.datasource";
+import { TransactionDatasource } from "@/datasources/transaction.datasource";
+
 abstract class UserUseCase {
 	abstract getUserProfile(): Promise<User | null>;
 	abstract changePassword(data: ChangePasswordType): Promise<Response>;
@@ -16,13 +19,23 @@ abstract class UserUseCase {
 	abstract followUser(userId: string): Promise<Response>;
 	abstract unfollowUser(userId: string): Promise<Response>;
 	abstract getUserReactionByType(type: ReactionType): Promise<Response>;
+	abstract getListPurchaseRecipeByUserId(): Promise<Response>;
+	abstract getUserTransaction(): Promise<Response>;
 }
 
 class UserUseCaseImpl implements UserUseCase {
 	constructor(
 		private readonly userDatasource: UserDatasource,
-		private readonly reactionDatasource: ReactionDatasource
+		private readonly reactionDatasource: ReactionDatasource,
+		private readonly recipeDatasource: RecipeDatasource,
+		private readonly transactionDatasource: TransactionDatasource
 	) {}
+	async getUserTransaction(): Promise<Response> {
+		return await this.transactionDatasource.getUserTransaction();
+	}
+	async getListPurchaseRecipeByUserId(): Promise<Response> {
+		return await this.recipeDatasource.getListUserPurchaseRecipe();
+	}
 	async getUserReactionByType(type: ReactionType): Promise<Response> {
 		return await this.reactionDatasource.getUserReactionByType(type);
 	}

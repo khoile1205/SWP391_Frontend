@@ -15,9 +15,19 @@ export abstract class IRecipeDatasource {
 	abstract getUserFavoriteRecipe(userId: string): Promise<Response>;
 	abstract getRecipesByCategoryId(categoryId: number): Promise<Response>;
 	abstract deleteRecipeById(recipeId: string): Promise<Response>;
+	abstract getListUserPurchaseRecipe(): Promise<Response>;
 }
 
 export class RecipeDatasource implements IRecipeDatasource {
+	async getListUserPurchaseRecipe(): Promise<Response> {
+		const response = await apiService.get("/api/purchasedrecipes");
+		const isSuccess = response.status === 200;
+		const resBody = await response.json();
+		const message = resBody.message;
+		if (!isSuccess) return new Response(false, null, message);
+
+		return new Response(true, resBody.result, message);
+	}
 	async deleteRecipeById(recipeId: string): Promise<Response> {
 		const response = await apiService.delete(`/api/recipes/delete/${recipeId}`);
 		const isSuccess = response.status === 204;

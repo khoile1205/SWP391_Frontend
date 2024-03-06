@@ -48,6 +48,11 @@ const profileTabs = [
 		key: "schedules",
 		role: [Roles.ADMIN, Roles.CHEF],
 	},
+	{
+		tab: "Wallet",
+		key: "wallet",
+		role: [Roles.ADMIN, Roles.USER],
+	},
 ];
 
 const ProfileLayout: React.FC = () => {

@@ -22,7 +22,9 @@ export const useGetRecipeById = (recipeId: string | undefined) => {
 			return;
 		}
 		setRecipe(response.data);
-		setCheckedIngredients(Array(response.data.ingredients.length).fill(false));
+		setCheckedIngredients(
+			recipe?.ingredients ? Array(response.data.ingredients.length).fill(false) : []
+		);
 		setLoading(false);
 	};
 
