@@ -5,3 +5,4 @@ export * from "./useGetRecipesByUserId";
 export * from "./useGetRecipeById";
 export * from "./useRecipeBookmark";
 export * from "./useGetRelatedRecipes";
+export * from "./useGetAllRecipesWtihCategory";

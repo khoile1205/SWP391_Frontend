@@ -1,23 +1,44 @@
-import Slider, { Settings } from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
 
-const Carousel = () => {
-	const settings: Settings = {
-		dots: true,
-		infinite: true,
-		speed: 500,
-		slidesToShow: 3,
-		slidesToScroll: 1,
-		prevArrow: <ArrowLeftCircleIcon />,
-	};
-
-	return (
-		<div className="">
-			<Slider {...settings}></Slider>
-		</div>
-	);
+const responsive = {
+	desktop: {
+		breakpoint: { max: 3000, min: 1024 },
+		items: 3,
+		slidesToSlide: 3,
+	},
+	tablet: {
+		breakpoint: { max: 1024, min: 464 },
+		items: 2,
+		slidesToSlide: 2,
+	},
+	mobile: {
+		breakpoint: { max: 464, min: 0 },
+		items: 1,
+		slidesToSlide: 1,
+	},
 };
 
-export default Carousel;
+interface CarouselProps<T> {
+	items: T[];
+	renderItem: (item: T) => React.ReactNode;
+	className?: string;
+}
+
+export const CarouselComponent = <T,>({ items, renderItem, className }: CarouselProps<T>) => {
+	return (
+		<Carousel
+			responsive={responsive}
+			infinite={true}
+			containerClass={`${className} mt-2`}
+			swipeable
+			pauseOnHover
+			autoPlay
+			itemClass="px-2"
+		>
+			{items.map((item, index) => (
+				<div key={index}>{renderItem(item)}</div>
+			))}
+		</Carousel>
+	);
+};

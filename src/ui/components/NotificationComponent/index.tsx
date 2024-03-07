@@ -1,55 +1,53 @@
+import userStore from "@/zustand/user.store";
 import { BellOutlined } from "@ant-design/icons";
-import { List, Popover, Badge } from "antd";
-import React from "react";
+import { List, Popover, Badge, Avatar, Typography, Button } from "antd";
+import React, { useRef } from "react";
+import { useOnClickOutside } from "usehooks-ts";
 
 interface Props {
 	visible: boolean;
+	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
-export const NotificationComponent: React.FC<Props> = ({ visible }) => {
-	const [noticeList] = React.useState<any[]>([]);
-	// const { noticeCount } = useSelector((state) => state.user);
-	// const { formatMessage } = useLocale();
+export const NotificationComponent: React.FC<Props> = ({ visible, setVisible }) => {
+	const ref = useRef(null);
 
-	// const noticeListFilter = <T extends Notice["type"]>(type: T) => {
-	// 	return noticeList.filter((notice) => notice.type === type) as Notice<T>[];
-	// };
+	const { userNotification } = userStore((state) => state);
 
-	// loads the notices belonging to logged in user
-	// and sets loading flag in-process
-	// const getNotice = async () => {
-	// 	setLoading(true);
-	// 	const { status, result } = await getNoticeList();
-
-	// 	setLoading(false);
-	// 	status && setNoticeList(result);
-	// };
-
-	// useEffect(() => {
-	// 	getNotice();
-	// }, []);
-
+	const markAllAsRead = () => {
+		console.log("ok");
+	};
 	const tabs = (
-		<div>
+		<div style={{ maxHeight: "400px", overflowY: "auto" }} ref={ref}>
+			<div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
+				<Button type="dashed" onClick={markAllAsRead}>
+					Mark All as Read
+				</Button>
+			</div>
 			<List
-				className="flex flex-col items-center"
 				itemLayout="horizontal"
-				dataSource={noticeList}
+				dataSource={userNotification}
 				renderItem={(item) => (
-					<List.Item
-						actions={
-							[
-								// <Button type="link" onClick={() => removeNotification(item.key)}>
-								// 	Dismiss
-								// </Button>,
-							]
-						}
-					>
-						<List.Item.Meta title={item.message} description={item.description} />
+					<List.Item>
+						<List.Item.Meta
+							avatar={
+								<Avatar
+									src={`${item.sender?.avatarUrl ?? "	http://res.cloudinary.com/dtxnc9edv/image/upload/v1709607415/avatar/e5yteorp9ryw6uftnrub.jpg"}`}
+								/>
+							}
+							description={<Typography.Text strong={!item.isSeen}>{item.content}</Typography.Text>}
+						/>
 					</List.Item>
 				)}
 			/>
 		</div>
 	);
+
+	const handleClickOutside = () => {
+		// Your custom logic here
+		setVisible(false);
+	};
+
+	useOnClickOutside(ref, handleClickOutside);
 
 	return (
 		<Popover
@@ -62,8 +60,11 @@ export const NotificationComponent: React.FC<Props> = ({ visible }) => {
 				width: 336,
 			}}
 		>
-			<Badge count={1} overflowCount={10}>
-				<BellOutlined className="h-7 w-7 text-xl" />
+			<Badge
+				count={userNotification.filter((element) => !element.isSeen).length}
+				overflowCount={10}
+			>
+				<BellOutlined className="h-6 w-6 text-xl" />
 			</Badge>
 		</Popover>
 	);

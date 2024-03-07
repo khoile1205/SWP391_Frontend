@@ -1,19 +1,20 @@
-import { useGetAllRecipes } from "@/hooks/recipes";
-import { RecipeCard } from "@/ui/components";
+import { useGetAllRecipes, useGetAllRecipesWtihCategory } from "@/hooks/recipes";
+import { CarouselComponent, RecipeCard } from "@/ui/components";
 import AppString from "@/utils/app-string";
 import AppColor from "@/utils/appColor";
 import { pickRandomElements } from "@/utils/array_exts";
 import { showToast } from "@/utils/notify";
 import userStore from "@/zustand/user.store";
 import { SearchOutlined } from "@ant-design/icons";
-import { Button, Input, Typography } from "antd";
-import { useMemo, useState } from "react";
+import { Button, Flex, Input, Typography } from "antd";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function RecipesPage() {
 	const { user } = userStore((state) => state);
 
 	const { recipes } = useGetAllRecipes();
+	const { data: recipesByCategory } = useGetAllRecipesWtihCategory();
 	const [searchKeyword, setSearchKeyword] = useState<string>("");
 	const navigate = useNavigate();
 
@@ -25,10 +26,6 @@ export default function RecipesPage() {
 			navigate("/sign-in");
 		}
 	};
-
-	const specialRecipes = useMemo(() => pickRandomElements(recipes, 6), [recipes]);
-	const maybeLikeItRecipes = useMemo(() => pickRandomElements(recipes, 6), [recipes]);
-	const superDeliciousRecipes = useMemo(() => pickRandomElements(recipes, 6), [recipes]);
 
 	return (
 		<div className="mx-auto">
@@ -63,34 +60,42 @@ export default function RecipesPage() {
 					<Typography.Title level={2} className="font-playfair">
 						Special Recipes
 					</Typography.Title>
-					<div className="md:grid md:grid-cols-3 md:gap-4">
-						{specialRecipes.map((recipe) => (
-							<RecipeCard key={recipe.id} recipe={recipe} />
-						))}
-					</div>
+					<CarouselComponent
+						items={pickRandomElements(recipes, recipes.length)}
+						renderItem={(recipe) => <RecipeCard key={recipe.id} recipe={recipe} />}
+					/>
 				</div>
 				<div className="">
 					<Typography.Title level={2} className="font-playfair capitalize">
 						{" "}
 						Maybe you like it
 					</Typography.Title>
-					<div className="md:grid md:grid-cols-3 md:gap-4">
-						{maybeLikeItRecipes.map((recipe) => (
-							<RecipeCard key={recipe.id} recipe={recipe} />
-						))}
-					</div>
+					<CarouselComponent
+						items={recipes}
+						renderItem={(recipe) => <RecipeCard key={recipe.id} recipe={recipe} />}
+					/>
 				</div>
-				<div className="">
-					<Typography.Title level={2} className="font-playfair capitalize">
-						{" "}
-						Super Delicious
-					</Typography.Title>
-					<div className="md:grid md:grid-cols-3 md:gap-4">
-						{superDeliciousRecipes.map((recipe) => (
-							<RecipeCard key={recipe.id} recipe={recipe} />
-						))}
-					</div>
-				</div>
+				{recipesByCategory &&
+					recipesByCategory.length > 0 &&
+					recipesByCategory.map((data) => (
+						<div className="" key={data.category.id}>
+							<Flex align="center" className="space-x-3">
+								<Typography.Title level={2} className="!m-0 font-playfair">
+									For {data.category.name}
+								</Typography.Title>
+								{data.recipes.length > 3 && (
+									<Typography.Link className="!text-primary" href={`/category/${data.category.id}`}>
+										See more
+									</Typography.Link>
+								)}
+							</Flex>
+							<CarouselComponent
+								items={data.recipes}
+								className=""
+								renderItem={(recipe) => <RecipeCard key={recipe.id} recipe={recipe} />}
+							/>
+						</div>
+					))}
 			</div>
 		</div>
 	);
