@@ -20,3 +20,5 @@ export * from "./ReactionButton";
 export * from "./ColCard";
 export * from "./NotificationComponent";
 export * from "./LineChart";
+export * from "./PaginationTable";
+export * from "./PaginationPageSize";

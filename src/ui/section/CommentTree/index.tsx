@@ -136,14 +136,9 @@ export const CommentSection: React.FC<CommentProps> = ({ commentData, recipe }) 
 								setReplyingTo={setReplyingTo}
 							></CommentComponent>
 						}
-						{/* {comment.listChildComments &&
-							comment.listChildComments.map((comment) =>
-								renderComments(comment, 1, replyingTo, setReplyingTo)
-							)} */}
 					</>
 				)}
 			/>
-			{/* {visibleComments.length <= displayedComments && <Divider></Divider>} */}
 			<div>
 				<div className="block items-center justify-between sm:flex">
 					<Typography.Title level={2} className={"mb-10 font-playfair"}>

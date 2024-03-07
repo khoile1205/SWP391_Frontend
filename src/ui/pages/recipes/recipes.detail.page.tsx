@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
 	Avatar,
 	Divider,
@@ -286,31 +286,33 @@ const RecipeReactions: React.FC<{
 	reactions: Reaction;
 	isReacted: Record<keyof Reaction, boolean>;
 	handleReactRecipe: (type: Reactions) => void;
-}> = ({ reactions, isReacted, handleReactRecipe }) => (
-	<div className=" space-x-6 md:flex md:items-center ">
-		<Typography.Title level={1} className={"!mb-1 font-playfair"}>
-			Reactions
-		</Typography.Title>
-		<ReactionButton
-			reactionType={Reactions.like}
-			count={reactions.like.length}
-			isReacted={isReacted.like}
-			onClick={() => handleReactRecipe(Reactions.like)}
-		/>
-		<ReactionButton
-			reactionType={Reactions.favorite}
-			count={reactions.favorite.length}
-			isReacted={isReacted.favorite}
-			onClick={() => handleReactRecipe(Reactions.favorite)}
-		/>
-		<ReactionButton
-			reactionType={Reactions.haha}
-			count={reactions.haha.length}
-			isReacted={isReacted.haha}
-			onClick={() => handleReactRecipe(Reactions.haha)}
-		/>
-	</div>
-);
+}> = ({ reactions, isReacted, handleReactRecipe }) => {
+	return (
+		<div className=" space-x-6 md:flex md:items-center ">
+			<Typography.Title level={1} className={"!mb-1 font-playfair"}>
+				Reactions
+			</Typography.Title>
+			<ReactionButton
+				reactionType={Reactions.like}
+				count={reactions.like.length}
+				isReacted={isReacted.like}
+				onClick={() => handleReactRecipe(Reactions.like)}
+			/>
+			<ReactionButton
+				reactionType={Reactions.favorite}
+				count={reactions.favorite.length}
+				isReacted={isReacted.favorite}
+				onClick={() => handleReactRecipe(Reactions.favorite)}
+			/>
+			<ReactionButton
+				reactionType={Reactions.haha}
+				count={reactions.haha.length}
+				isReacted={isReacted.haha}
+				onClick={() => handleReactRecipe(Reactions.haha)}
+			/>
+		</div>
+	);
+};
 
 // Related Recipes Component - Displays a list of related recipes
 const RelatedRecipesSection: React.FC<{ relatedRecipes: Recipe[] }> = ({ relatedRecipes }) => (
@@ -493,6 +495,14 @@ export default function RecipeDetailPage() {
 	const { bookmarked, setBookmarked } = useRecipeBookmark(recipeId);
 	const { relatedRecipes } = useGetRelatedRecipes(recipe!);
 	const { payRecipe } = paymentStore((state) => state);
+
+	useEffect(() => {
+		// Check if the recipe is available before updating the title
+		if (recipe) {
+			document.title = `${recipe.title} - Nest Cooking`;
+		}
+	}, [recipe]);
+
 	// useEffect to handle resizing of the window
 	useEffectOnce(() => {
 		const handleResize = () => {
@@ -505,16 +515,16 @@ export default function RecipeDetailPage() {
 	});
 
 	// useEffect to initialize reaction states
-	useEffectOnce(() => {
+	useEffect(() => {
 		if (user && recipe) {
 			setIsReacted({
-				favorite: recipe.reactions.favorite.includes(user.id),
-				haha: recipe.reactions.haha.includes(user.id),
-				like: recipe.reactions.like.includes(user.id),
+				favorite: recipe.reactions ? recipe.reactions.favorite.includes(user.id) : false,
+				haha: recipe.reactions ? recipe.reactions.haha.includes(user.id) : false,
+				like: recipe.reactions ? recipe.reactions.like.includes(user.id) : false,
 			});
 			setReactions(recipe.reactions);
 		}
-	});
+	}, [recipe, user]);
 
 	// Controller
 	const handleBookmarkClick = useAuthenticateFeature(async () => {
