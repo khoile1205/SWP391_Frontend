@@ -14,11 +14,18 @@ import {
 interface LineChartProps {
 	data: any;
 	title: string;
+	horizontalName: string;
+	verticalName: string;
 }
-export const LineChartComponent: React.FC<LineChartProps> = ({ data, title }) => {
+export const LineChartComponent: React.FC<LineChartProps> = ({
+	data,
+	title,
+	horizontalName,
+	verticalName,
+}) => {
 	return (
 		<div className="w-full">
-			<Typography.Title level={3}>{title}</Typography.Title>
+			<Typography.Title level={4}>{title}</Typography.Title>
 			<ResponsiveContainer height={500}>
 				<LineChart
 					width={500}
@@ -36,8 +43,14 @@ export const LineChartComponent: React.FC<LineChartProps> = ({ data, title }) =>
 					<YAxis />
 					<Tooltip />
 					<Legend />
-					<Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
-					<Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+					<Line
+						type="monotone"
+						dataKey="uv"
+						stroke="#8884d8"
+						activeDot={{ r: 8 }}
+						name={horizontalName}
+					/>
+					<Line type="monotone" dataKey={"pv"} stroke="#82ca9d" name={verticalName} />
 				</LineChart>
 			</ResponsiveContainer>
 		</div>

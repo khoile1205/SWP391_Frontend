@@ -21,6 +21,8 @@ import { ReportUseCaseImpl } from "./report.usecase/report.usecase";
 import { PaymentDatasourceImpl } from "@/datasources/payment.datasource";
 import { PaymentUsecaseImpl } from "./payment.usecase/payment.usecase";
 import { TransactionDatasourceImpl } from "@/datasources/transaction.datasource";
+import { AdminUsecaseImpl } from "./admin.usecase/admin.usecase";
+import { AdminDatasourceImpl } from "@/datasources/admin.datasource";
 
 const authUseCase = new AuthUseCase(new AuthDataSourceImpl(), new UserDatasourceImpl());
 const userUseCase = new UserUseCaseImpl(
@@ -46,6 +48,8 @@ const commentUseCase = new CommentUsecaseImpl(
 const reactionUseCase = new ReactionUseCaseImpl(new ReactionDatasourceImpl());
 const reportUseCase = new ReportUseCaseImpl(new ReportDatasourceImpl());
 const paymentUsecase = new PaymentUsecaseImpl(new PaymentDatasourceImpl());
+const adminUsecase = new AdminUsecaseImpl(new AdminDatasourceImpl());
+
 export {
 	authUseCase,
 	userUseCase,
@@ -58,4 +62,5 @@ export {
 	reactionUseCase,
 	reportUseCase,
 	paymentUsecase,
+	adminUsecase,
 };
