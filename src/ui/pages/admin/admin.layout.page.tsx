@@ -23,10 +23,10 @@ const adminTabs = [
 		tab: "Transaction History Management",
 		key: "transaction",
 	},
-	{
-		tab: "Booking",
-		key: "booking",
-	},
+	// {
+	// 	tab: "Booking",
+	// 	key: "booking",
+	// },
 	{
 		tab: "Become-Chef Request",
 		key: "request",

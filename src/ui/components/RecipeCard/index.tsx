@@ -75,10 +75,6 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 			setBookmarked(true);
 		}
 	};
-	// const handleReactRecipe = useAuthenticateFeature(async () => {
-	// 	console.log(true);
-
-	// });
 	const handleReactRecipe = useAuthenticateFeature(async () => {
 		let result;
 		if (isReacted) {

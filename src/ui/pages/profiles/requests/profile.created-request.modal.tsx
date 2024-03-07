@@ -141,7 +141,6 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 			width={1000}
 			open={open}
 			onOk={async () => {
-				console.log(formik.values);
 				if (formik.isValid) {
 					handleSubmitForm();
 				} else {
@@ -268,7 +267,6 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 							}}
 							onRemove={(file) => {
 								// Handle removal from formik values
-								console.log(formik.values.certificateImageUrls, file.response);
 								const updatedCertificateImageUrls = formik.values.certificateImageUrls.filter(
 									(url) => url !== file.response
 								);

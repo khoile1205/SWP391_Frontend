@@ -1,10 +1,12 @@
 import { BellOutlined } from "@ant-design/icons";
-import { Popover, Tooltip, Badge } from "antd";
-import { useState, type FC } from "react";
+import { List, Popover, Badge } from "antd";
+import React from "react";
 
-const NotificationComponent: FC = () => {
-	const [visible, setVisible] = useState(false);
-	// const [noticeList, setNoticeList] = useState<Notice[]>([]);
+interface Props {
+	visible: boolean;
+}
+export const NotificationComponent: React.FC<Props> = ({ visible }) => {
+	const [noticeList] = React.useState<any[]>([]);
 	// const { noticeCount } = useSelector((state) => state.user);
 	// const { formatMessage } = useLocale();
 
@@ -26,103 +28,43 @@ const NotificationComponent: FC = () => {
 	// 	getNotice();
 	// }, []);
 
-	// const tabs = (
-	// 	<div>
-	// 		<Spin tip="Loading..." indicator={antIcon} spinning={loading}>
-	// 			<Tabs defaultActiveKey="1">
-	// 				<TabPane
-	// 					tab={`${formatMessage({
-	// 						id: "app.notice.messages",
-	// 					})}(${noticeListFilter("notification").length})`}
-	// 					key="1"
-	// 				>
-	// 					<List
-	// 						dataSource={noticeListFilter("notification")}
-	// 						renderItem={(item) => (
-	// 							<List.Item>
-	// 								<List.Item.Meta
-	// 									avatar={<Avatar src={item.avatar} />}
-	// 									title={<a href={item.title}>{item.title}</a>}
-	// 									description={item.datetime}
-	// 								/>
-	// 							</List.Item>
-	// 						)}
-	// 					/>
-	// 				</TabPane>
-
-	// 				<TabPane
-	// 					tab={`${formatMessage({
-	// 						id: "app.notice.news",
-	// 					})}(${noticeListFilter("message").length})`}
-	// 					key="2"
-	// 				>
-	// 					<List
-	// 						dataSource={noticeListFilter("message")}
-	// 						renderItem={(item) => (
-	// 							<List.Item>
-	// 								<List.Item.Meta
-	// 									avatar={<Avatar src={item.avatar} />}
-	// 									title={<a href={item.title}>{item.title}</a>}
-	// 									description={
-	// 										<div className="notice-description">
-	// 											<div className="notice-description-content">{item.description}</div>
-	// 											<div className="notice-description-datetime">{item.datetime}</div>
-	// 										</div>
-	// 									}
-	// 								/>
-	// 							</List.Item>
-	// 						)}
-	// 					/>
-	// 				</TabPane>
-	// 				<TabPane
-	// 					tab={`${formatMessage({
-	// 						id: "app.notice.tasks",
-	// 					})}(${noticeListFilter("event").length})`}
-	// 					key="3"
-	// 				>
-	// 					<List
-	// 						dataSource={noticeListFilter("event")}
-	// 						renderItem={(item) => (
-	// 							<List.Item>
-	// 								<List.Item.Meta
-	// 									title={
-	// 										<div className="notice-title">
-	// 											<div className="notice-title-content">{item.title}</div>
-	// 											<Tag color={EventStatus[item.status]}>{item.extra}</Tag>
-	// 										</div>
-	// 									}
-	// 									description={item.description}
-	// 								/>
-	// 							</List.Item>
-	// 						)}
-	// 					/>
-	// 				</TabPane>
-	// 			</Tabs>
-	// 		</Spin>
-	// 	</div>
-	// );
+	const tabs = (
+		<div>
+			<List
+				className="flex flex-col items-center"
+				itemLayout="horizontal"
+				dataSource={noticeList}
+				renderItem={(item) => (
+					<List.Item
+						actions={
+							[
+								// <Button type="link" onClick={() => removeNotification(item.key)}>
+								// 	Dismiss
+								// </Button>,
+							]
+						}
+					>
+						<List.Item.Meta title={item.message} description={item.description} />
+					</List.Item>
+				)}
+			/>
+		</div>
+	);
 
 	return (
 		<Popover
-			// content={tabs}
+			content={tabs}
 			overlayClassName="bg-2"
 			placement="bottomRight"
 			trigger={["click"]}
 			open={visible}
-			onOpenChange={(v) => setVisible(v)}
 			overlayStyle={{
 				width: 336,
 			}}
 		>
-			<Tooltip title={"Notification"}>
-				<Badge count={1} overflowCount={999}>
-					<span className="notice" id="notice-center">
-						<BellOutlined className="anticon" />
-					</span>
-				</Badge>
-			</Tooltip>
+			<Badge count={1} overflowCount={10}>
+				<BellOutlined className="h-7 w-7 text-xl" />
+			</Badge>
 		</Popover>
 	);
 };
-
-export default NotificationComponent;

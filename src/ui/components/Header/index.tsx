@@ -1,13 +1,13 @@
 import { Fragment, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import userStore from "@/zustand/user.store";
 import Logo from "@/assets/Icon/NestCooking.svg";
 import { showToast } from "@/utils/notify";
 import AppString from "@/utils/app-string";
 import { LoginOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import { SearchBox } from "..";
+import { NotificationComponent, SearchBox } from "..";
 import { useLoadingCallback } from "@/hooks/common";
 import { Roles } from "@/enums";
 
@@ -15,7 +15,7 @@ const navigation = [
 	{ name: "Home", href: "/", current: true },
 	{ name: "Recipes", href: "/recipes", current: false },
 	{ name: "Category", href: "/category", current: false },
-	{ name: "Booking", href: "/booking", current: false },
+	// { name: "Booking", href: "/booking", current: false },
 ];
 
 function classNames(...classes: unknown[]) {
@@ -25,6 +25,8 @@ function classNames(...classes: unknown[]) {
 export function Header() {
 	const [openSearchBox, setOpenSearchBox] = useState<boolean>(false);
 	const { user, logOut } = userStore();
+	const [visibleNotification, setVisibleNotification] = useState(false);
+
 	const handleLogout = useLoadingCallback(async () => {
 		const isLogout = logOut();
 		if (isLogout) {
@@ -88,15 +90,14 @@ export function Header() {
 												aria-hidden="true"
 											></MagnifyingGlassIcon>
 										</Button>
-										<button
-											type="button"
-											className="text-medium  hidden rounded-full p-1 hover:ring-offset-gray-700 lg:flex"
-										>
-											<span className=" -inset-1.5" />
-											<span className="sr-only">View notifications</span>
-											<BellIcon className="h-6 w-6" aria-hidden="true" />
-										</button>
 
+										<Button
+											onClick={() => setVisibleNotification(!visibleNotification)}
+											type="text"
+											className="relative flex rounded-full p-1 text-2xl hover:ring-offset-gray-700"
+										>
+											<NotificationComponent visible={visibleNotification}></NotificationComponent>
+										</Button>
 										{/* Profile dropdown */}
 										{user != null ? (
 											<Menu as="div" className="relative z-50 ml-3">

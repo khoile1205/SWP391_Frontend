@@ -26,9 +26,9 @@ export default function RecipesPage() {
 		}
 	};
 
-	const specialRecipes = useMemo(() => pickRandomElements(recipes, 3), [recipes]);
-	const maybeLikeItRecipes = useMemo(() => pickRandomElements(recipes, 3), [recipes]);
-	const superDeliciousRecipes = useMemo(() => pickRandomElements(recipes, 3), [recipes]);
+	const specialRecipes = useMemo(() => pickRandomElements(recipes, 6), [recipes]);
+	const maybeLikeItRecipes = useMemo(() => pickRandomElements(recipes, 6), [recipes]);
+	const superDeliciousRecipes = useMemo(() => pickRandomElements(recipes, 6), [recipes]);
 
 	return (
 		<div className="mx-auto">

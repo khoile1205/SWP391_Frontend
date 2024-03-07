@@ -21,7 +21,6 @@ export default function CreateReportModal() {
 
 	// Controller
 	const handleSubmitForm = useAuthenticateFeature(async () => {
-		console.log(formik.values);
 		const response = await sendReport({
 			content: formik.values.content,
 			targetId: targetId,

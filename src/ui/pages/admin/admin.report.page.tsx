@@ -1,169 +1,182 @@
-import { Table, Button, Input, Tooltip, Image, Flex, Typography, Select } from "antd";
-import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { Recipe } from "@/models/recipe.model";
-import userStore from "@/zustand/user.store";
-import { ConfirmModal } from "@/ui/components";
-import { useEffect, useState } from "react";
-import { recipeStore } from "@/zustand/recipe.store";
-import { showToast } from "@/utils/notify";
-import { useGetRecipesByUserIdWithPagination } from "@/hooks/recipes";
+import { CoffeeOutlined, CommentOutlined, UserOutlined } from "@ant-design/icons";
 import { Column } from "@/types/@override/Table";
+import { useGetAllReports } from "@/hooks/admin";
+import { Report } from "@/models/report.model";
+import { ActionStatus } from "@/enums";
+import { ReportType } from "@/enums/report.type.enum";
+import React, { useState } from "react";
+import { PaginationTable, PaginationPageSize } from "@/ui/components";
+import { Tooltip, Typography, Flex, Button, Modal } from "antd";
+import AppColor from "@/utils/appColor";
+import { useAuthenticateFeature } from "@/hooks/common";
 
+const renderStatusColor = (status: Report["status"]): string => {
+	switch (status) {
+		case ActionStatus.PENDING:
+			return "orange";
+		case ActionStatus.REJECTED:
+			return "red";
+		case ActionStatus.ACCEPTED:
+			return "green";
+		default:
+			return "black";
+	}
+};
+
+const renderReportTypeIcon = (type: Report["type"]) => {
+	const iconMap: Record<Partial<Report["type"]>, React.ReactNode> = {
+		user: <UserOutlined />,
+		recipe: <CoffeeOutlined />,
+		comment: <CommentOutlined />,
+	};
+	return iconMap[type] ? (
+		<Tooltip title={type.charAt(0).toUpperCase() + type.slice(1)}>{iconMap[type]}</Tooltip>
+	) : null;
+};
+
+type ConfirmModalType = ActionStatus.ACCEPTED | ActionStatus.REJECTED;
 export default function AdminReportPage() {
-	const { user } = userStore((state) => state);
-	const { deleteRecipeById } = recipeStore((state) => state);
-	const { visibleRecipes } = useGetRecipesByUserIdWithPagination(user?.id);
+	const { reportData, handleAdminReport } = useGetAllReports();
+	const [reportHandle, setReportHandle] = useState<Report>();
+	const [confirmationMessage, setConfirmationMessage] = useState("");
+	const [modalType, setModalType] = useState<ConfirmModalType>(ActionStatus.ACCEPTED);
+	const [pageSize, setPageSize] = React.useState<number>(5);
+	const [isModalVisible, setIsModalVisible] = useState(false);
 
-	const [recipes, setRecipes] = useState<Recipe[]>([]);
-	const [pageSize, setPageSize] = useState<number>(5);
-
-	useEffect(() => {
-		if (visibleRecipes.length > 0) {
-			setRecipes([...visibleRecipes]);
-		}
-	}, [visibleRecipes]);
-
-	const handleSearchTitle = (title: string) => {
-		if (!title) {
-			setRecipes([...visibleRecipes]);
-			return;
-		}
-		const newRecipes = visibleRecipes.filter((recipe) =>
-			recipe.title.toLowerCase().includes(title.toLowerCase())
-		);
-		setRecipes(newRecipes);
+	// Event handler
+	const showModal = (message: string, modalType: ConfirmModalType, report: Report) => {
+		setConfirmationMessage(message);
+		setModalType(modalType);
+		setIsModalVisible(true);
+		setReportHandle(report);
 	};
 
-	const handleDeleteRecipe = async (recipeId: string) => {
-		const response = await deleteRecipeById(recipeId);
-		if (response.isSuccess) {
-			showToast("success", response.message as string);
-			const newRecipes = recipes.filter((recipe) => recipe.id !== recipeId);
-			setRecipes(newRecipes);
-		} else {
-			showToast("error", response.message as string);
-		}
+	const handleOk = useAuthenticateFeature(async () => {
+		await handleAdminReport({
+			adminAction: modalType == ActionStatus.ACCEPTED ? 0 : 1,
+			content: `Report ${reportHandle!.id} has been ${modalType == ActionStatus.ACCEPTED ? "accepted" : "rejected"}`,
+			reportId: reportHandle!.id,
+			title: "Report Action",
+		});
+		// Your logic when the user clicks OK
+		setIsModalVisible(false);
+	});
+
+	const handleCancel = () => {
+		// Your logic when the user cancels or clicks outside the modal
+		setIsModalVisible(false);
 	};
-	const columns: Column<Recipe>[] = [
+
+	const columns: Column<Report>[] = [
 		{
-			title: "ID",
-			dataIndex: "id",
+			title: "User",
+			dataIndex: "user",
+			render: (_text: string, record: Report) => (
+				<Tooltip title={record.user.firstName + " " + record.user.lastName}>
+					{record.user.firstName + " " + record.user.lastName}
+				</Tooltip>
+			),
 			align: "center",
-			width: "30%",
-			sorter: (a, b) => a.id.localeCompare(b.id),
-		},
-		{
-			title: "Thumbnail",
-			dataIndex: "thumbnailUrl",
-			align: "center",
-			width: "20%",
-			render: (_text: string, record: Recipe) => <Image src={record.thumbnailUrl}></Image>,
 		},
 		{
 			title: "Title",
 			dataIndex: "title",
-			width: "20%",
-			align: "center",
-
-			render: (_text: string, record: Recipe) => (
+			render: (_text: string, record: Report) => (
 				<Tooltip title={record.title}>{record.title}</Tooltip>
 			),
-			sorter: (a, b) => a.title.localeCompare(b.title),
+			align: "center",
 		},
 		{
-			title: "Difficult",
-			dataIndex: "difficult",
+			title: "Content",
+			dataIndex: "content",
+			render: (_text: string, record: Report) => <Typography>{record.content}</Typography>,
 			align: "center",
-			width: "20%",
-
-			render: (price: number) => <span>{price}</span>,
-			sorter: (a, b) => a.difficult - b.difficult,
+			sorter: (a, b) => a.type.localeCompare(b.type),
+		},
+		{
+			title: "Type",
+			dataIndex: "type",
+			render: (type: Report["type"]) => renderReportTypeIcon(type),
+			align: "center",
+		},
+		{
+			title: "Target",
+			dataIndex: "targetId",
+			render: (_text: string, record: Report) => (
+				<Typography.Link
+					href={`/${record.type == ReportType.RECIPE ? `${record.type}s` : `${record.type}`}/${record.targetId}`}
+				>
+					Link here
+				</Typography.Link>
+			),
+			align: "center",
+		},
+		{
+			title: "Status",
+			dataIndex: "status",
+			render: (status: Report["status"]) => (
+				<span style={{ color: renderStatusColor(status) }}>{status.toUpperCase()}</span>
+			),
+			align: "center",
+			sorter: (a, b) => a.status.localeCompare(b.status),
+		},
+		{
+			title: "Created At",
+			dataIndex: "createdAt",
+			align: "center",
+			render: (createdAt: Date) => <span>{new Date(createdAt).toLocaleDateString("en-US")}</span>,
+			sorter: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
 		},
 		{
 			title: "",
 			align: "center",
-			width: "13%",
-
-			render: (_text: any, record: Recipe) => (
-				<Flex justify="center">
+			render: (_text: string, record: Report) => (
+				<Flex justify="center" className="space-x-3">
 					<Button
-						href={`/recipes/${record.id}`}
-						type="text"
-						icon={<EyeOutlined className="text-primary" style={{ fontSize: "16px" }} />}
-					/>
-					<Button
-						href={`recipes/edit/${record.id}`}
-						type="text"
-						icon={<EditOutlined className="text-primary" style={{ fontSize: "16px" }} />}
-					/>
-					<Button
-						type="text"
-						icon={<DeleteOutlined className="text-primary" style={{ fontSize: "16px" }} />}
+						type="primary"
+						style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
 						onClick={() =>
-							ConfirmModal({
-								content: "Are you sure you want to delete this recipe?",
-								onOk: () => {
-									handleDeleteRecipe(record.id);
-								},
-							})
+							showModal("Are you sure you want to accept?", ActionStatus.ACCEPTED, record)
 						}
-					/>
+						disabled={record.status != ActionStatus.PENDING}
+					>
+						Accept
+					</Button>
+					<Button
+						type="primary"
+						style={{ backgroundColor: "#ff4d4f", borderColor: "#ff4d4f" }}
+						onClick={() =>
+							showModal("Are you sure you want to reject?", ActionStatus.REJECTED, record)
+						}
+						disabled={record.status != ActionStatus.PENDING}
+					>
+						Reject
+					</Button>
 				</Flex>
 			),
 		},
 	];
 
 	return (
-		<div className="flex flex-col items-center justify-center px-4 py-8 lg:px-8">
-			<h2 className="mb-4 text-2xl font-bold text-gray-900">View Created Recipes</h2>
+		<div className="w-100vh flex flex-col items-center justify-center px-4 py-8 lg:px-8">
+			<h2 className="mb-4 text-2xl font-bold text-gray-900">Admin Recipe Management</h2>
 
-			<Flex className="mb-4 w-full" align="center" justify="space-between">
-				<Flex align="center" className="space-x-3">
-					<Typography.Text>Search </Typography.Text>
-					<span>
-						<Input
-							type="text"
-							placeholder="Search recipes by title ..."
-							className="focus:border-blue-500 rounded-md border-gray-300 px-3 py-2 focus:outline-none"
-							onChange={(e) => handleSearchTitle(e.target.value)}
-						/>
-					</span>
-				</Flex>
-				<Flex align="center" className="space-x-3">
-					<Typography>Rows per page: </Typography>
-					<Select
-						defaultValue={pageSize}
-						options={[
-							{
-								label: 5,
-								value: 5,
-							},
-							{
-								label: 10,
-								value: 10,
-							},
-							{
-								label: 15,
-								value: 15,
-							},
-						]}
-						onChange={(value: number) => setPageSize(value)}
-					></Select>
-				</Flex>
-			</Flex>
-			<Table
-				columns={columns}
-				dataSource={recipes}
-				pagination={{
-					defaultPageSize: 5,
-					showSizeChanger: false,
-					pageSize: pageSize,
+			<PaginationPageSize options={[5, 10, 15]} pageSize={pageSize} setPageSize={setPageSize} />
+			<PaginationTable columns={columns} dataSource={reportData} pageSize={pageSize} />
+			<Modal
+				title="Confirmation"
+				open={isModalVisible}
+				onOk={handleOk}
+				okButtonProps={{
+					style: {
+						backgroundColor: modalType == ActionStatus.ACCEPTED ? AppColor.greenColor : "#ff4d4f",
+					},
 				}}
-				bordered
-				className="rounded-lg shadow-md"
-				rowClassName={(_, index) => (index % 2 === 0 ? "even-row" : "odd-row")}
-				scroll={{ y: 700 }}
-			/>
+				okText="Confirm"
+				onCancel={handleCancel}
+			>
+				<p>{confirmationMessage}</p>
+			</Modal>
 		</div>
 	);
 }

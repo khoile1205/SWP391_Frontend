@@ -6,7 +6,6 @@ interface ListUserProps {
 	listUsers: User[];
 }
 export const ListUser: React.FC<ListUserProps> = ({ listUsers }) => {
-	console.log(listUsers);
 	return (
 		<div className="md:grid md:grid-cols-3 md:gap-4">
 			{listUsers.map((user) => (
