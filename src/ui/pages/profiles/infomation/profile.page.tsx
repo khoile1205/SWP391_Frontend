@@ -2,8 +2,7 @@ import { UpdateUserInformationType } from "@/types/user";
 import AppColor from "@/utils/appColor";
 import { showToast } from "@/utils/notify";
 import userStore from "@/zustand/user.store";
-import { LockOutlined, UserOutlined, WalletOutlined } from "@ant-design/icons";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import {
 	Avatar,
 	Button,
@@ -45,13 +44,7 @@ export default function ProfilePage() {
 	// React state
 	const [isEdit, setIsEdit] = useState<boolean>(false);
 	// const [isEditPhoneNumber, setIsEditPhoneNumber] = useState<boolean>(false);
-	const [isShowAccountBalance, setIsEditShowAccountBalance] = useState<boolean>(false);
 	const [avatarUrl, setAvatarUrl] = useState<string | null | undefined>(user?.avatarUrl);
-
-	// Hooks
-	const balanceDisplay = useMemo(() => {
-		return isShowAccountBalance ? user?.balance : "******";
-	}, [isShowAccountBalance, user?.balance]);
 
 	// Controller
 	const handleUpdateUser = useLoadingCallbackWithFormik(
@@ -186,16 +179,6 @@ export default function ProfilePage() {
 									Change avatar
 								</Button>
 							</Upload>
-
-							<button
-								className="text-md border px-8 py-[4px] font-inter"
-								style={{
-									borderRadius: 4,
-								}}
-								onClick={() => setIsEdit(true)}
-							>
-								Delete account
-							</button>
 						</div>
 						<Divider></Divider>
 
@@ -239,15 +222,17 @@ export default function ProfilePage() {
 										value={"************"}
 										disabled
 									></Input>
-									<Typography
-										className={`hover:text-primary mt-2 text-end text-[${AppColor.deepOrangeColor}] hover:cursor-pointer`}
-										onClick={() => {
-											window.scrollTo({ behavior: "smooth", top: 0 });
-											navigate("/profile/change-password");
-										}}
-									>
-										Change password
-									</Typography>
+									<div className="mt-2  text-end">
+										<Typography.Link
+											className={`hover:!text-primary text-end !text-gray-500 hover:cursor-pointer`}
+											onClick={() => {
+												window.scrollTo({ behavior: "smooth", top: 0 });
+												navigate("/profile/change-password");
+											}}
+										>
+											Change password
+										</Typography.Link>
+									</div>
 								</Col>
 							</Row>
 							<Row className="space-y-8 sm:space-y-0">
@@ -404,36 +389,6 @@ export default function ProfilePage() {
 				</Row>
 			</Form> */}
 
-			<Divider></Divider>
-
-			<Row className="flex-col py-3">
-				<Typography.Title level={3}>NestCooking Wallet</Typography.Title>
-				<div className="flex w-full items-center space-x-4  pt-3  sm:w-2/3">
-					<WalletOutlined />
-					<Typography.Text className="text-xl">{balanceDisplay} vnd</Typography.Text>
-					{!isShowAccountBalance ? (
-						<EyeIcon
-							className="h-6 w-6 cursor-pointer text-gray-400"
-							aria-hidden="true"
-							onClick={() => setIsEditShowAccountBalance(!isShowAccountBalance)}
-						/>
-					) : (
-						<EyeSlashIcon
-							className="h-6 w-6 cursor-pointer text-gray-400"
-							aria-hidden="true"
-							onClick={() => setIsEditShowAccountBalance(!isShowAccountBalance)}
-						/>
-					)}
-					<button
-						className="text-md border px-8 py-[4px] font-inter"
-						style={{
-							borderRadius: 4,
-						}}
-					>
-						<Typography.Text className="">View wallet</Typography.Text>
-					</button>
-				</div>
-			</Row>
 			<Divider></Divider>
 		</div>
 	);

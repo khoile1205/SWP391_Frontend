@@ -6,10 +6,10 @@ import "./index.less";
 const wrapperCol: ColProps = {
 	xs: 24,
 	sm: 24,
-	md: 12,
-	lg: 12,
-	xl: 12,
-	xxl: 6,
+	md: 24,
+	lg: 8,
+	xl: 8,
+	xxl: 8,
 };
 
 interface ColCardProps {
@@ -18,16 +18,24 @@ interface ColCardProps {
 	body: React.ReactNode;
 	footer: React.ReactNode;
 	loading: boolean;
+	tooltipTitle: string;
 }
 
-export const ColCard: FC<ColCardProps> = ({ metaName, metaCount, body, footer, loading }) => {
+export const ColCard: FC<ColCardProps> = ({
+	metaName,
+	metaCount,
+	body,
+	footer,
+	loading,
+	tooltipTitle,
+}) => {
 	return (
 		<Col {...wrapperCol}>
 			<Card loading={loading} className="overview" bordered={false}>
 				<div className="overview-header">
 					<div className="overview-header-meta">{metaName}</div>
 					<div className="overview-header-count">{metaCount}</div>
-					<Tooltip title="Introduce">
+					<Tooltip title={`${tooltipTitle}`}>
 						<InfoCircleOutlined className="overview-header-action" />
 					</Tooltip>
 				</div>

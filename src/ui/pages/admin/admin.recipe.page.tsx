@@ -1,4 +1,4 @@
-import { Table, Button, Input, Tooltip, Image, Flex, Typography, Select } from "antd";
+import { Table, Button, Tooltip, Image, Flex, Typography, Select } from "antd";
 import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Recipe } from "@/models/recipe.model";
 import userStore from "@/zustand/user.store";
@@ -22,17 +22,6 @@ export default function AdminRecipePage() {
 			setRecipes([...visibleRecipes]);
 		}
 	}, [visibleRecipes]);
-
-	const handleSearchTitle = (title: string) => {
-		if (!title) {
-			setRecipes([...visibleRecipes]);
-			return;
-		}
-		const newRecipes = visibleRecipes.filter((recipe) =>
-			recipe.title.toLowerCase().includes(title.toLowerCase())
-		);
-		setRecipes(newRecipes);
-	};
 
 	const handleDeleteRecipe = async (recipeId: string) => {
 		const response = await deleteRecipeById(recipeId);
@@ -115,10 +104,10 @@ export default function AdminRecipePage() {
 
 	return (
 		<div className="flex flex-col items-center justify-center px-4 py-8 lg:px-8">
-			<h2 className="mb-4 text-2xl font-bold text-gray-900">View Created Recipes</h2>
+			<h2 className="mb-4 text-2xl font-bold text-gray-900">Recipe Management</h2>
 
-			<Flex className="mb-4 w-full" align="center" justify="space-between">
-				<Flex align="center" className="space-x-3">
+			<Flex className="mb-4 w-full" align="center" justify="end">
+				{/* <Flex align="center" className="space-x-3">
 					<Typography.Text>Search </Typography.Text>
 					<span>
 						<Input
@@ -128,7 +117,7 @@ export default function AdminRecipePage() {
 							onChange={(e) => handleSearchTitle(e.target.value)}
 						/>
 					</span>
-				</Flex>
+				</Flex> */}
 				<Flex align="center" className="space-x-3">
 					<Typography>Rows per page: </Typography>
 					<Select
