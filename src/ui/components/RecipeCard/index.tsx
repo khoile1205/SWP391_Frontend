@@ -129,7 +129,14 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => {
 			]}
 			cover={
 				<a href={`/recipes/${recipe.id}`}>
-					<img alt="example" src={recipe.thumbnailUrl} className="h-[227px] w-full" />
+					<img
+						alt="example"
+						src={
+							recipe.thumbnailUrl ||
+							"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRE-I5oD2o4wLpRh1UXJ5vPJLCR8bZnWcCqJNYtco5OXg&s"
+						}
+						className="h-[227px] w-full"
+					/>
 				</a>
 			}
 		>

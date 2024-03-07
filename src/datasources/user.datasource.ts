@@ -14,9 +14,18 @@ abstract class UserDatasource {
 	abstract getFollowingByUserId(userId: string): Promise<Response>;
 	abstract followUser(userId: string): Promise<Response>;
 	abstract unfollowUser(userId: string): Promise<Response>;
+	abstract userNotification(): Promise<Response>;
 }
 
 class UserDatasourceImpl extends UserDatasource {
+	async userNotification(): Promise<Response> {
+		const response = await apiService.get(`/api/notification`);
+		const isSuccess = response.status === 200;
+		const resBody = await response.json();
+		const message = resBody.message;
+
+		return new Response(isSuccess, resBody.result, message);
+	}
 	async unfollowUser(userId: string): Promise<Response> {
 		const response = await apiService.delete(`${API_User}/follow/${userId}`);
 		const isSuccess = response.ok === true;

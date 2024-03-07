@@ -25,7 +25,7 @@ function classNames(...classes: unknown[]) {
 export function Header() {
 	const [openSearchBox, setOpenSearchBox] = useState<boolean>(false);
 	const { user, logOut } = userStore();
-	const [visibleNotification, setVisibleNotification] = useState(false);
+	const [visibleNotification, setVisibleNotification] = useState<boolean>(false);
 
 	const handleLogout = useLoadingCallback(async () => {
 		const isLogout = logOut();
@@ -92,11 +92,14 @@ export function Header() {
 										</Button>
 
 										<Button
-											onClick={() => setVisibleNotification(!visibleNotification)}
+											onClick={() => setVisibleNotification((prev) => !prev)}
 											type="text"
-											className="relative flex rounded-full p-1 text-2xl hover:ring-offset-gray-700"
+											className="text-medium relative flex rounded-full p-1 hover:ring-offset-gray-700"
 										>
-											<NotificationComponent visible={visibleNotification}></NotificationComponent>
+											<NotificationComponent
+												visible={visibleNotification}
+												setVisible={setVisibleNotification}
+											></NotificationComponent>
 										</Button>
 										{/* Profile dropdown */}
 										{user != null ? (

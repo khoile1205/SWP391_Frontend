@@ -8,10 +8,12 @@ import { ChangePasswordType, UpdateUserInformationType } from "@/types/user";
 import { handleUseCase } from "./commons/handle.usecase";
 import Response from "@/usecases/auth.usecase/responses/response";
 import { Reaction, ReactionType } from "@/types/reaction";
+import { Notification } from "@/models/notification.model";
 
 type UserStore = {
 	user: User | null;
 	userRecipeReaction: Reaction | null;
+	userNotification: Notification[];
 	listUserPurcharseRecipe: string[];
 	error: ErrorState | null;
 	updateUser: (user: User | null) => void;
@@ -32,13 +34,24 @@ type UserStore = {
 	getUserReactionByType(type: ReactionType): Promise<Result>;
 	getListPurchaseRecipe(): Promise<Result>;
 	getUserTransaction(): Promise<Result>;
+	getUserNotification(): Promise<Result>;
 };
 
 const userStore = create<UserStore>()((set, get) => ({
 	user: null,
 	error: null,
+	userNotification: [],
 	userRecipeReaction: null,
 	listUserPurcharseRecipe: [],
+	getUserNotification: async () => {
+		const result = await handleUseCase(userUseCase.getUserNotification());
+		if (result.isSuccess) {
+			set(() => ({
+				userNotification: result.data as Notification[],
+			}));
+		}
+		return result;
+	},
 	getListPurchaseRecipe: async () => {
 		const result = await handleUseCase(userUseCase.getListPurchaseRecipeByUserId());
 		if (result.isSuccess) {
@@ -77,6 +90,9 @@ const userStore = create<UserStore>()((set, get) => ({
 			user: data!.user,
 		}));
 
+		await get().getUserNotification();
+		await get().getListPurchaseRecipe();
+
 		return Result.success(message);
 	},
 	login: async (signInInfo: SignInInformation) => {
@@ -105,6 +121,8 @@ const userStore = create<UserStore>()((set, get) => ({
 		if (result)
 			set(() => ({
 				user: null,
+				userNotification: [],
+				listUserPurcharseRecipe: [],
 			}));
 
 		return result;

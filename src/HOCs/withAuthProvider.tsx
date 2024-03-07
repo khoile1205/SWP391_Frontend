@@ -1,6 +1,6 @@
 import { useUserAuthentication } from "@/hooks/auth";
 import { useCategories } from "@/hooks/category";
-import { useInitialUserPurchaseRecipes } from "@/hooks/user";
+import { useGetUserNotification, useInitialUserPurchaseRecipes } from "@/hooks/user";
 import { useInitializeUserReaction } from "@/hooks/user/useInitializeUserReaction";
 import { FunctionComponent, ComponentType } from "react";
 import { Slide, ToastContainer } from "react-toastify";
@@ -10,6 +10,7 @@ export function withAuthProvider(WrappedComponent: ComponentType) {
 	const AuthProvider: FunctionComponent = (props) => {
 		useCategories();
 		useUserAuthentication();
+		useGetUserNotification();
 		useInitializeUserReaction();
 		useInitialUserPurchaseRecipes();
 		return (

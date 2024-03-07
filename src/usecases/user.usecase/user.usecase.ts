@@ -21,6 +21,7 @@ abstract class UserUseCase {
 	abstract getUserReactionByType(type: ReactionType): Promise<Response>;
 	abstract getListPurchaseRecipeByUserId(): Promise<Response>;
 	abstract getUserTransaction(): Promise<Response>;
+	abstract getUserNotification(): Promise<Response>;
 }
 
 class UserUseCaseImpl implements UserUseCase {
@@ -30,6 +31,9 @@ class UserUseCaseImpl implements UserUseCase {
 		private readonly recipeDatasource: RecipeDatasource,
 		private readonly transactionDatasource: TransactionDatasource
 	) {}
+	getUserNotification(): Promise<Response> {
+		return this.userDatasource.userNotification();
+	}
 	async getUserTransaction(): Promise<Response> {
 		return await this.transactionDatasource.getUserTransaction();
 	}
