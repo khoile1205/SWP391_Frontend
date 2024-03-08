@@ -1,10 +1,11 @@
-import { Table, Tooltip, Flex, Select, Typography } from "antd";
+import { Tooltip, Flex, Select, Typography } from "antd";
 import { CoffeeOutlined, CommentOutlined, UserOutlined } from "@ant-design/icons";
 import { Report } from "@/models/report.model";
 import { ActionStatus } from "@/enums";
 import { useGetUserReports } from "@/hooks/profiles";
 import { useState } from "react";
 import { ReportType } from "@/enums/report.type.enum";
+import { PaginationTable } from "@/ui/components";
 
 const renderStatusColor = (status: Report["status"]): string => {
 	switch (status) {
@@ -122,15 +123,7 @@ export default function ProfileReports() {
 					onChange={(value: number) => setPageSize(value)}
 				></Select>
 			</Flex>
-			<Table
-				columns={columns}
-				dataSource={reports}
-				pagination={{ defaultPageSize: 1, showSizeChanger: false, pageSize: pageSize }}
-				bordered
-				className="rounded-lg shadow-md"
-				rowClassName={(_, index) => (index % 2 === 0 ? "even-row" : "odd-row")}
-				scroll={{ y: 400 }}
-			/>
+			<PaginationTable columns={columns} dataSource={reports} pageSize={pageSize}></PaginationTable>
 		</div>
 	);
 }

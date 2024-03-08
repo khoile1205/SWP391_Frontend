@@ -23,6 +23,8 @@ import { PaymentUsecaseImpl } from "./payment.usecase/payment.usecase";
 import { TransactionDatasourceImpl } from "@/datasources/transaction.datasource";
 import { AdminUsecaseImpl } from "./admin.usecase/admin.usecase";
 import { AdminDatasourceImpl } from "@/datasources/admin.datasource";
+import { NotificationDatasourceImpl } from "@/datasources/notification.datasource";
+import { NotificationUsecaseImpl } from "./notification.usecase/notification.usecase";
 
 const authUseCase = new AuthUseCase(new AuthDataSourceImpl(), new UserDatasourceImpl());
 const userUseCase = new UserUseCaseImpl(
@@ -49,8 +51,9 @@ const reactionUseCase = new ReactionUseCaseImpl(new ReactionDatasourceImpl());
 const reportUseCase = new ReportUseCaseImpl(new ReportDatasourceImpl());
 const paymentUsecase = new PaymentUsecaseImpl(new PaymentDatasourceImpl());
 const adminUsecase = new AdminUsecaseImpl(new AdminDatasourceImpl());
-
+const notificationUsecase = new NotificationUsecaseImpl(new NotificationDatasourceImpl());
 export {
+	notificationUsecase,
 	authUseCase,
 	userUseCase,
 	fileUseCase,

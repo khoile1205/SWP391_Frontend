@@ -51,4 +51,5 @@ export default class AppString {
 	static readonly createPaymentErrorMessage = "Error to create payment. Please try again";
 	static readonly paymentSuccessMessage = "Payment successfully";
 	static readonly paymentErrorMessage = "Error to payment. Please try again";
+	static readonly createNotificationSuccessMessage = "Notification created successfully";
 }
