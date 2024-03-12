@@ -6,6 +6,9 @@ import { HomePage } from "@/ui/pages/home.page";
 import CreateRecipePage from "@/ui/pages/recipes/recipes.create.page";
 import { lazy } from "react";
 import { RouteObject } from "react-router-dom";
+import ChefBookingPage from "@/ui/pages/booking.page";
+import BookingCartPage from "@/ui/pages/booking.cart.page";
+import BookingCheckoutPage from "@/ui/pages/booking.checkout.page";
 
 // Import loadable components
 const SignInPage = Loadable(lazy(() => import("@/ui/pages/sign-in.page")));
@@ -28,7 +31,7 @@ const CategoryHomepage = Loadable(lazy(() => import("@/ui/pages/category/categor
 // render - reset password
 const NotFoundPage = Loadable(lazy(() => import("@/ui/pages/not-found.page")));
 
-// render - user
+// redner - reset password
 const UserProfilePage = Loadable(lazy(() => import("@/ui/pages/users/users.profile.page")));
 const UserFollowerPage = Loadable(lazy(() => import("@/ui/pages/users/users.follower.page")));
 const UserFollowingPage = Loadable(lazy(() => import("@/ui/pages/users/users.following.page")));
@@ -37,7 +40,8 @@ const UserFollowingPage = Loadable(lazy(() => import("@/ui/pages/users/users.fol
 const SearchAllPage = Loadable(lazy(() => import("@/ui/pages/search/search.all.page")));
 
 // render - booking page
-const BookingPage = Loadable(lazy(() => import("@/ui/pages/booking/booking.page")));
+const BookingPage = Loadable(lazy(() => import("@/ui/pages/booking.page")));
+// const BookingPage = Loadable(lazy(() => import("@/ui/pages/booking/booking.page")));
 const PaymentTransactionPage = Loadable(lazy(() => import("@/ui/pages/payment/payment")));
 
 const MainRoutes: RouteObject[] = [
@@ -98,6 +102,18 @@ const MainRoutes: RouteObject[] = [
 				element: <RecipeDetailPage></RecipeDetailPage>,
 			},
 		],
+	},
+	{
+		path: "/booking-chef",
+		element: <ChefBookingPage></ChefBookingPage>,
+	},
+	{
+		path: "/booking-cart",
+		element: <BookingCartPage></BookingCartPage>,
+	},
+	{
+		path: "/booking-checkout",
+		element: <BookingCheckoutPage></BookingCheckoutPage>,
 	},
 	{
 		path: "category",
