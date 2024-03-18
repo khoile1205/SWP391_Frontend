@@ -2,8 +2,9 @@ import { useGetTransactionHistory } from "@/hooks/profiles";
 import { Transaction } from "@/models/transaction.model";
 import { TransactionType } from "@/enums/transaction.enum";
 import { Column } from "@/types/@override/Table";
-import { useState } from "react";
-import { Tooltip, Flex, Typography, Select, Table } from "antd";
+import React, { useState } from "react";
+import { Tooltip } from "antd";
+import { PaginationPageSize, PaginationTable } from "@/ui/components";
 
 const renderTransactionType = (type: Transaction["type"]) => {
 	switch (type) {
@@ -16,7 +17,15 @@ const renderTransactionType = (type: Transaction["type"]) => {
 	}
 };
 export default function ProfileTransactionHistory() {
-	const { transactionHistory } = useGetTransactionHistory();
+	const { data } = useGetTransactionHistory();
+	const [transactionHistory, setTransactionHistory] = useState<Transaction[]>(
+		data as Transaction[]
+	);
+
+	React.useEffect(() => {
+		setTransactionHistory(data as Transaction[]);
+	}, [data]);
+
 	const [pageSize, setPageSize] = useState<number>(5);
 
 	const columns: Column<Transaction>[] = [
@@ -26,7 +35,7 @@ export default function ProfileTransactionHistory() {
 			align: "center",
 		},
 		{
-			title: "Amount",
+			title: "Price",
 			dataIndex: "amount",
 			align: "center",
 			render: (_text: string, record: Transaction) => (
@@ -43,6 +52,21 @@ export default function ProfileTransactionHistory() {
 				</Tooltip>
 			),
 			align: "center",
+			filters: [
+				{
+					value: TransactionType.DEPOSIT,
+					text: "Deposit",
+				},
+				{
+					value: TransactionType.PURCHASEDRECIPE,
+					text: "Purchase Recipe",
+				},
+				{
+					value: TransactionType.WITHDRAW,
+					text: "Withdraw",
+				},
+			],
+			onFilter: (value, record) => record.type == value,
 		},
 		{
 			title: "Currency",
@@ -71,37 +95,9 @@ export default function ProfileTransactionHistory() {
 
 	return (
 		<div className="flex flex-col items-center justify-center px-4 py-8 lg:px-8">
-			<h2 className="mb-4 text-2xl font-bold text-gray-900">View Transactions</h2>
-			<Flex className="mb-4 w-full space-x-3" align="center" justify="end">
-				<Typography>Rows per page: </Typography>
-				<Select
-					defaultValue={pageSize}
-					options={[
-						{
-							label: 5,
-							value: 5,
-						},
-						{
-							label: 10,
-							value: 10,
-						},
-						{
-							label: 15,
-							value: 15,
-						},
-					]}
-					onChange={(value: number) => setPageSize(value)}
-				></Select>
-			</Flex>
-			<Table
-				columns={columns}
-				dataSource={transactionHistory}
-				pagination={{ defaultPageSize: 5, pageSize: pageSize, showSizeChanger: false }}
-				bordered
-				className="rounded-lg shadow-md"
-				rowClassName={(_, index) => (index % 2 === 0 ? "even-row" : "odd-row")}
-				scroll={{ y: 400 }}
-			/>
+			<h2 className="mb-4 text-2xl font-bold text-gray-900">View Transaction History</h2>
+			<PaginationPageSize options={[5, 10, 15]} pageSize={pageSize} setPageSize={setPageSize} />
+			<PaginationTable columns={columns} dataSource={transactionHistory} pageSize={pageSize} />
 		</div>
 	);
 }

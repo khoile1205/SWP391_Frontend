@@ -29,20 +29,20 @@ const profileTabs = [
 		role: [Roles.USER, Roles.CHEF],
 	},
 	{
+		tab: "Favourite Recipes",
+		key: "favourite-recipes",
+		role: [Roles.USER, Roles.CHEF],
+	},
+	{
 		tab: "Reports",
 		key: "reports",
 		role: [Roles.USER, Roles.CHEF],
 	},
 	{
-		tab: "Transaction",
+		tab: "Transaction History",
 		key: "transactions",
 		role: [Roles.USER, Roles.CHEF],
 	},
-	// {
-	// 	tab: "Booking",
-	// 	key: "bookings",
-	// 	role: [Roles.USER],
-	// },
 	{
 		tab: "Become-Chef Request",
 		key: "requests",

@@ -5,4 +5,7 @@ export type Column<T> = {
 	width?: string;
 	render?: (text: any, record: T) => JSX.Element | null;
 	sorter?: (a: T, b: T) => number;
+	colSpan?: number;
+	filters?: { text: string; value: string }[];
+	onFilter?: (value: string, record: T) => void;
 };

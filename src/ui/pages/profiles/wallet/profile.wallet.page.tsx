@@ -74,19 +74,19 @@ export default function ProfileWalletPage() {
 					<Space direction="vertical" size={16} style={{ width: "100%" }}>
 						<Button
 							type="primary"
-							icon={<ArrowDownOutlined />}
-							onClick={handleWithdraw}
-							style={{ width: "100%", backgroundColor: "#e74c3c", borderColor: "#e74c3c" }}
-						>
-							Withdraw
-						</Button>
-						<Button
-							type="primary"
 							icon={<ArrowUpOutlined />}
 							onClick={handleTopUp}
 							style={{ width: "100%", backgroundColor: "#2ecc71", borderColor: "#2ecc71" }}
 						>
 							Top Up
+						</Button>
+						<Button
+							type="primary"
+							icon={<ArrowDownOutlined />}
+							onClick={handleWithdraw}
+							style={{ width: "100%", backgroundColor: "#e74c3c", borderColor: "#e74c3c" }}
+						>
+							Withdraw
 						</Button>
 					</Space>
 				</Card>
