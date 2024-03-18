@@ -30,6 +30,9 @@ const RecipesPage = Loadable(lazy(() => import("@/ui/pages/profiles/recipes/prof
 const ProfileWalletPage = Loadable(
 	lazy(() => import("@/ui/pages/profiles/wallet/profile.wallet.page"))
 );
+const FavouriteRecipesPage = Loadable(
+	lazy(() => import("@/ui/pages/profiles/favourite-recipe/profile.favourite-recipes.page"))
+);
 
 const UserRoutes: RouteObject[] = [
 	{
@@ -119,6 +122,15 @@ const UserRoutes: RouteObject[] = [
 					<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
 						<ProfileWalletPage></ProfileWalletPage>
 					</RBACRoutes>
+				),
+			},
+			{
+				path: "favourite-recipes",
+				element: (
+					<RBACRoutes
+						allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}
+						children={<FavouriteRecipesPage></FavouriteRecipesPage>}
+					></RBACRoutes>
 				),
 			},
 		],

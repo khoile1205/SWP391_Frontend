@@ -74,19 +74,19 @@ export default function ProfileWalletPage() {
 					<Space direction="vertical" size={16} style={{ width: "100%" }}>
 						<Button
 							type="primary"
-							icon={<ArrowDownOutlined />}
-							onClick={handleWithdraw}
-							style={{ width: "100%", backgroundColor: "#e74c3c", borderColor: "#e74c3c" }}
-						>
-							Withdraw
-						</Button>
-						<Button
-							type="primary"
 							icon={<ArrowUpOutlined />}
 							onClick={handleTopUp}
 							style={{ width: "100%", backgroundColor: "#2ecc71", borderColor: "#2ecc71" }}
 						>
 							Top Up
+						</Button>
+						<Button
+							type="primary"
+							icon={<ArrowDownOutlined />}
+							onClick={handleWithdraw}
+							style={{ width: "100%", backgroundColor: "#e74c3c", borderColor: "#e74c3c" }}
+						>
+							Withdraw
 						</Button>
 					</Space>
 				</Card>
@@ -109,7 +109,8 @@ export default function ProfileWalletPage() {
 						<Input
 							prefix={<DollarOutlined />}
 							type="number"
-							min={1}
+							min={10000}
+							step={1000}
 							placeholder="Enter withdrawal amount"
 							style={{ width: "100%" }}
 						/>
@@ -136,7 +137,8 @@ export default function ProfileWalletPage() {
 					>
 						<Input
 							prefix={<DollarOutlined />}
-							min={1}
+							min={10000}
+							step={1000}
 							type="number"
 							placeholder="Enter top-up amount"
 							style={{ width: "100%" }}

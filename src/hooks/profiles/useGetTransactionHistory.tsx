@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export const useGetTransactionHistory = () => {
 	const { user, getUserTransaction } = userStore((state) => state);
-	const { data: transactionHistory } = useQuery({
+	const { data } = useQuery({
 		queryKey: ["getTransactionHistory", user?.id],
 		queryFn: async () => {
 			const result = await getUserTransaction();
@@ -14,5 +14,5 @@ export const useGetTransactionHistory = () => {
 		retryDelay: 0,
 	});
 
-	return { transactionHistory };
+	return { data };
 };

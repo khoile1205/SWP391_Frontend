@@ -1,8 +1,8 @@
-import { Table, Button, Tooltip, Image, Flex, Typography, Select } from "antd";
+import { Button, Tooltip, Image, Flex } from "antd";
 import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Recipe } from "@/models/recipe.model";
 import userStore from "@/zustand/user.store";
-import { ConfirmModal } from "@/ui/components";
+import { ConfirmModal, PaginationPageSize, PaginationTable } from "@/ui/components";
 import { useEffect, useState } from "react";
 import { recipeStore } from "@/zustand/recipe.store";
 import { showToast } from "@/utils/notify";
@@ -118,41 +118,13 @@ export default function AdminRecipePage() {
 						/>
 					</span>
 				</Flex> */}
-				<Flex align="center" className="space-x-3">
-					<Typography>Rows per page: </Typography>
-					<Select
-						defaultValue={pageSize}
-						options={[
-							{
-								label: 5,
-								value: 5,
-							},
-							{
-								label: 10,
-								value: 10,
-							},
-							{
-								label: 15,
-								value: 15,
-							},
-						]}
-						onChange={(value: number) => setPageSize(value)}
-					></Select>
-				</Flex>
+				<PaginationPageSize
+					options={[5, 10, 15]}
+					pageSize={pageSize}
+					setPageSize={setPageSize}
+				></PaginationPageSize>
 			</Flex>
-			<Table
-				columns={columns}
-				dataSource={recipes}
-				pagination={{
-					defaultPageSize: 5,
-					showSizeChanger: false,
-					pageSize: pageSize,
-				}}
-				bordered
-				className="rounded-lg shadow-md"
-				rowClassName={(_, index) => (index % 2 === 0 ? "even-row" : "odd-row")}
-				scroll={{ y: 700 }}
-			/>
+			<PaginationTable columns={columns} dataSource={recipes} pageSize={pageSize} />
 		</div>
 	);
 }
