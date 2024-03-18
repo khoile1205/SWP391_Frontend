@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import PastaImage from "@/assets/Icon/pasta.jpg";
 import TeamOutlined from "@ant-design/icons/TeamOutlined";
 import { BiFork, BiNotepad } from "react-icons/bi";
-import { Input } from "antd";
+import { Button, DatePicker, DatePickerProps, Flex, Input, Typography } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
 interface Chef {
 	name: string;
 	followers: number;
@@ -21,9 +22,12 @@ export interface Dish {
 	note?: string;
 }
 
-const BookingCart: React.FC = () => {
-	const [dateTimeStart, setDateTimeStart] = useState<Date | null>(null);
-	const [dateTimeEnd, setDateTimeEnd] = useState<Date | null>(null);
+interface Props {
+	changeStep: (step: number) => void;
+}
+const BookingCart: React.FC<Props> = ({ changeStep }) => {
+	const [dateTimeStart, setDateTimeStart] = useState<Date | undefined>(new Date());
+	const [dateTimeEnd, setDateTimeEnd] = useState<Date | undefined>(new Date());
 	const [cartItems, setCartItems] = useState<Dish[]>([]);
 	const [showAllDishes, setShowAllDishes] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
@@ -115,54 +119,11 @@ const BookingCart: React.FC = () => {
 		},
 	];
 	const handleCheckout = () => {
-		const startDateTimeInput = document.getElementById("start-date") as HTMLInputElement | null;
-		const endDateTimeInput = document.getElementById("end-date") as HTMLInputElement | null;
-
-		if (
-			!startDateTimeInput ||
-			!startDateTimeInput.value ||
-			!endDateTimeInput ||
-			!endDateTimeInput.value
-		) {
+		if (!dateTimeStart || !dateTimeEnd) {
 			alert("Please select start and end date & time before checking out.");
-
-			const startDateTimeLabel = document.querySelector(
-				"label[for=start-date]"
-			) as HTMLLabelElement | null;
-			const endDateTimeLabel = document.querySelector(
-				"label[for=end-date]"
-			) as HTMLLabelElement | null;
-
-			if (
-				startDateTimeLabel &&
-				startDateTimeLabel.textContent &&
-				!startDateTimeLabel.textContent.includes("*")
-			) {
-				startDateTimeLabel.style.color = "red";
-				startDateTimeLabel.textContent += "*";
-				startDateTimeLabel.textContent = startDateTimeLabel.textContent.replace(":", "").trim();
-			}
-			if (
-				endDateTimeLabel &&
-				endDateTimeLabel.textContent &&
-				!endDateTimeLabel.textContent.includes("*")
-			) {
-				endDateTimeLabel.style.color = "red";
-				endDateTimeLabel.textContent += "*";
-				endDateTimeLabel.textContent = endDateTimeLabel.textContent.replace(":", "").trim();
-			}
-
-			if (startDateTimeInput) {
-				startDateTimeInput.focus();
-			}
-
-			const dateTimeSection = document.getElementById("date-time-section");
-			if (dateTimeSection) {
-				dateTimeSection.scrollIntoView({ behavior: "smooth" });
-			}
-
 			return;
 		}
+
 		console.log("Selected Date Start:", dateTimeStart);
 		console.log("Selected Date End:", dateTimeEnd);
 		console.log("Cart Items:", cartItems);
@@ -232,10 +193,13 @@ const BookingCart: React.FC = () => {
 	const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(event.target.value);
 	};
+
 	return (
 		<div className="container" style={{ width: "100%", margin: "0 auto" }}>
+			<Button className="bg-primary mb-3 text-white" onClick={() => changeStep(1)}>
+				Back
+			</Button>
 			<div
-				className="chef-info"
 				style={{
 					padding: "20px",
 					backgroundColor: "#f5f5f5",
@@ -261,53 +225,77 @@ const BookingCart: React.FC = () => {
 						</p>
 					</div>
 				</div>
-				<div className="date-time-picker">
-					<label htmlFor="start-date" style={{ fontWeight: "bold", marginBottom: "5px" }}>
-						Date Time Start:
-					</label>
-					<input
-						type="datetime-local"
-						id="start-date"
-						onChange={(e) => setDateTimeStart(new Date(e.target.value))}
-						style={{
-							padding: "8px",
-							border: "1px solid #ddd",
-							borderRadius: "4px",
-							width: "100%",
-							marginBottom: "10px",
-						}}
-					/>
-					<label htmlFor="end-date" style={{ fontWeight: "bold", marginBottom: "5px" }}>
-						Date Time End:
-					</label>
-					<input
-						type="datetime-local"
-						id="end-date"
-						onChange={(e) => setDateTimeEnd(new Date(e.target.value))}
-						style={{ padding: "8px", border: "1px solid #ddd", borderRadius: "4px", width: "100%" }}
-					/>
-				</div>
-				<div className="search-bar">
-					<label
-						htmlFor="search"
-						style={{ fontSize: "16px", fontWeight: "bold", marginBottom: "5px", color: "#333" }}
-					>
-						Search Recipes:
-					</label>
-					<Input
-						type="text"
-						id="search"
-						placeholder="Search Recipes"
-						value={searchTerm}
-						onChange={handleSearch}
-						style={{
-							padding: "8px",
-							border: "1px solid #ddd",
-							borderRadius: "4px",
-							width: "100%",
-							marginBottom: "10px",
-						}}
-					/>
+				<div className="date-time-picker mt-3 space-y-2">
+					<Flex className="space-x-3">
+						<div className="w-1/4">
+							<Typography
+								style={{
+									fontSize: "16px",
+									fontWeight: "bold",
+									color: !dateTimeStart ? "red" : "inherit",
+								}}
+								className="mb-1"
+							>
+								Date Time Start:
+							</Typography>
+							<DatePicker
+								className="w-full"
+								minDate={dayjs(new Date())}
+								defaultValue={dayjs(new Date())}
+								showTime={{ format: "HH:mm" }}
+								format="YYYY-MM-DD HH:mm"
+								onOk={(value: DatePickerProps["value"]) => setDateTimeStart(value?.toDate())}
+								onChange={(value: DatePickerProps["value"]) => setDateTimeStart(value?.toDate())}
+							></DatePicker>
+						</div>
+						<div className="!w-1/4">
+							<Typography
+								style={{
+									fontSize: "16px",
+									fontWeight: "bold",
+									color: !dateTimeEnd ? "red" : "inherit",
+								}}
+								className="mb-1"
+							>
+								Date Time End:
+							</Typography>
+							<DatePicker
+								className="w-full"
+								value={dayjs(dateTimeEnd)}
+								minDate={dateTimeStart ? dayjs(dateTimeStart) : undefined}
+								defaultValue={dateTimeStart ? dayjs(dateTimeStart) : dayjs(new Date())}
+								disabled={!dateTimeStart}
+								showTime={{ format: "HH:mm" }}
+								format="YYYY-MM-DD HH:mm"
+								onOk={(value: DatePickerProps["value"]) => setDateTimeEnd(value?.toDate())}
+								onChange={(value: DatePickerProps["value"]) => setDateTimeEnd(value?.toDate())}
+							></DatePicker>
+						</div>
+					</Flex>
+
+					<div>
+						<div className="search-bar">
+							<Typography
+								style={{ fontSize: "16px", fontWeight: "bold", marginBottom: "5px", color: "#333" }}
+							>
+								Search Recipes:
+							</Typography>
+							<Input
+								type="text"
+								id="search"
+								placeholder="Search Recipes"
+								value={searchTerm}
+								onChange={handleSearch}
+								style={{
+									padding: "8px",
+									border: "1px solid #ddd",
+									borderRadius: "4px",
+									width: "100%",
+									marginBottom: "10px",
+								}}
+							/>
+						</div>
+					</div>
 				</div>
 			</div>
 

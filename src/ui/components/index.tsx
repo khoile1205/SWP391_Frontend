@@ -23,3 +23,4 @@ export * from "./LineChart";
 export * from "./PaginationTable";
 export * from "./PaginationPageSize";
 export * from "./Carousel";
+export * from "./DatePicker";

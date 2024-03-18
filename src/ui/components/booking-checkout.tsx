@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Dish } from "./booking-cart";
+import { Dish } from "../pages/booking/booking.step-2.page";
 
 const BookingForm: React.FC = () => {
 	const [address, setAddress] = useState("");
