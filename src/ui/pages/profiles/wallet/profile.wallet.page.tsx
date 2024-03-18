@@ -109,7 +109,8 @@ export default function ProfileWalletPage() {
 						<Input
 							prefix={<DollarOutlined />}
 							type="number"
-							min={1}
+							min={10000}
+							step={1000}
 							placeholder="Enter withdrawal amount"
 							style={{ width: "100%" }}
 						/>
@@ -136,7 +137,8 @@ export default function ProfileWalletPage() {
 					>
 						<Input
 							prefix={<DollarOutlined />}
-							min={1}
+							min={10000}
+							step={1000}
 							type="number"
 							placeholder="Enter top-up amount"
 							style={{ width: "100%" }}
