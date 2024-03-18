@@ -2,6 +2,7 @@ import ProtectedRoutes from "@/HOCs/ProtectedRoutes";
 import RBACRoutes from "@/HOCs/RBACRoutes";
 import { Roles } from "@/enums";
 import { Loadable } from "@/ui/components/Loadable";
+import BookingCheckoutPage from "@/ui/pages/booking.checkout.page";
 import { HomePage } from "@/ui/pages/home.page";
 import CreateRecipePage from "@/ui/pages/recipes/recipes.create.page";
 import { lazy } from "react";
@@ -28,7 +29,7 @@ const CategoryHomepage = Loadable(lazy(() => import("@/ui/pages/category/categor
 // render - reset password
 const NotFoundPage = Loadable(lazy(() => import("@/ui/pages/not-found.page")));
 
-// render - user
+// redner - reset password
 const UserProfilePage = Loadable(lazy(() => import("@/ui/pages/users/users.profile.page")));
 const UserFollowerPage = Loadable(lazy(() => import("@/ui/pages/users/users.follower.page")));
 const UserFollowingPage = Loadable(lazy(() => import("@/ui/pages/users/users.following.page")));
@@ -37,6 +38,7 @@ const UserFollowingPage = Loadable(lazy(() => import("@/ui/pages/users/users.fol
 const SearchAllPage = Loadable(lazy(() => import("@/ui/pages/search/search.all.page")));
 
 // render - booking page
+// const BookingPage = Loadable(lazy(() => import("@/ui/pages/booking.page")));
 const BookingPage = Loadable(lazy(() => import("@/ui/pages/booking/booking.page")));
 const PaymentTransactionPage = Loadable(lazy(() => import("@/ui/pages/payment/payment")));
 
@@ -98,6 +100,14 @@ const MainRoutes: RouteObject[] = [
 				element: <RecipeDetailPage></RecipeDetailPage>,
 			},
 		],
+	},
+	{
+		path: "/booking",
+		element: <BookingPage></BookingPage>,
+	},
+	{
+		path: "/booking-checkout",
+		element: <BookingCheckoutPage></BookingCheckoutPage>,
 	},
 	{
 		path: "category",

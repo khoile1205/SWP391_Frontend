@@ -25,6 +25,8 @@ import { AdminUsecaseImpl } from "./admin.usecase/admin.usecase";
 import { AdminDatasourceImpl } from "@/datasources/admin.datasource";
 import { NotificationDatasourceImpl } from "@/datasources/notification.datasource";
 import { NotificationUsecaseImpl } from "./notification.usecase/notification.usecase";
+import { BookingUsecaseImpl } from "./booking.usecase/booking.usecase";
+import { BookingDatasourceImpl } from "@/datasources/booking.datasource";
 
 const authUseCase = new AuthUseCase(new AuthDataSourceImpl(), new UserDatasourceImpl());
 const userUseCase = new UserUseCaseImpl(
@@ -52,7 +54,10 @@ const reportUseCase = new ReportUseCaseImpl(new ReportDatasourceImpl());
 const paymentUsecase = new PaymentUsecaseImpl(new PaymentDatasourceImpl());
 const adminUsecase = new AdminUsecaseImpl(new AdminDatasourceImpl());
 const notificationUsecase = new NotificationUsecaseImpl(new NotificationDatasourceImpl());
+const bookingUsecase = new BookingUsecaseImpl(new BookingDatasourceImpl());
+
 export {
+	bookingUsecase,
 	notificationUsecase,
 	authUseCase,
 	userUseCase,
