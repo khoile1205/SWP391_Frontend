@@ -3,13 +3,25 @@
 @tailwind utilities;
 
 @layer base {
-    html {
-      font-family: "Inter", system-ui, sans-serif;
-    }
-    .bg-primary {
-      background-color:rgb(255,100,47);
-    }
-    .text-primary {
-      color: rgb(255,100,47);
-    }
+  html {
+    font-family: "Inter", system-ui, sans-serif;
   }
+
+  .bg-primary {
+    background-color: rgb(255, 100, 47);
+  }
+
+  .text-primary {
+    color: rgb(255, 100, 47);
+  }
+
+  /* Add your custom style for the confirm button */
+  
+}
+
+.ant-picker-panel-layout .ant-btn-primary {
+  background-color: rgb(255, 100, 47) !important;
+  border-color: rgb(255, 100, 47) !important;
+  color: white !important;
+  padding: 0 12px !important;
+}

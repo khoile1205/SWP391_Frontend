@@ -2,7 +2,7 @@ import ProtectedRoutes from "@/HOCs/ProtectedRoutes";
 import RBACRoutes from "@/HOCs/RBACRoutes";
 import { Roles } from "@/enums";
 import { Loadable } from "@/ui/components/Loadable";
-import BookingCheckoutPage from "@/ui/pages/booking.checkout.page";
+import BookingCheckoutPage from "@/ui/pages/booking/booking.checkout.page";
 import { HomePage } from "@/ui/pages/home.page";
 import CreateRecipePage from "@/ui/pages/recipes/recipes.create.page";
 import { lazy } from "react";
