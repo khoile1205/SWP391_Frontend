@@ -1,174 +1,217 @@
 import React, { useState } from "react";
-import PastaImage from "@/assets/Icon/pasta.jpg";
 import TeamOutlined from "@ant-design/icons/TeamOutlined";
 import { BiFork, BiNotepad } from "react-icons/bi";
-import { Button, DatePicker, DatePickerProps, Flex, Input, Typography } from "antd";
+import {
+	Button,
+	DatePicker,
+	DatePickerProps,
+	Flex,
+	Form,
+	Input,
+	InputNumber,
+	List,
+	Typography,
+} from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
-import dayjs from "dayjs";
-interface Chef {
-	name: string;
-	followers: number;
-	avatarUrl: string;
-}
+import dayjs, { Dayjs } from "dayjs";
+import { ChefBookingEntity, ChefBookingSchedule, CreateBookingDTO } from "@/types/booking";
+import { Recipe } from "@/models/recipe.model";
+import { useGetChefRecipes, useGetChefSchedules } from "@/hooks/booking";
+import AppColor from "@/utils/appColor";
+import { Counter } from "@/ui/components";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
-export interface Dish {
-	id: number;
-	name: string;
-	price: number;
-	portion: string;
-	imageUrl: string;
-	quantity?: number;
-	note?: string;
-}
+const bookingInformationValidationSchema = Yup.object().shape({
+	address: Yup.string().required("Address is required"),
+	timeStart: Yup.date()
+		.min(dayjs().add(2, "day").toDate(), "Time start should be at least 2 days from now")
+		.required("Start time is required"),
+	timeEnd: Yup.date()
+		.min(Yup.ref("timeStart"), "End time should be after start time")
+		.required("End time is required"),
+});
 
 interface Props {
+	chefInformation: Omit<ChefBookingEntity, "listRecipes">;
 	changeStep: (step: number) => void;
+	bookingData: CreateBookingDTO;
+	setBookingData: (data: Partial<CreateBookingDTO>) => void;
 }
-const BookingCart: React.FC<Props> = ({ changeStep }) => {
-	const [dateTimeStart, setDateTimeStart] = useState<Date | undefined>(new Date());
-	const [dateTimeEnd, setDateTimeEnd] = useState<Date | undefined>(new Date());
-	const [cartItems, setCartItems] = useState<Dish[]>([]);
+
+const BookingCart: React.FC<Props> = ({
+	chefInformation,
+	changeStep,
+	setBookingData,
+	bookingData,
+}) => {
+	const formik = useFormik({
+		initialValues: {
+			address: bookingData.address,
+			timeStart: bookingData.timeStart,
+			timeEnd: bookingData.timeEnd,
+		},
+		onSubmit: () => {
+			setBookingData({
+				address: bookingData.address,
+				timeStart: bookingData.timeStart,
+				timeEnd: bookingData.timeEnd,
+			});
+		},
+		validationSchema: bookingInformationValidationSchema,
+		enableReinitialize: true,
+	});
+	const { recipes, refetchListRecipes } = useGetChefRecipes(bookingData.chefId);
+	React.useEffect(() => {
+		if (bookingData.chefId) refetchListRecipes();
+	}, [bookingData.chefId, refetchListRecipes]);
+
+	const { listSchedules, refetchListChefSchedules } = useGetChefSchedules(bookingData.chefId);
+	React.useEffect(() => {
+		if (bookingData.chefId) refetchListChefSchedules();
+	}, [bookingData.chefId, refetchListChefSchedules]);
+
+	const [listRecipes, setListRecipes] = React.useState<Recipe[]>(recipes ?? []);
+	const [listChefBookingSchedules, setListChefBookingSchedules] = React.useState<
+		ChefBookingSchedule[]
+	>(listSchedules ?? []);
+
+	React.useEffect(() => {
+		setListRecipes(recipes);
+	}, [recipes]);
+
+	React.useEffect(() => {
+		setListChefBookingSchedules(listSchedules);
+	}, [listSchedules]);
+
 	const [showAllDishes, setShowAllDishes] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
-	const [notes, setNotes] = useState<{ [key: number]: string }>({});
-	const navigate = useNavigate();
-	const chef: Chef = {
-		name: "John Doe",
-		followers: 1000,
-		avatarUrl: PastaImage,
+
+	const disabledTime = (current: Dayjs, type: "start" | "end"): any => {
+		if (!listChefBookingSchedules || listChefBookingSchedules.length === 0) {
+			return {};
+		}
+
+		const timeStart = dayjs(bookingData.timeStart);
+		const startHour = timeStart.hour();
+		const startMinute = timeStart.minute();
+
+		if (type === "end") {
+			const selectedDate = current.startOf("day").valueOf();
+			const startDate = timeStart.startOf("day").valueOf();
+			if (selectedDate === startDate) {
+				// If the selected date is the same as the start date, disable times before the start time
+				return {
+					disabledHours: () =>
+						Array.from({ length: 24 }, (_, hour) => (hour < startHour ? hour : null)),
+					disabledMinutes: (hour: number) =>
+						hour === startHour
+							? Array.from({ length: 60 }, (_, minute) => (minute < startMinute ? minute : null))
+							: [],
+				};
+			}
+		}
+
+		for (const schedule of listChefBookingSchedules) {
+			const scheduleStart = dayjs(schedule.timeStart);
+			const scheduleEnd = dayjs(schedule.timeEnd);
+
+			if (current.isAfter(scheduleStart) && current.isBefore(scheduleEnd)) {
+				// Disable all hours and minutes during the scheduled time
+				return {
+					disabledHours: () => Array.from({ length: 24 }, (_, hour) => hour),
+					disabledMinutes: () => Array.from({ length: 60 }, (_, minute) => minute),
+					disabledSeconds: () => [],
+				};
+			}
+		}
+
+		return {}; // Enable all hours, minutes, and seconds if not within any schedule
 	};
 
-	const dishes: Dish[] = [
-		{
-			id: 1,
-			name: "Spaghetti Carbonara",
-			price: 15.99,
-			portion: "Serves 2",
-			imageUrl: PastaImage,
-		},
-		{
-			id: 2,
-			name: "Grilled Salmon with Roasted Vegetables",
-			price: 22.5,
-			portion: "Serves 1",
-			imageUrl: PastaImage,
-		},
-		{
-			id: 3,
-			name: "Spaghetti Carbonara",
-			price: 15.99,
-			portion: "Serves 2",
-			imageUrl: PastaImage,
-		},
-		{
-			id: 4,
-			name: "Spaghetti Carbonara",
-			price: 15.99,
-			portion: "Serves 2",
-			imageUrl: PastaImage,
-		},
-		{
-			id: 5,
-			name: "Spaghetti Carbonara",
-			price: 15.99,
-			portion: "Serves 2",
-			imageUrl: PastaImage,
-		},
-		{
-			id: 6,
-			name: "Spaghetti Carbonara",
-			price: 15.99,
-			portion: "Serves 2",
-			imageUrl: PastaImage,
-		},
-		{
-			id: 7,
-			name: "Spaghetti Carbonara",
-			price: 15.99,
-			portion: "Serves 2",
-			imageUrl: PastaImage,
-		},
-		{
-			id: 8,
-			name: "Spaghetti Carbonara",
-			price: 15.99,
-			portion: "Serves 2",
-			imageUrl: PastaImage,
-		},
-		{
-			id: 9,
-			name: "Spaghetti Carbonara",
-			price: 15.99,
-			portion: "Serves 2",
-			imageUrl: PastaImage,
-		},
-		{
-			id: 10,
-			name: "Spaghetti Carbonara",
-			price: 15.99,
-			portion: "Serves 2",
-			imageUrl: PastaImage,
-		},
-		{
-			id: 11,
-			name: "Spaghetti Carbonara",
-			price: 15.99,
-			portion: "Serves 2",
-			imageUrl: PastaImage,
-		},
-	];
 	const handleCheckout = () => {
-		if (!dateTimeStart || !dateTimeEnd) {
+		if (!bookingData.timeStart || !bookingData.timeEnd) {
 			alert("Please select start and end date & time before checking out.");
 			return;
 		}
 
-		console.log("Selected Date Start:", dateTimeStart);
-		console.log("Selected Date End:", dateTimeEnd);
-		console.log("Cart Items:", cartItems);
-		navigate("/booking-checkout", {
-			state: {
-				dateTimeStart,
-				dateTimeEnd,
-				cartItems,
-				notes,
-			},
+		window.location.pathname = "/booking-checkout";
+	};
+
+	const handleAddNote = (recipeId: string, note: string) => {
+		setBookingData({
+			bookingDishes: bookingData.bookingDishes.map((item) =>
+				(item.recipeId as Recipe).id === recipeId ? { ...item, note } : item
+			),
+			total: bookingData.total,
 		});
 	};
 
-	const handleAddNote = (dishId: number, note: string) => {
-		setNotes({ ...notes, [dishId]: note });
-	};
+	const handleChangeTimeStart = (value: DatePickerProps["value"]) => {
+		setBookingData({ timeStart: value?.toDate() });
 
-	const handleAddToCart = (dish: Dish) => {
-		const existingItem = cartItems.find((item) => item.id === dish.id);
-
-		if (existingItem) {
-			setCartItems(
-				cartItems.map((item) =>
-					item.id === dish.id ? { ...item, quantity: (item.quantity || 0) + 1 } : item
-				)
-			);
-		} else {
-			const newCartItem = { ...dish, quantity: 1 };
-			setCartItems([...cartItems, newCartItem]);
-			setNotes({ ...notes, [dish.id]: "" });
+		if (value && bookingData.timeEnd && value.toDate() > bookingData.timeEnd) {
+			setBookingData({ timeEnd: new Date(value.toDate().getTime() + 60 * 60 * 1000) });
 		}
 	};
 
-	const handleRemoveFromCart = (dishId: number) => {
-		setCartItems(cartItems.filter((item) => item.id !== dishId));
+	const handleChangeTimeEnd = (value: DatePickerProps["value"]) => {
+		setBookingData({ timeEnd: value?.toDate() });
+	};
+	const handleAddToCart = (recipe: Recipe) => {
+		setBookingData({
+			bookingDishes: [
+				...bookingData.bookingDishes,
+				{
+					note: "",
+					recipeId: recipe,
+					quantity: 1,
+				},
+			],
+			total: bookingData.total + recipe.bookingPrice,
+		});
 	};
 
-	const handleQuantityChange = (dishId: number, change: number) => {
-		setCartItems((prevCartItems) =>
-			prevCartItems.map((item) =>
-				item.id === dishId
-					? { ...item, quantity: Math.max((item.quantity || 0) + change, 0) }
-					: item
-			)
+	const handleRemoveFromCart = (recipeId: string) => {
+		const existingItem = bookingData.bookingDishes.find(
+			(item) => (item.recipeId as Recipe).id === recipeId
 		);
+
+		if (existingItem) {
+			const recipe = listRecipes.find((item) => item.id === recipeId);
+			const bookingPrice = recipe?.bookingPrice ?? 0;
+
+			setBookingData({
+				bookingDishes: bookingData.bookingDishes.filter(
+					(item) => (item.recipeId as Recipe).id !== recipeId
+				),
+				total: bookingData.total - existingItem.quantity * bookingPrice,
+			});
+		}
+	};
+
+	const handleQuantityChange = (recipeId: string, change: number) => {
+		const existingItem = bookingData.bookingDishes.find(
+			(item) => (item.recipeId as Recipe).id === recipeId
+		);
+
+		if (existingItem) {
+			const recipe = listRecipes.find((item) => item.id === recipeId);
+			const bookingPrice = recipe?.bookingPrice ?? 0;
+
+			const newQuantity = Math.max(existingItem.quantity + change, 1);
+
+			setBookingData({
+				bookingDishes: bookingData.bookingDishes.map((item) =>
+					(item.recipeId as Recipe).id === recipeId ? { ...item, quantity: newQuantity } : item
+				),
+				total: bookingData.total + (newQuantity - existingItem.quantity) * bookingPrice,
+			});
+		}
+	};
+
+	const handleChangeAddress = (address: string) => {
+		setBookingData({ address });
 	};
 	const handleMoreRecipes = () => {
 		setShowAllDishes(true);
@@ -176,18 +219,14 @@ const BookingCart: React.FC<Props> = ({ changeStep }) => {
 
 	const getFilteredDishes = () => {
 		if (!searchTerm) {
-			return dishes.slice(0, showAllDishes ? undefined : 3);
+			return listRecipes.slice(0, showAllDishes ? undefined : 3);
 		}
 
-		const filteredDishes = dishes.filter((dish) =>
-			dish.name.toLowerCase().includes(searchTerm.toLowerCase())
+		const filteredDishes = listRecipes.filter((dish) =>
+			dish.title.toLowerCase().includes(searchTerm.toLowerCase())
 		);
 
 		return filteredDishes.slice(0, showAllDishes ? undefined : 3);
-	};
-
-	const calculateTotal = () => {
-		return cartItems.reduce((total, item) => total + item.price * (item.quantity || 1), 0);
 	};
 
 	const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -209,43 +248,93 @@ const BookingCart: React.FC<Props> = ({ changeStep }) => {
 			>
 				<div style={{ display: "flex", alignItems: "center" }}>
 					<img
-						src={chef.avatarUrl}
+						src={
+							chefInformation.avatarUrl ??
+							"https://buffer.com/cdn-cgi/image/w=1000,fit=contain,q=90,f=auto/library/content/images/size/w1200/2023/10/free-images.jpg"
+						}
 						alt="Chef Avatar"
 						style={{ width: "80px", height: "80px", borderRadius: "50%", marginRight: "20px" }}
 					/>
 					<div>
 						<h2 style={{ margin: "0", fontSize: "24px", fontWeight: "bold", color: "#333" }}>
-							{chef.name}
+							{chefInformation.firstName + " " + chefInformation.lastName}
 						</h2>
 						<p style={{ margin: "5px 0", fontSize: "16px", color: "#666" }}>
 							<span style={{ fontWeight: "bold", color: "#cc9f66", marginRight: "5px" }}>
-								{chef.followers}
+								{chefInformation.followerCount}
 							</span>{" "}
 							followers
 						</p>
 					</div>
 				</div>
-				<div className="date-time-picker mt-3 space-y-2">
+				<Form className="mt-3 space-y-2" layout="vertical">
+					<Form.Item
+						validateStatus={formik.errors.address ? "error" : undefined}
+						help={
+							formik.errors.address &&
+							formik.touched.address && <div className="my-3">{formik.errors.address}</div>
+						}
+						label={
+							<Typography
+								style={{
+									fontSize: "16px",
+									fontWeight: "bold",
+									color: formik.errors.address ? "red" : "inherit",
+								}}
+								className="mb-1"
+							>
+								Your Address
+							</Typography>
+						}
+					>
+						<Input
+							type="text"
+							id="address"
+							value={formik.values.address}
+							placeholder="Your Address"
+							onBlur={formik.handleBlur}
+							onChange={(e) => {
+								formik.setFieldValue("address", e.target.value);
+								handleChangeAddress(e.target.value);
+							}}
+							required
+							style={{
+								width: "100%",
+								border: `1px solid ${formik.errors.address ? "red" : "#ccc"}`,
+								borderRadius: "4px",
+							}}
+							className="input px-5 py-1 !ring-0 focus:outline-0"
+						/>
+					</Form.Item>
+
 					<Flex className="space-x-3">
 						<div className="w-1/4">
 							<Typography
 								style={{
 									fontSize: "16px",
 									fontWeight: "bold",
-									color: !dateTimeStart ? "red" : "inherit",
+									color: !bookingData.timeStart ? "red" : "inherit",
 								}}
 								className="mb-1"
 							>
 								Date Time Start:
 							</Typography>
 							<DatePicker
-								className="w-full"
-								minDate={dayjs(new Date())}
-								defaultValue={dayjs(new Date())}
-								showTime={{ format: "HH:mm" }}
+								size="large"
+								superNextIcon={<BiNotepad />}
+								showTime={{
+									format: "HH:mm",
+								}}
+								needConfirm={false}
+								name="timeStart"
+								className="w-full ps-4"
+								minDate={dayjs(new Date()).add(2, "day")}
+								defaultValue={dayjs(bookingData.timeStart)}
 								format="YYYY-MM-DD HH:mm"
-								onOk={(value: DatePickerProps["value"]) => setDateTimeStart(value?.toDate())}
-								onChange={(value: DatePickerProps["value"]) => setDateTimeStart(value?.toDate())}
+								disabledTime={(current: Dayjs) => disabledTime(current, "start")}
+								onBlur={formik.handleBlur}
+								onOk={handleChangeTimeStart}
+								onChange={handleChangeTimeStart}
 							></DatePicker>
 						</div>
 						<div className="!w-1/4">
@@ -253,196 +342,230 @@ const BookingCart: React.FC<Props> = ({ changeStep }) => {
 								style={{
 									fontSize: "16px",
 									fontWeight: "bold",
-									color: !dateTimeEnd ? "red" : "inherit",
+									color: !bookingData.timeEnd ? "red" : "inherit",
 								}}
 								className="mb-1"
 							>
 								Date Time End:
 							</Typography>
 							<DatePicker
-								className="w-full"
-								value={dayjs(dateTimeEnd)}
-								minDate={dateTimeStart ? dayjs(dateTimeStart) : undefined}
-								defaultValue={dateTimeStart ? dayjs(dateTimeStart) : dayjs(new Date())}
-								disabled={!dateTimeStart}
+								size="large"
+								className="w-full ps-4"
+								name="timeEnd"
+								needConfirm={false}
+								minDate={bookingData.timeStart ? dayjs(bookingData.timeStart) : undefined}
+								disabled={!bookingData.timeStart}
+								defaultValue={dayjs(bookingData.timeEnd)}
+								disabledTime={(current: Dayjs) => disabledTime(current, "end")}
 								showTime={{ format: "HH:mm" }}
 								format="YYYY-MM-DD HH:mm"
-								onOk={(value: DatePickerProps["value"]) => setDateTimeEnd(value?.toDate())}
-								onChange={(value: DatePickerProps["value"]) => setDateTimeEnd(value?.toDate())}
+								onBlur={formik.handleBlur}
+								onOk={handleChangeTimeEnd}
+								onChange={handleChangeTimeEnd}
 							></DatePicker>
 						</div>
 					</Flex>
-
-					<div>
-						<div className="search-bar">
-							<Typography
-								style={{ fontSize: "16px", fontWeight: "bold", marginBottom: "5px", color: "#333" }}
-							>
-								Search Recipes:
-							</Typography>
-							<Input
-								type="text"
-								id="search"
-								placeholder="Search Recipes"
-								value={searchTerm}
-								onChange={handleSearch}
-								style={{
-									padding: "8px",
-									border: "1px solid #ddd",
-									borderRadius: "4px",
-									width: "100%",
-									marginBottom: "10px",
-								}}
-							/>
+					<List header="Please check:">
+						<div className="ms-4">
+							<List.Item>
+								<Typography.Text className="text-xs">
+									<span className="text-red">*</span> Please ensure that the address is correct.
+								</Typography.Text>
+							</List.Item>
+							<List.Item>
+								<Typography.Text className="text-xs">
+									<span className="text-red">*</span> Booking must be placed 2 days or more from
+									now.
+								</Typography.Text>
+							</List.Item>
+							<List.Item>
+								<Typography.Text className="text-xs">
+									<span className="text-red">*</span> The booking time end must be greater than the
+									booking time start
+								</Typography.Text>
+							</List.Item>
+							<List.Item>
+								<Typography.Text className="text-xs">
+									<span className="text-red">*</span> Booking time must not be within the chef's
+									schedule
+								</Typography.Text>
+							</List.Item>
+							<List.Item>
+								<Typography.Text className="text-xs">
+									<span className="text-red">*</span> Please ensure that the time interval between
+									Time Start and 'Time End' is at least 1 hour.
+								</Typography.Text>
+							</List.Item>
 						</div>
-					</div>
-				</div>
+					</List>
+				</Form>
 			</div>
 
 			<div
 				className="menu"
-				style={{ width: "100%", padding: "20px", backgroundColor: "#f5f5f5", borderRadius: "4px" }}
+				style={{
+					width: "100%",
+					padding: "20px",
+					backgroundColor: "#f5f5f5",
+					borderRadius: "4px",
+				}}
 			>
 				<div style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
 					<BiFork style={{ width: "32px", height: "32px", marginRight: "10px" }} />
-					<h2 style={{ margin: "0", fontSize: "32px", fontFamily: "cursive", color: "#333" }}>
-						{chef.name}'s Menu
-					</h2>
+					<Typography.Title
+						level={2}
+						className=""
+						style={{ margin: "0", fontSize: "32px", fontFamily: "cursive", color: "#333" }}
+					>
+						{chefInformation.firstName + " " + chefInformation.lastName}'s Menu
+					</Typography.Title>
 				</div>
-				<div
-					className="menu-grid"
-					style={{
-						display: "grid",
-						gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-						gap: "20px",
-					}}
-				>
-					{getFilteredDishes().map((dish) => (
-						<div
-							className="dish-item"
-							key={dish.id}
+				<div>
+					<Flex className=" space-x-2" align="center">
+						<Typography
 							style={{
-								backgroundColor: "#fff",
-								boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-								borderRadius: "4px",
-								padding: "20px",
+								fontSize: "16px",
+								fontWeight: "bold",
+								marginBottom: "5px",
+								color: "#333",
 							}}
 						>
-							<img
-								src={dish.imageUrl}
-								alt={dish.name}
+							Search Recipes:
+						</Typography>
+						<Input
+							type="text"
+							id="search"
+							className="w-1/2 rounded-md px-3 py-1"
+							placeholder="Search Recipes"
+							value={searchTerm}
+							onChange={handleSearch}
+							style={{
+								border: "1px solid #ddd",
+								marginBottom: "10px",
+							}}
+						/>
+					</Flex>
+				</div>
+				<div className="block sm:grid sm:grid-cols-2 lg:grid-cols-3">
+					{listRecipes &&
+						getFilteredDishes().map((dish) => (
+							<div
+								className="dish-item"
+								key={dish.id}
 								style={{
-									width: "100%",
-									height: "auto",
-									objectFit: "cover",
+									backgroundColor: "#fff",
+									boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
 									borderRadius: "4px",
-									cursor: "pointer",
+									padding: "20px",
 								}}
-								onClick={() => window.open("your_recipe_link_here", "_blank")}
-							/>
-							<div className="dish-details">
-								<h3 style={{ margin: "0", fontSize: "18px", color: "#333", marginTop: "10px" }}>
-									{dish.name}
-								</h3>
-								<div style={{ display: "flex", alignItems: "center", margin: "5px 0" }}>
-									<TeamOutlined
-										style={{ width: "16px", height: "16px", marginRight: "5px", color: "#666" }}
-									/>
-									<span style={{ fontSize: "14px", color: "#666" }}>{dish.portion}</span>
-								</div>
-								<p style={{ fontWeight: "bold" }}>${dish.price.toFixed(2)}</p>
-								{cartItems.find((item) => item.id === dish.id) ? (
-									<div style={{ display: "flex", alignItems: "center" }}>
-										<button
-											onClick={() => handleQuantityChange(dish.id, -1)}
-											style={{
-												backgroundColor: "#ddd",
-												padding: "5px",
-												marginRight: "10px",
-												width: "50px",
-												borderRadius: "4px",
-											}}
-										>
-											-
-										</button>
-										<input
-											type="number"
-											value={cartItems.find((item) => item.id === dish.id)?.quantity || 0}
-											onChange={(e) => {
-												const newQuantity = parseInt(e.target.value);
-												handleQuantityChange(
-													dish.id,
-													newQuantity -
-														(cartItems.find((item) => item.id === dish.id)?.quantity || 0)
-												);
-											}}
-											style={{
-												width: "50px",
-												padding: "5px",
-												border: "1px solid #ddd",
-												borderRadius: "4px",
-											}}
+							>
+								{/* Avatar */}
+								<img
+									src={dish.thumbnailUrl}
+									alt={dish.title}
+									style={{
+										width: "100%",
+										height: "auto",
+										objectFit: "cover",
+										borderRadius: "4px",
+										cursor: "pointer",
+									}}
+									onClick={() => window.open(`/recipes/${dish.id}`, "_blank")}
+								/>
+								{/* Basic information */}
+								<div className="">
+									<Typography.Title
+										level={3}
+										style={{ margin: "0", fontSize: "18px", color: "#333", marginTop: "10px" }}
+									>
+										{dish.title}
+									</Typography.Title>
+									<div style={{ display: "flex", alignItems: "center" }} className="mt-2">
+										<TeamOutlined
+											style={{ width: "12px", height: "12px", marginRight: "5px", color: "#666" }}
 										/>
+										<Typography style={{ fontSize: "12px", color: "#666" }}>
+											Portion: {dish.portion}
+										</Typography>
+									</div>
+									<Typography style={{ fontWeight: "bold" }} className="my-2">
+										Price: ${dish.bookingPrice}
+									</Typography>
+									{bookingData.bookingDishes &&
+									bookingData.bookingDishes.find(
+										(item) => (item.recipeId as Recipe).id === dish.id
+									) ? (
+										<div className="space-y-3">
+											<div style={{ display: "flex", alignItems: "center" }} className="space-x-2">
+												<Counter
+													onChange={() => handleQuantityChange(dish.id, +1)}
+													type="increment"
+												></Counter>
+												<InputNumber
+													value={
+														bookingData.bookingDishes.find(
+															(item) => (item.recipeId as Recipe).id === dish.id
+														)?.quantity || 0
+													}
+													onChange={(e) => {
+														let newQuantity = e ?? 1;
+														if (newQuantity <= 0) {
+															newQuantity = 1;
+														}
+														handleQuantityChange(
+															dish.id,
+															newQuantity -
+																(bookingData.bookingDishes.find(
+																	(item) => (item.recipeId as Recipe).id === dish.id
+																)?.quantity || 1)
+														);
+													}}
+													min={1}
+													style={{
+														maxWidth: "50px",
+														border: "1px solid #ddd",
+														borderRadius: "4px",
+													}}
+													className=" text-center"
+													inputMode="numeric"
+												></InputNumber>
+												<Counter
+													onChange={() => handleQuantityChange(dish.id, -1)}
+													type="decrement"
+												/>
+												<DeleteOutlined
+													onClick={() => handleRemoveFromCart(dish.id)}
+													style={{ fontSize: "16px" }}
+												/>
+											</div>
+											<Input.TextArea
+												className="border-1 border-gray"
+												placeholder="Add a note"
+												value={
+													bookingData.bookingDishes.find(
+														(item) => (item.recipeId as Recipe).id === dish.id
+													)?.note || ""
+												}
+												onChange={(e) => handleAddNote(dish.id, e.target.value)}
+												rows={2}
+											/>
+										</div>
+									) : (
 										<button
-											onClick={() => handleQuantityChange(dish.id, 1)}
+											onClick={() => handleAddToCart(dish)}
+											className="px-4 py-1 "
 											style={{
-												backgroundColor: "#007bff",
-												color: "#fff",
-												padding: "5px",
-												marginLeft: "10px",
+												backgroundColor: AppColor.deepOrangeColor,
 												borderRadius: "4px",
-												width: "50px",
-											}}
-										>
-											+
-										</button>
-										<button
-											onClick={() => handleRemoveFromCart(dish.id)}
-											style={{
-												backgroundColor: "transparent",
 												border: "none",
-												color: "#ccc",
-												marginLeft: "10px",
-												cursor: "pointer",
-												display: "flex",
-												alignItems: "center",
-												justifyContent: "center",
 											}}
 										>
-											<DeleteOutlined style={{ fontSize: "24px", color: "#454545" }} />
+											<Typography className="text-white">Add to Cart</Typography>
 										</button>
-									</div>
-								) : (
-									<button
-										onClick={() => handleAddToCart(dish)}
-										style={{
-											backgroundColor: "#007bff",
-											color: "#fff",
-											padding: "8px 16px",
-											borderRadius: "4px",
-											border: "none",
-										}}
-									>
-										Add to Cart
-									</button>
-								)}
-								{cartItems.find((item) => item.id === dish.id) && (
-									<div
-										className="dish-notes"
-										style={{ display: "flex", alignItems: "center", marginTop: "15px" }}
-									>
-										<Input
-											type="text"
-											placeholder="Add a note"
-											value={notes[dish.id] || ""}
-											onChange={(e) => handleAddNote(dish.id, e.target.value)}
-											prefix={<BiNotepad style={{ color: "rgba(0,0,0,.25)" }} />}
-										/>
-									</div>
-								)}
+									)}
+								</div>
 							</div>
-						</div>
-					))}
+						))}
 				</div>
 			</div>
 
@@ -450,7 +573,7 @@ const BookingCart: React.FC<Props> = ({ changeStep }) => {
 				className="more-recipes-container"
 				style={{ width: "100%", display: "flex", justifyContent: "center" }}
 			>
-				{dishes.length > getFilteredDishes().length && (
+				{listRecipes && listRecipes.length > getFilteredDishes().length && showAllDishes && (
 					<button
 						className="more-recipes"
 						onClick={handleMoreRecipes}
@@ -465,7 +588,7 @@ const BookingCart: React.FC<Props> = ({ changeStep }) => {
 							transition: "background-color 0.2s ease-in-out",
 						}}
 					>
-						{showAllDishes ? "" : "More Recipes"}
+						More Recipes
 					</button>
 				)}
 			</div>
@@ -482,24 +605,28 @@ const BookingCart: React.FC<Props> = ({ changeStep }) => {
 					alignItems: "center",
 				}}
 			>
-				<p>
-					<strong>Total: ${calculateTotal().toFixed(2)}</strong>
-				</p>
+				<Typography.Text strong className="text-lg">
+					Total: ${bookingData.total}
+				</Typography.Text>
 				<button
 					onClick={handleCheckout}
-					disabled={cartItems.length === 0}
+					disabled={bookingData.bookingDishes && bookingData.bookingDishes.length <= 0}
 					style={{
-						backgroundColor: cartItems.length === 0 ? "#ccc" : "#007bff",
-						color: "#fff",
-						padding: "10px 20px",
+						backgroundColor:
+							bookingData.bookingDishes && bookingData.bookingDishes.length <= 0
+								? "#ccc"
+								: AppColor.deepOrangeColor,
 						borderRadius: "4px",
 						border: "none",
 						marginTop: "10px",
-						cursor: cartItems.length === 0 ? "not-allowed" : "pointer",
+						cursor: bookingData.bookingDishes.length <= 0 ? "not-allowed" : "pointer",
 						transition: "background-color 0.3s ease-in-out",
 					}}
+					className="px-5 py-2"
 				>
-					Continue
+					<Typography.Text strong className="text-white">
+						Continue
+					</Typography.Text>
 				</button>
 			</div>
 		</div>

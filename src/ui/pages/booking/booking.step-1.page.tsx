@@ -1,42 +1,68 @@
 import React from "react";
 import { Card, Table, Button, Image, Row, Col, Input, Space, Flex, Select } from "antd";
 import { Recipe } from "@/models/recipe.model";
-// import { useNavigate } from "react-router-dom";
-import { CloseOutlined, SearchOutlined } from "@ant-design/icons";
+import { CloseOutlined } from "@ant-design/icons";
 import AppColor from "@/utils/appColor";
 import { useGetBookingChef } from "@/hooks/booking";
+import { pickRandomElements } from "@/utils/array_exts";
+import Loadmore from "@/ui/components/Loadmore";
+import { CreateBookingDTO } from "@/types/booking";
 
 interface Props {
 	changeStep: (step: number) => void;
-	setChef: (data: any) => void;
+	setBookingData: (data: Partial<CreateBookingDTO>) => void;
+	setChefInformation: (data: any) => void;
+	bookingData: CreateBookingDTO;
 }
 
 type SearchType = "chef" | "recipe";
 
-const ChefBooking: React.FC<Props> = ({ changeStep, setChef }) => {
+const ChefBooking: React.FC<Props> = ({
+	changeStep,
+	setBookingData,
+	setChefInformation,
+	bookingData,
+}) => {
 	const [visibleChefs, setVisibleChefs] = React.useState(3);
 	const [searchTerm, setSearchTerm] = React.useState("");
 	const [searchType, setSearchType] = React.useState<SearchType>("chef");
 
-	// const navigate = useNavigate();
-
 	const { chefs } = useGetBookingChef();
 
+	const [listChefs, setListChefs] = React.useState(chefs ?? []);
+
+	React.useEffect(() => {
+		setListChefs(chefs ?? []);
+	}, [chefs]);
+
 	const filteredChefs = React.useMemo(() => {
-		return chefs.filter((chef) => {
+		return listChefs.filter((chef) => {
+			const fullName = chef.firstName + " " + chef.lastName;
+
 			const searchTextLower = searchTerm.toLowerCase();
+
 			if (searchType === "chef") {
-				return chef.userName.toLowerCase().includes(searchTextLower);
+				return fullName.toLowerCase().includes(searchTextLower);
 			} else {
-				return chef.recipes.some((recipe) => recipe.title.toLowerCase().includes(searchTextLower));
+				return chef.listRecipes.some((recipe: Recipe) =>
+					recipe.title.toLowerCase().includes(searchTextLower)
+				);
 			}
 		});
-	}, [chefs, searchTerm, searchType]);
+	}, [listChefs, searchTerm, searchType]);
 
 	const loadMoreChefs = () => {
 		setVisibleChefs((prevVisibleChefs) => prevVisibleChefs + 3);
 	};
 
+	const handleSelectChef = (chef: any) => {
+		changeStep(2);
+
+		if (bookingData.chefId != chef.id) {
+			setBookingData({ chefId: chef.id, bookingDishes: [] });
+		}
+		setChefInformation(chef);
+	};
 	const updatePlaceholder = React.useMemo(() => {
 		const newPlaceholder = searchType === "chef" ? "Search by Chef Name" : "Search by Recipe Name";
 		return newPlaceholder;
@@ -72,7 +98,6 @@ const ChefBooking: React.FC<Props> = ({ changeStep, setChef }) => {
 								suffix={
 									<Flex align="center" className="space-x-3">
 										{searchTerm && <CloseOutlined onClick={() => setSearchTerm("")} />}
-										<SearchOutlined></SearchOutlined>
 									</Flex>
 								}
 								className="w-full rounded-lg border border-gray-300 px-4 py-1 text-[16px] outline-none"
@@ -83,7 +108,7 @@ const ChefBooking: React.FC<Props> = ({ changeStep, setChef }) => {
 				</Flex>
 			</div>
 
-			{(searchTerm ? filteredChefs : chefs).map((chef) => (
+			{(searchTerm ? filteredChefs : listChefs).map((chef) => (
 				<Card
 					key={chef.id}
 					style={{
@@ -94,15 +119,18 @@ const ChefBooking: React.FC<Props> = ({ changeStep, setChef }) => {
 						boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
 					}}
 				>
-					<Row justify="space-between" style={{ alignItems: "center", maxWidth: "300px" }}>
-						{chef.avatarURL && (
-							<Image
-								src={chef.avatarURL}
-								style={{ width: "70px", height: "70px", borderRadius: "50%", marginRight: "10px" }}
-							/>
-						)}
+					<Row justify="start" style={{ alignItems: "center" }} className="mb-2 space-x-4">
+						<Image
+							src={
+								chef.avatarUrl ??
+								"https://buffer.com/cdn-cgi/image/w=1000,fit=contain,q=90,f=auto/library/content/images/size/w1200/2023/10/free-images.jpg"
+							}
+							style={{ width: "70px", height: "70px", borderRadius: "50%" }}
+						/>
 						<div style={{ display: "flex", flexDirection: "column" }}>
-							<h2 style={{ fontSize: "18px", fontWeight: "bold" }}>{chef.userName}</h2>
+							<h2 style={{ fontSize: "18px", fontWeight: "bold" }}>
+								{chef.firstName + " " + chef.lastName}
+							</h2>
 							<span style={{ fontSize: "12px", color: "#ccc" }}>
 								{chef.followerCount} followers
 							</span>
@@ -110,15 +138,12 @@ const ChefBooking: React.FC<Props> = ({ changeStep, setChef }) => {
 						<Button
 							type="primary"
 							style={{ backgroundColor: AppColor.deepOrangeColor, color: "white" }}
-							onClick={() => {
-								changeStep(2);
-								setChef(chef.id);
-							}}
+							onClick={() => handleSelectChef(chef)}
 						>
 							View Details
 						</Button>
 					</Row>
-					<Table dataSource={chef.recipes} pagination={false}>
+					<Table dataSource={pickRandomElements(chef.listRecipes, 3)} pagination={false}>
 						<Table.Column
 							title="Recipe Name"
 							dataIndex="title"
@@ -153,14 +178,8 @@ const ChefBooking: React.FC<Props> = ({ changeStep, setChef }) => {
 				</Card>
 			))}
 			{visibleChefs < filteredChefs.length && (
-				<div style={{ textAlign: "center", marginTop: "20px" }}>
-					<Button
-						type="primary"
-						onClick={loadMoreChefs}
-						style={{ backgroundColor: AppColor.deepOrangeColor, color: "white" }}
-					>
-						Load More Chefs
-					</Button>
+				<div style={{ textAlign: "center" }}>
+					<Loadmore onClick={loadMoreChefs} title="Load More Chefs"></Loadmore>
 				</div>
 			)}
 		</div>
