@@ -4,6 +4,7 @@ import { adminUsecase } from "@/usecases";
 import { handleUseCase } from "./commons/handle.usecase";
 import { HandleReportDTO } from "@/types/report";
 import { CreateNotificationDTO } from "@/types/notification";
+import { VerifyRecipeDTO } from "@/types/admin";
 
 type Action = {
 	getDashboardStatistics(): Promise<Result>;
@@ -11,9 +12,16 @@ type Action = {
 	getAllTransationHistory(): Promise<Result>;
 	handleReport(data: HandleReportDTO): Promise<Result>;
 	createSystemNotification(data: CreateNotificationDTO): Promise<Result>;
+	getAllRecipes(): Promise<Result>;
+	handleVerifyPublicRecipe(data: VerifyRecipeDTO): Promise<Result>;
 };
 
 export const adminStore = create<Action>(() => ({
+	handleVerifyPublicRecipe: async (data: VerifyRecipeDTO) =>
+		await handleUseCase(adminUsecase.handleVerifyPublicRecipe(data)),
+	getAllRecipes: async () => {
+		return await handleUseCase(adminUsecase.getAllRecipes());
+	},
 	createSystemNotification: async (data: CreateNotificationDTO) =>
 		await handleUseCase(adminUsecase.createSystemNotification(data)),
 	handleReport: async (data: HandleReportDTO) =>

@@ -16,11 +16,11 @@ import { DeleteOutlined } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
 import { ChefBookingEntity, ChefBookingSchedule, CreateBookingDTO } from "@/types/booking";
 import { Recipe } from "@/models/recipe.model";
-import { useGetChefRecipes, useGetChefSchedules } from "@/hooks/booking";
 import AppColor from "@/utils/appColor";
 import { Counter } from "@/ui/components";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useGetChefRecipes, useGetChefWorkingSchedule } from "@/hooks/booking";
 
 const bookingInformationValidationSchema = Yup.object().shape({
 	address: Yup.string().required("Address is required"),
@@ -66,7 +66,7 @@ const BookingCart: React.FC<Props> = ({
 		if (bookingData.chefId) refetchListRecipes();
 	}, [bookingData.chefId, refetchListRecipes]);
 
-	const { listSchedules, refetchListChefSchedules } = useGetChefSchedules(bookingData.chefId);
+	const { data, refetchListChefSchedules } = useGetChefWorkingSchedule(bookingData.chefId);
 	React.useEffect(() => {
 		if (bookingData.chefId) refetchListChefSchedules();
 	}, [bookingData.chefId, refetchListChefSchedules]);
@@ -74,15 +74,15 @@ const BookingCart: React.FC<Props> = ({
 	const [listRecipes, setListRecipes] = React.useState<Recipe[]>(recipes ?? []);
 	const [listChefBookingSchedules, setListChefBookingSchedules] = React.useState<
 		ChefBookingSchedule[]
-	>(listSchedules ?? []);
+	>(data ?? []);
 
 	React.useEffect(() => {
 		setListRecipes(recipes);
 	}, [recipes]);
 
 	React.useEffect(() => {
-		setListChefBookingSchedules(listSchedules);
-	}, [listSchedules]);
+		setListChefBookingSchedules(data);
+	}, [data]);
 
 	const [showAllDishes, setShowAllDishes] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
@@ -369,31 +369,32 @@ const BookingCart: React.FC<Props> = ({
 						<div className="ms-4">
 							<List.Item>
 								<Typography.Text className="text-xs">
-									<span className="text-red">*</span> Please ensure that the address is correct.
+									<span className="!text-red-500">*</span> Please ensure that the address is
+									correct.
 								</Typography.Text>
 							</List.Item>
 							<List.Item>
 								<Typography.Text className="text-xs">
-									<span className="text-red">*</span> Booking must be placed 2 days or more from
-									now.
+									<span className="!text-red-500">*</span> Booking must be placed 2 days or more
+									from now.
 								</Typography.Text>
 							</List.Item>
 							<List.Item>
 								<Typography.Text className="text-xs">
-									<span className="text-red">*</span> The booking time end must be greater than the
-									booking time start
+									<span className="!text-red-500">*</span> The booking time end must be greater than
+									the booking time start
+								</Typography.Text>
+							</List.Item>
+							<List.Item>
+								<Typography.Text className=" text-xs">
+									<span className="!text-red-500">*</span> Booking time must not be within the
+									chef's schedule
 								</Typography.Text>
 							</List.Item>
 							<List.Item>
 								<Typography.Text className="text-xs">
-									<span className="text-red">*</span> Booking time must not be within the chef's
-									schedule
-								</Typography.Text>
-							</List.Item>
-							<List.Item>
-								<Typography.Text className="text-xs">
-									<span className="text-red">*</span> Please ensure that the time interval between
-									Time Start and 'Time End' is at least 1 hour.
+									<span className="!text-red-500">*</span> Please ensure that the time interval
+									between Time Start and 'Time End' is at least 1 hour.
 								</Typography.Text>
 							</List.Item>
 						</div>

@@ -20,6 +20,7 @@ export class Recipe {
 	ingredients: Ingredients[];
 	categories: Category[];
 	createdAt: Date;
+	isVerified: boolean;
 	updatedAt: Date;
 	comments: Comment;
 	reactions: Reaction;
@@ -36,6 +37,8 @@ export class Recipe {
 		bookingPrice: number,
 		cookingTime: number,
 		difficult: number,
+		isVerified: boolean,
+
 		instructors: Instructors[],
 		ingredients: Ingredients[],
 		categories: Category[],
@@ -62,6 +65,7 @@ export class Recipe {
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 		this.comments = comments;
+		this.isVerified = isVerified;
 		this.reactions = reactions;
 	}
 }

@@ -5,7 +5,7 @@ import { Modal } from "antd";
 const { confirm } = Modal;
 
 type ModalProps = {
-	content: string;
+	content: JSX.Element | string;
 	onOk: () => void;
 };
 export const ConfirmModal = ({ content, onOk }: ModalProps) => {

@@ -48,11 +48,16 @@ const profileTabs = [
 		key: "requests",
 		role: [Roles.USER],
 	},
-	// {
-	// 	tab: "Schedules",
-	// 	key: "schedules",
-	// 	role: [Roles.CHEF],
-	// },
+	{
+		tab: "Schedules",
+		key: "schedules",
+		role: [Roles.CHEF],
+	},
+	{
+		tab: "Booking History",
+		key: "bookings",
+		role: [Roles.USER],
+	},
 ];
 
 const ProfileLayout: React.FC = () => {

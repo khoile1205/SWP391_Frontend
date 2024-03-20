@@ -1,5 +1,6 @@
 import { Recipe } from "@/models/recipe.model";
 import { ShortInfoUser } from "./user";
+import { ActionStatus } from "@/enums";
 
 export type CreateBookingDTO = {
 	chefId: string;
@@ -24,4 +25,9 @@ export type ChefBookingEntity = ShortInfoUser & {
 export type ChefBookingSchedule = {
 	timeStart: Date;
 	timeEnd: Date;
+};
+
+export type UpdateBookingDTO = {
+	bookingId: string;
+	status: ActionStatus;
 };

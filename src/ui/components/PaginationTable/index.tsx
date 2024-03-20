@@ -15,7 +15,7 @@ export const PaginationTable = <T,>({
 	paginationOptions,
 }: Props<T>) => {
 	return (
-		<div className="w-full" style={{ maxWidth: "100%", overflowX: "auto" }}>
+		<div className="" style={{ maxWidth: "100%", minWidth: "100%", overflowX: "auto" }}>
 			<Table
 				columns={columns}
 				dataSource={dataSource as any[]}

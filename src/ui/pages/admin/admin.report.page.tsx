@@ -118,7 +118,12 @@ export default function AdminReportPage() {
 				<span style={{ color: renderStatusColor(status) }}>{status.toUpperCase()}</span>
 			),
 			align: "center",
-			sorter: (a, b) => a.status.localeCompare(b.status),
+			filters: [
+				{ text: "Accepted", value: ActionStatus.ACCEPTED },
+				{ text: "Pending", value: ActionStatus.PENDING },
+				{ text: "Rejected", value: ActionStatus.REJECTED },
+			],
+			onFilter: (value: string, record: Report) => record.status === value,
 		},
 		{
 			title: "Created At",
@@ -134,7 +139,7 @@ export default function AdminReportPage() {
 				<Flex justify="center" className="space-x-3">
 					<Button
 						type="primary"
-						style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
+						style={{ backgroundColor: "#52c41a !important", borderColor: "#52c41a !important" }}
 						onClick={() =>
 							showModal("Are you sure you want to accept?", ActionStatus.ACCEPTED, record)
 						}
@@ -144,7 +149,7 @@ export default function AdminReportPage() {
 					</Button>
 					<Button
 						type="primary"
-						style={{ backgroundColor: "#ff4d4f", borderColor: "#ff4d4f" }}
+						style={{ backgroundColor: "#ff4d4f !important", borderColor: "#ff4d4f !important" }}
 						onClick={() =>
 							showModal("Are you sure you want to reject?", ActionStatus.REJECTED, record)
 						}
@@ -161,7 +166,9 @@ export default function AdminReportPage() {
 		<div className="w-100vh flex flex-col items-center justify-center px-4 py-8 lg:px-8">
 			<h2 className="mb-4 text-2xl font-bold text-gray-900">Admin Recipe Management</h2>
 
-			<PaginationPageSize options={[5, 10, 15]} pageSize={pageSize} setPageSize={setPageSize} />
+			<div className="mb-4 ms-4 w-full text-start">
+				<PaginationPageSize options={[5, 10, 15]} pageSize={pageSize} setPageSize={setPageSize} />
+			</div>
 			<PaginationTable columns={columns} dataSource={reportData} pageSize={pageSize} />
 			<Modal
 				title="Confirmation"
