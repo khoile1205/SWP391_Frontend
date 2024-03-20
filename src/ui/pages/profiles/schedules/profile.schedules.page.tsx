@@ -1,162 +1,157 @@
-import { Table, Pagination, Button, Input, Tooltip } from "antd";
-import { EyeOutlined, UserOutlined, BookOutlined, MessageOutlined } from "@ant-design/icons";
+import { Booking } from "@/models/booking.model";
+import AppColor from "@/utils/appColor";
+import { PaginationPageSize, PaginationTable } from "@/ui/components";
+import userStore from "@/zustand/user.store";
+import React from "react";
+import { EyeOutlined } from "@ant-design/icons";
+import { Tooltip, Typography, Button } from "antd";
+import { useGetChefSchedules } from "@/hooks/booking";
+import bookingStore from "@/zustand/booking.store";
+import { useAuthenticateFeature } from "@/hooks/common";
+import { ActionStatus, Roles } from "@/enums";
+import { Column } from "@/types/@override/Table";
+import { BookingDetailModal } from "@/ui/section";
+import { showToast } from "@/utils/notify";
 
-interface Report {
-	id: number;
-	title: string;
-	type: "user" | "recipe" | "comment";
-	status: "pending" | "reject" | "accept";
-	createdAt: Date;
-}
-
-const reports: Report[] = [
-	{
-		id: 1,
-		title: "Test Report",
-		type: "user",
-		status: "pending",
-		createdAt: new Date("2023-12-21T11:00:00"),
-	},
-	{
-		id: 2,
-		title: "Test Report",
-		type: "recipe",
-		status: "reject",
-		createdAt: new Date("2023-12-21T11:00:00"),
-	},
-	{
-		id: 3,
-		title: "Test Report",
-		type: "comment",
-		status: "accept",
-		createdAt: new Date("2023-12-21T11:00:00"),
-	},
-	{
-		id: 4,
-		title: "Test Report",
-		type: "user",
-		status: "pending",
-		createdAt: new Date("2023-12-21T11:00:00"),
-	},
-];
-
-const renderStatusColor = (status: Report["status"]): string => {
+const renderStatusColor = (status: ActionStatus) => {
 	switch (status) {
-		case "pending":
-			return "orange";
-		case "reject":
-			return "red";
-		case "accept":
-			return "green";
-		default:
-			return "black";
+		case ActionStatus.PENDING:
+			return AppColor.deepOrangeColor;
+		case ActionStatus.REJECTED:
+			return AppColor.redColor;
+		case ActionStatus.ACCEPTED:
+			return AppColor.greenColor;
+		case ActionStatus.CANCELED:
+			return AppColor.redColor;
+		case ActionStatus.COMPLETED:
+			return AppColor.greenColor;
 	}
 };
 
-const renderReportTypeIcon = (type: Report["type"]) => {
-	switch (type) {
-		case "user":
-			return <UserOutlined />;
-		case "recipe":
-			return <BookOutlined />;
-		case "comment":
-			return <MessageOutlined />;
-		default:
-			return null;
-	}
-};
+export default function ProfileChefSchedulesHistory() {
+	const { getBookingDetailById } = bookingStore((state) => state);
+	const { updateBookingStatus } = bookingStore((state) => state);
 
-export default function ProfileSchedulesPage() {
-	const handleViewDetail = (id: number) => {
-		console.log("View details of report with ID:", id);
-	};
+	const { user } = userStore((state) => state);
+	const { data } = useGetChefSchedules(user!.id as string);
+	const [listBookings, setListBookings] = React.useState<Booking[]>(data);
+	const [booking, setBooking] = React.useState<Booking>();
+	const [openModal, setOpenModal] = React.useState<boolean>(false);
 
-	type Column<T> = {
-		title: string;
-		dataIndex?: keyof T;
-		align?: "center" | "left" | "right";
-		width?: number;
-		render?: (text: any, record: T) => JSX.Element | null;
-		sorter?: (a: T, b: T) => number;
-	};
+	React.useEffect(() => {
+		setListBookings(data);
+	}, [data]);
 
-	const columns: Column<Report>[] = [
+	const [pageSize, setPageSize] = React.useState<number>(5);
+
+	const handleUpdateBookingStatus = useAuthenticateFeature(async (status: ActionStatus) => {
+		const data = {
+			bookingId: booking?.id as string,
+			status: status,
+		};
+
+		const response = await updateBookingStatus(data);
+		if (response.isSuccess) {
+			showToast("success", response.message as string);
+			setOpenModal(false);
+			setListBookings((prev) =>
+				prev.map((booking) =>
+					booking.id === data.bookingId ? { ...booking, status: status } : booking
+				)
+			);
+		} else {
+			showToast("error", response.message as string);
+		}
+	});
+	const handleViewDetailBooking = useAuthenticateFeature(async (booking: Booking) => {
+		const response = await getBookingDetailById(booking.id);
+		if (response.isSuccess) setBooking(response.data);
+		setOpenModal(true);
+	});
+
+	const columns: Column<Booking>[] = [
 		{
 			title: "ID",
 			dataIndex: "id",
 			align: "center",
-			width: 50,
-			sorter: (a, b) => a.id - b.id,
+			width: "20%",
 		},
 		{
-			title: "Title",
-			dataIndex: "title",
-			render: (_text: string, record: Report) => (
-				<Tooltip title={record.title}>{record.title}</Tooltip>
-			),
-		},
-		{
-			title: "Type",
-			dataIndex: "type",
-			render: (type: Report["type"]) => renderReportTypeIcon(type),
+			title: "User",
+			dataIndex: "user",
 			align: "center",
-			sorter: (a, b) => a.type.localeCompare(b.type),
+			render: (_text: string, record: Booking) => {
+				const userFullname = record.user.firstName + " " + record.user.lastName;
+				return <Tooltip title={userFullname}>{userFullname}</Tooltip>;
+			},
 		},
 		{
 			title: "Status",
 			dataIndex: "status",
-			render: (status: Report["status"]) => (
-				<span style={{ color: renderStatusColor(status) }}>{status.toUpperCase()}</span>
+			render: (status: Booking["status"]) => (
+				<Typography
+					style={{
+						color: renderStatusColor(status),
+					}}
+				>
+					{status}
+				</Typography>
 			),
 			align: "center",
-			sorter: (a, b) => a.status.localeCompare(b.status),
+			filters: [
+				{ text: "Accepted", value: ActionStatus.ACCEPTED },
+				{ text: "Pending", value: ActionStatus.PENDING },
+				{ text: "Rejected", value: ActionStatus.REJECTED },
+				{ text: "Canceled", value: ActionStatus.CANCELED },
+				{ text: "Completed", value: ActionStatus.COMPLETED },
+			],
+			onFilter: (value: string, record: Booking) => record.status === value,
 		},
 		{
-			title: "Created At",
-			dataIndex: "createdAt",
+			title: "Time Start",
+			dataIndex: "timeStart",
 			align: "center",
-			render: (createdAt: Date) => <span>{createdAt.toLocaleDateString("en-US")}</span>,
-			sorter: (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+			render: (tiemStart: Date) => <span>{new Date(tiemStart).toLocaleString("vi-VN")}</span>,
+			sorter: (a, b) => new Date(a.timeStart).getTime() - new Date(b.timeStart).getTime(),
+		},
+		{
+			title: "Time Start",
+			dataIndex: "timeEnd",
+			align: "center",
+			render: (timeEnd: Date) => <span>{new Date(timeEnd).toLocaleString("vi-VN")}</span>,
+			sorter: (a, b) => new Date(a.timeEnd).getTime() - new Date(b.timeEnd).getTime(),
 		},
 		{
 			title: "Actions",
 			align: "center",
-			render: (_text: any, record: Report) => (
-				<Button
-					type="text"
-					icon={<EyeOutlined style={{ fontSize: "16px", color: "#1890ff" }} />}
-					onClick={() => handleViewDetail(record.id)}
-				/>
+			render: (_text: any, record: Booking) => (
+				<Tooltip title="View Detail Booking">
+					<Button
+						type="text"
+						icon={<EyeOutlined style={{ fontSize: "16px", color: AppColor.deepOrangeColor }} />}
+						onClick={() => handleViewDetailBooking(record)}
+					/>
+				</Tooltip>
 			),
 		},
 	];
 
 	return (
-		<div className="flex flex-col items-center justify-center px-4 py-8 lg:px-8">
-			<h2 className="mb-4 text-2xl font-bold text-gray-900">View Reports</h2>
-			<div className="mb-4">
-				<Input
-					type="text"
-					placeholder="Search reports..."
-					className="focus:border-blue-500 rounded-md border-gray-300 px-3 py-2 focus:outline-none"
-				/>
+		<>
+			<div className="flex flex-col items-center justify-center px-4 py-8 lg:px-8">
+				<h2 className="mb-4 text-2xl font-bold text-gray-900">View Schedule </h2>
+				<div className="mb-4 ms-4 w-full">
+					<PaginationPageSize options={[5, 10, 15]} pageSize={pageSize} setPageSize={setPageSize} />
+				</div>
+				<PaginationTable columns={columns} dataSource={listBookings} pageSize={pageSize} />
 			</div>
-			<Table
-				columns={columns}
-				dataSource={reports}
-				// pagination={{ defaultPageSize: 5, showSizeChanger: false }}
-				bordered
-				className="rounded-lg shadow-md"
-				rowClassName={(_, index) => (index % 2 === 0 ? "even-row" : "odd-row")}
-				scroll={{ y: 400 }}
+			<BookingDetailModal
+				open={openModal}
+				setOpen={setOpenModal}
+				bookingData={booking}
+				role={Roles.CHEF}
+				handleUpdateBookingStatus={handleUpdateBookingStatus}
 			/>
-			<Pagination
-				defaultCurrent={1}
-				total={reports.length}
-				pageSize={5}
-				showQuickJumper
-				style={{ marginTop: "16px", textAlign: "center" }}
-			/>
-		</div>
+		</>
 	);
 }

@@ -1,3 +1,4 @@
 export * from "./useGetBookingChef";
-export * from "./useGetChefSchedules";
+export * from "./useGetChefWorkingSchedule";
 export * from "./useGetChefRecipes";
+export * from "./useGetChefSchedules";

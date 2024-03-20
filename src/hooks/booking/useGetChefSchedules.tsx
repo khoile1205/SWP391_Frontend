@@ -1,14 +1,14 @@
-import { ChefBookingSchedule } from "@/types/booking";
+import { Booking } from "@/models/booking.model";
 import bookingStore from "@/zustand/booking.store";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetChefSchedules = (chefId: string) => {
 	const { getChefSchedules } = bookingStore((state) => state);
-	const { data, refetch } = useQuery({
-		queryKey: ["getChefSchedules"],
+	const { data } = useQuery({
+		queryKey: ["getChefSchedules", chefId],
 		queryFn: async () => {
 			if (chefId) {
-				const response = await getChefSchedules(chefId);
+				const response = await getChefSchedules();
 				return response.data ?? [];
 			}
 		},
@@ -16,5 +16,5 @@ export const useGetChefSchedules = (chefId: string) => {
 		retryDelay: 0,
 	});
 
-	return { listSchedules: data as ChefBookingSchedule[], refetchListChefSchedules: refetch };
+	return { data: data as Booking[] };
 };

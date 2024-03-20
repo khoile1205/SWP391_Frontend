@@ -9,7 +9,7 @@ interface PaginationPageSizeProps {
 
 export const PaginationPageSize = ({ pageSize, setPageSize, options }: PaginationPageSizeProps) => {
 	return (
-		<Flex className="mb-4 w-full" align="center" justify="space-between">
+		<Flex className="" align="center" justify="space-between">
 			<Flex align="center" className="space-x-3">
 				<Typography>Rows per page: </Typography>
 				<Select

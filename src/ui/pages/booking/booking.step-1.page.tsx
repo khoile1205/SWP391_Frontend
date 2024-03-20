@@ -146,7 +146,7 @@ const ChefBooking: React.FC<Props> = ({
 					<Table dataSource={pickRandomElements(chef.listRecipes, 3)} pagination={false}>
 						<Table.Column
 							title="Recipe Name"
-							dataIndex="title"
+							// dataIndex=""
 							key="title"
 							render={(record: Recipe) => (
 								<Space direction="vertical">
@@ -157,14 +157,16 @@ const ChefBooking: React.FC<Props> = ({
 										style={{ fontSize: "12px", marginTop: "5px", color: "#999" }}
 									>
 										<span>Serves: {record.portion || "-"}</span>
-										<span style={{ marginLeft: "10px" }}>Price: ${record.bookingPrice || "-"}</span>
+										<span style={{ marginLeft: "10px" }}>
+											Price: $ {record.bookingPrice || "-"}
+										</span>
 									</Space>
 								</Space>
 							)}
 						/>
 						<Table.Column
 							title="Image"
-							dataIndex="thumbnailUrl"
+							// dataIndex="thumbnailUrl"
 							key="thumbnailUrl"
 							render={(record: Recipe) => (
 								<Image

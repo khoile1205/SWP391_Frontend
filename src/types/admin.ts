@@ -1,3 +1,5 @@
+import { ActionStatus } from "@/enums";
+
 export type DashboardStatistic = {
 	numberStatistic: {
 		totalOfBooking: number;
@@ -14,4 +16,9 @@ export type ChartUnit = {
 	name: Date;
 	uv: number;
 	pv: number;
+};
+
+export type VerifyRecipeDTO = {
+	recipeId: string;
+	status: ActionStatus;
 };

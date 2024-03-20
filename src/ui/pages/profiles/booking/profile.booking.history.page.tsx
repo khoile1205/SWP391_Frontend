@@ -1,121 +1,84 @@
-import { Table, Pagination, Button, Input, Tooltip } from "antd";
-import { EyeOutlined, UserOutlined, BookOutlined, MessageOutlined } from "@ant-design/icons";
+import { Booking } from "@/models/booking.model";
+import { ActionStatus, Roles } from "@/enums";
+import AppColor from "@/utils/appColor";
+import { PaginationPageSize, PaginationTable } from "@/ui/components";
+import { useGetUserBookings } from "@/hooks/profiles/useGetUserBookings";
+import React from "react";
+import { EyeOutlined } from "@ant-design/icons";
+import { Tooltip, Typography, Button, Flex } from "antd";
+import { Column } from "@/types/@override/Table";
+import { BookingDetailModal } from "@/ui/section";
+import { useAuthenticateFeature } from "@/hooks/common";
+import bookingStore from "@/zustand/booking.store";
+import { renderStatusColor } from "@/ui/utils/renderStatusColor";
 
-interface Booking {
-	id: number;
-	title: string;
-	type: "user" | "recipe" | "comment";
-	status: "pending" | "reject" | "accept";
-	createdAt: Date;
-}
+export default function ProfileUserBookingHistory() {
+	const { getBookingDetailById } = bookingStore((state) => state);
 
-const Bookings: Booking[] = [
-	{
-		id: 1,
-		title: "Test Booking",
-		type: "user",
-		status: "pending",
-		createdAt: new Date("2023-12-21T11:00:00"),
-	},
-	{
-		id: 2,
-		title: "Test Booking",
-		type: "recipe",
-		status: "reject",
-		createdAt: new Date("2023-12-21T11:00:00"),
-	},
-	{
-		id: 3,
-		title: "Test Booking",
-		type: "comment",
-		status: "accept",
-		createdAt: new Date("2023-12-21T11:00:00"),
-	},
-	{
-		id: 4,
-		title: "Test Booking",
-		type: "user",
-		status: "pending",
-		createdAt: new Date("2023-12-21T11:00:00"),
-	},
-];
+	const { data } = useGetUserBookings();
+	const [pageSize, setPageSize] = React.useState<number>(5);
+	const [listBookings, setListBookings] = React.useState<Booking[]>(data);
+	const [booking, setBooking] = React.useState<Booking>();
+	const [openModal, setOpenModal] = React.useState<boolean>(false);
 
-const renderStatusColor = (status: Booking["status"]): string => {
-	switch (status) {
-		case "pending":
-			return "orange";
-		case "reject":
-			return "red";
-		case "accept":
-			return "green";
-		default:
-			return "black";
-	}
-};
+	React.useEffect(() => {
+		setListBookings(data);
+	}, [data]);
 
-const renderBookingTypeIcon = (type: Booking["type"]) => {
-	switch (type) {
-		case "user":
-			return <UserOutlined />;
-		case "recipe":
-			return <BookOutlined />;
-		case "comment":
-			return <MessageOutlined />;
-		default:
-			return null;
-	}
-};
-
-export default function ProfileBookingHistory() {
-	const handleViewDetail = (id: number) => {
-		console.log("View details of Booking with ID:", id);
-	};
-
-	type Column<T> = {
-		title: string;
-		dataIndex?: keyof T;
-		align?: "center" | "left" | "right";
-		width?: number;
-		render?: (text: any, record: T) => JSX.Element | null;
-		sorter?: (a: T, b: T) => number;
-	};
-
+	const handleViewDetailBooking = useAuthenticateFeature(async (booking: Booking) => {
+		const response = await getBookingDetailById(booking.id);
+		if (response.isSuccess) setBooking(response.data);
+		setOpenModal(true);
+	});
 	const columns: Column<Booking>[] = [
 		{
 			title: "ID",
 			dataIndex: "id",
 			align: "center",
-			width: 50,
-			sorter: (a, b) => a.id - b.id,
+			width: "0.1",
+			sorter: (a, b) => a.id.localeCompare(b.id),
 		},
 		{
-			title: "Title",
-			dataIndex: "title",
-			render: (_text: string, record: Booking) => (
-				<Tooltip title={record.title}>{record.title}</Tooltip>
-			),
-		},
-		{
-			title: "Type",
-			dataIndex: "type",
-			render: (type: Booking["type"]) => renderBookingTypeIcon(type),
+			title: "Chef",
+			dataIndex: "chef",
 			align: "center",
-			sorter: (a, b) => a.type.localeCompare(b.type),
+			render: (_text: string, record: Booking) => {
+				const chefFullName = record.chef.firstName + " " + record.chef.lastName;
+				return <Tooltip title={chefFullName}>{chefFullName}</Tooltip>;
+			},
 		},
 		{
 			title: "Status",
 			dataIndex: "status",
 			render: (status: Booking["status"]) => (
-				<span style={{ color: renderStatusColor(status) }}>{status.toUpperCase()}</span>
+				<Typography
+					style={{
+						color: renderStatusColor(status),
+					}}
+				>
+					{status}
+				</Typography>
 			),
 			align: "center",
-			sorter: (a, b) => a.status.localeCompare(b.status),
+			filters: [
+				{ text: "Accepted", value: ActionStatus.ACCEPTED },
+				{ text: "Pending", value: ActionStatus.PENDING },
+				{ text: "Rejected", value: ActionStatus.REJECTED },
+			],
+			onFilter: (value: string, record: Booking) => record.status === value,
 		},
 		{
-			title: "Created At",
-			dataIndex: "createdAt",
+			title: "Time Start",
+			dataIndex: "timeStart",
 			align: "center",
-			render: (createdAt: Date) => <span>{createdAt.toLocaleDateString("en-US")}</span>,
+			render: (tiemStart: Date) => <span>{new Date(tiemStart).toLocaleString("vi-VN")}</span>,
+			sorter: (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+		},
+		{
+			title: "Time Start",
+			dataIndex: "timeEnd",
+			align: "center",
+			render: (timeEnd: Date) => <span>{new Date(timeEnd).toLocaleString("vi-VN")}</span>,
 			sorter: (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
 		},
 		{
@@ -124,39 +87,34 @@ export default function ProfileBookingHistory() {
 			render: (_text: any, record: Booking) => (
 				<Button
 					type="text"
-					icon={<EyeOutlined style={{ fontSize: "16px", color: "#1890ff" }} />}
-					onClick={() => handleViewDetail(record.id)}
+					icon={<EyeOutlined style={{ fontSize: "16px", color: AppColor.deepOrangeColor }} />}
+					onClick={() => handleViewDetailBooking(record)}
 				/>
 			),
 		},
 	];
 
 	return (
-		<div className="flex flex-col items-center justify-center px-4 py-8 lg:px-8">
-			<h2 className="mb-4 text-2xl font-bold text-gray-900">View Bookings</h2>
-			<div className="mb-4">
-				<Input
+		<>
+			<div className="flex flex-col items-center justify-center px-4 py-8 lg:px-8">
+				<h2 className="mb-4 text-2xl font-bold text-gray-900">View Bookings</h2>
+				<Flex className="mb-4 w-full" align="center" justify="space-between">
+					{/* <Input
 					type="text"
 					placeholder="Search Bookings..."
 					className="focus:border-blue-500 rounded-md border-gray-300 px-3 py-2 focus:outline-none"
-				/>
+				/> */}
+					<PaginationPageSize options={[5, 10, 15]} pageSize={pageSize} setPageSize={setPageSize} />
+				</Flex>
+				<PaginationTable columns={columns} dataSource={listBookings} pageSize={pageSize} />
 			</div>
-			<Table
-				columns={columns}
-				dataSource={Bookings}
-				// pagination={{ defaultPageSize: 5, showSizeChanger: false }}
-				bordered
-				className="rounded-lg shadow-md"
-				rowClassName={(_, index) => (index % 2 === 0 ? "even-row" : "odd-row")}
-				scroll={{ y: 400 }}
+
+			<BookingDetailModal
+				open={openModal}
+				setOpen={setOpenModal}
+				bookingData={booking}
+				role={Roles.USER}
 			/>
-			<Pagination
-				defaultCurrent={1}
-				total={Bookings.length}
-				pageSize={5}
-				showQuickJumper
-				style={{ marginTop: "16px", textAlign: "center" }}
-			/>
-		</div>
+		</>
 	);
 }

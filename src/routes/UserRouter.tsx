@@ -37,101 +37,64 @@ const FavouriteRecipesPage = Loadable(
 const UserRoutes: RouteObject[] = [
 	{
 		path: "/profile",
-		element: <MemoizedProfileLayout></MemoizedProfileLayout>,
+		element: (
+			<RBACRoutes allowedRoles={[Roles.USER, Roles.CHEF]}>
+				<MemoizedProfileLayout></MemoizedProfileLayout>
+			</RBACRoutes>
+		),
 		children: [
 			{
 				path: "",
-				element: (
-					<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
-						<ProfilePage></ProfilePage>
-					</RBACRoutes>
-				),
+				element: <ProfilePage></ProfilePage>,
 			},
 			{
 				path: "change-password",
-				element: (
-					<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
-						<ChangePasswordPage></ChangePasswordPage>
-					</RBACRoutes>
-				),
+				element: <ChangePasswordPage></ChangePasswordPage>,
 			},
 			{
 				path: "reports",
-				element: (
-					<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
-						<ReportsPage></ReportsPage>
-					</RBACRoutes>
-				),
+				element: <ReportsPage></ReportsPage>,
 			},
 			{
 				path: "requests",
-				element: (
-					<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN]}>
-						<ProfileBecomeChefPage></ProfileBecomeChefPage>
-					</RBACRoutes>
-				),
+				element: <ProfileBecomeChefPage></ProfileBecomeChefPage>,
 			},
 			{
 				path: "transactions",
-				element: (
-					<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
-						<TransactionHistoryPage></TransactionHistoryPage>
-					</RBACRoutes>
-				),
+				element: <TransactionHistoryPage></TransactionHistoryPage>,
 			},
 			{
 				path: "bookings",
-				element: (
-					<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
-						<BookingHistoryPage></BookingHistoryPage>
-					</RBACRoutes>
-				),
+				element: <BookingHistoryPage></BookingHistoryPage>,
 			},
 			{
 				path: "schedules",
-				element: (
-					<RBACRoutes allowedRoles={[Roles.ADMIN, Roles.CHEF]}>
-						<SchedulesPage></SchedulesPage>
-					</RBACRoutes>
-				),
+				element: <SchedulesPage></SchedulesPage>,
 			},
 			{
 				path: "recipes",
 				children: [
 					{
 						path: "",
-						element: (
-							<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
-								<RecipesPage></RecipesPage>
-							</RBACRoutes>
-						),
+						element: <RecipesPage></RecipesPage>,
 					},
 					{
 						path: "edit/:recipeId",
-						element: (
-							<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
-								<UpdateRecipePage></UpdateRecipePage>
-							</RBACRoutes>
-						),
+						element: <UpdateRecipePage></UpdateRecipePage>,
 					},
 				],
 			},
 			{
 				path: "wallet",
-				element: (
-					<RBACRoutes allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}>
-						<ProfileWalletPage></ProfileWalletPage>
-					</RBACRoutes>
-				),
+				element: <ProfileWalletPage></ProfileWalletPage>,
 			},
 			{
 				path: "favourite-recipes",
-				element: (
-					<RBACRoutes
-						allowedRoles={[Roles.USER, Roles.ADMIN, Roles.CHEF]}
-						children={<FavouriteRecipesPage></FavouriteRecipesPage>}
-					></RBACRoutes>
-				),
+				element: <FavouriteRecipesPage></FavouriteRecipesPage>,
+			},
+			{
+				path: "favourite-recipes",
+				element: <FavouriteRecipesPage></FavouriteRecipesPage>,
 			},
 		],
 	},
