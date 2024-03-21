@@ -234,7 +234,7 @@ const RecipeIngredients: React.FC<{
 						<Typography.Text
 							className={`font-inter text-lg font-medium ${checkedIngredients[index] ? "text-gray-500 line-through" : "none"}`}
 						>
-							{ingredient.name + " " + ingredient.amount}
+							{ingredient.amount + " " + ingredient.name}
 						</Typography.Text>
 					</List.Item>
 				))}

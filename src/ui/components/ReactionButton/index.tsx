@@ -29,8 +29,6 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
 		}
 	};
 
-	console.log(isReacted, reactionType);
-
 	return (
 		<Button
 			type="default"

@@ -67,7 +67,7 @@ export default function SignUpPage() {
 										className="mt-2"
 										label="First name"
 										required
-										validateStatus={errors.firstName ? "error" : "success"}
+										validateStatus={errors.firstName && touched.firstName ? "error" : "success"}
 										help={
 											errors.firstName &&
 											touched.firstName && <div className=" my-3">{errors.firstName}</div>
@@ -94,7 +94,7 @@ export default function SignUpPage() {
 										className="mt-2"
 										label="Last name"
 										required
-										validateStatus={errors.lastName ? "error" : "success"}
+										validateStatus={errors.lastName && touched.lastName ? "error" : "success"}
 										help={
 											errors.lastName &&
 											touched.lastName && <div className=" my-3">{errors.lastName}</div>
@@ -121,7 +121,7 @@ export default function SignUpPage() {
 								className="mt-2"
 								label="Email"
 								required
-								validateStatus={errors.email ? "error" : "success"}
+								validateStatus={errors.email && touched.email ? "error" : "success"}
 								help={errors.email && touched.email && <div className=" my-3">{errors.email}</div>}
 							>
 								<Input
@@ -143,7 +143,7 @@ export default function SignUpPage() {
 								className="mt-2"
 								label="Username"
 								required
-								validateStatus={errors.username ? "error" : "success"}
+								validateStatus={errors.username && touched.username ? "error" : "success"}
 								help={
 									errors.username &&
 									touched.username && <div className=" my-3">{errors.username}</div>
@@ -168,7 +168,7 @@ export default function SignUpPage() {
 								className="mt-2"
 								label="Password"
 								required
-								validateStatus={errors.password ? "error" : "success"}
+								validateStatus={errors.password && touched.password ? "error" : "success"}
 								help={
 									errors.password &&
 									touched.password && <div className=" my-3">{errors.password}</div>
