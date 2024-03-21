@@ -15,7 +15,7 @@ export const useAuthenticateFeature = <T extends any[] = []>(callback: CallbackF
 		async (...args: T) => {
 			try {
 				if (!user) {
-					showToast("error", AppString.authorizeRequiredErrorMessage);
+					showToast("error", AppString.authorizeFeatureRequiredErrorMessage);
 					navigate("/sign-in");
 					return;
 				}
