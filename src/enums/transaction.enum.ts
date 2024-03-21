@@ -5,4 +5,5 @@ export enum TransactionType {
 	REFUND = "REFUND",
 	TRANSFER = "TRANSFER",
 	PURCHASEDRECIPE = "PURCHASEDRECIPE",
+	BOOKING = "BOOKING",
 }

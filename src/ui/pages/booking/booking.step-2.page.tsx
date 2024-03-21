@@ -21,6 +21,8 @@ import { Counter } from "@/ui/components";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useGetChefRecipes, useGetChefWorkingSchedule } from "@/hooks/booking";
+import { isBetween, isInRange } from "@/utils/date_exts";
+import { showToast } from "@/utils/notify";
 
 const bookingInformationValidationSchema = Yup.object().shape({
 	address: Yup.string().required("Address is required"),
@@ -88,8 +90,11 @@ const BookingCart: React.FC<Props> = ({
 	const [searchTerm, setSearchTerm] = useState("");
 
 	const disabledTime = (current: Dayjs, type: "start" | "end"): any => {
+		// Initialize the disabled state
+		const disabledHoursObj: Record<string, any> = {};
+
 		if (!listChefBookingSchedules || listChefBookingSchedules.length === 0) {
-			return {};
+			return disabledHoursObj;
 		}
 
 		const timeStart = dayjs(bookingData.timeStart);
@@ -101,32 +106,53 @@ const BookingCart: React.FC<Props> = ({
 			const startDate = timeStart.startOf("day").valueOf();
 			if (selectedDate === startDate) {
 				// If the selected date is the same as the start date, disable times before the start time
-				return {
-					disabledHours: () =>
-						Array.from({ length: 24 }, (_, hour) => (hour < startHour ? hour : null)),
-					disabledMinutes: (hour: number) =>
-						hour === startHour
-							? Array.from({ length: 60 }, (_, minute) => (minute < startMinute ? minute : null))
-							: [],
-				};
+				disabledHoursObj.disabledHours = () =>
+					Array.from({ length: 24 }, (_, hour) => (hour < startHour + 1 ? hour : null));
+
+				disabledHoursObj.disabledMinutes = (hour: number) =>
+					hour <= startHour + 1
+						? Array.from({ length: 60 }, (_, minute) => {
+								return minute <= startMinute ? minute : null;
+							})
+						: [];
 			}
 		}
 
 		for (const schedule of listChefBookingSchedules) {
-			const scheduleStart = dayjs(schedule.timeStart);
-			const scheduleEnd = dayjs(schedule.timeEnd);
-
-			if (current.isAfter(scheduleStart) && current.isBefore(scheduleEnd)) {
+			if (
+				isBetween({
+					startDate: schedule.timeStart,
+					endDate: schedule.timeEnd,
+					currentDate: current.toDate(),
+				})
+			) {
 				// Disable all hours and minutes during the scheduled time
-				return {
-					disabledHours: () => Array.from({ length: 24 }, (_, hour) => hour),
-					disabledMinutes: () => Array.from({ length: 60 }, (_, minute) => minute),
-					disabledSeconds: () => [],
+				const startMinute = dayjs(schedule.timeStart).minute();
+				const startHour = dayjs(schedule.timeStart).hour();
+
+				const endMinute = dayjs(schedule.timeEnd).minute();
+				const endHour = dayjs(schedule.timeEnd).hour();
+
+				disabledHoursObj.disabledHours = () =>
+					Array.from({ length: 24 }, (_, hour) => startHour < hour && hour < endHour);
+
+				disabledHoursObj.disabledMinutes = (hour: number) => {
+					if (hour == startHour) {
+						return Array.from({ length: 60 }, (_, minute) =>
+							startMinute <= minute ? minute : null
+						);
+					}
+					if (hour == endHour) {
+						return Array.from({ length: 60 }, (_, minute) => (endMinute >= minute ? minute : null));
+					}
+					if (hour > startHour && hour < endHour) {
+						return Array.from({ length: 60 }, (_, minute) => minute);
+					}
 				};
 			}
 		}
 
-		return {}; // Enable all hours, minutes, and seconds if not within any schedule
+		return disabledHoursObj;
 	};
 
 	const handleCheckout = () => {
@@ -135,7 +161,7 @@ const BookingCart: React.FC<Props> = ({
 			return;
 		}
 
-		window.location.pathname = "/booking-checkout";
+		window.location.pathname = "/booking/checkout";
 	};
 
 	const handleAddNote = (recipeId: string, note: string) => {
@@ -156,7 +182,47 @@ const BookingCart: React.FC<Props> = ({
 	};
 
 	const handleChangeTimeEnd = (value: DatePickerProps["value"]) => {
-		setBookingData({ timeEnd: value?.toDate() });
+		const timeEnd = value?.toDate();
+		let errorOccurred = false; // Flag to track if an error occurred
+
+		listChefBookingSchedules.forEach((schedule) => {
+			if (
+				isBetween({
+					startDate: schedule.timeStart,
+					endDate: schedule.timeEnd,
+					currentDate: timeEnd!,
+				})
+			) {
+				console.log(schedule.timeStart, schedule.timeEnd, timeEnd);
+
+				showToast("error", "Booking time must not be within the chef's schedule");
+				errorOccurred = true; // Set flag to true if an error occurs
+				return; // Exit the loop if an error occurs
+			}
+
+			// Check the range of time is between schedules
+			if (
+				isInRange({
+					startRangeDate: bookingData.timeStart,
+					endRangeDate: timeEnd!,
+					startDateCheck: schedule.timeStart,
+					endDateCheck: schedule.timeEnd,
+				})
+			) {
+				console.log(2);
+
+				showToast("error", "Booking time must not be within the chef's schedule");
+				errorOccurred = true; // Set flag to true if an error occurs
+				return; // Exit the loop if an error occurs
+			}
+		});
+
+		if (!errorOccurred) {
+			setBookingData({ timeEnd: timeEnd });
+		} else {
+			value = dayjs(bookingData.timeEnd);
+		}
+		return;
 	};
 	const handleAddToCart = (recipe: Recipe) => {
 		setBookingData({
@@ -325,7 +391,7 @@ const BookingCart: React.FC<Props> = ({
 								showTime={{
 									format: "HH:mm",
 								}}
-								needConfirm={false}
+								// needConfirm={false}
 								name="timeStart"
 								className="w-full ps-4"
 								minDate={dayjs(new Date()).add(2, "day")}
@@ -352,7 +418,7 @@ const BookingCart: React.FC<Props> = ({
 								size="large"
 								className="w-full ps-4"
 								name="timeEnd"
-								needConfirm={false}
+								// needConfirm={false}
 								minDate={bookingData.timeStart ? dayjs(bookingData.timeStart) : undefined}
 								disabled={!bookingData.timeStart}
 								defaultValue={dayjs(bookingData.timeEnd)}

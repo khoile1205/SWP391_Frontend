@@ -50,7 +50,7 @@ export default function AdminBookingPage() {
 			dataIndex: "id",
 			align: "center",
 			width: "30%",
-			sorter: (a, b) => a.id.localeCompare(b.id),
+			sorter: (a: Recipe, b: Recipe) => a.id.localeCompare(b.id),
 		},
 		{
 			title: "Thumbnail",
@@ -68,7 +68,7 @@ export default function AdminBookingPage() {
 			render: (_text: string, record: Recipe) => (
 				<Tooltip title={record.title}>{record.title}</Tooltip>
 			),
-			sorter: (a, b) => a.title.localeCompare(b.title),
+			sorter: (a: Recipe, b: Recipe) => a.title.localeCompare(b.title),
 		},
 		{
 			title: "Difficult",
@@ -77,7 +77,7 @@ export default function AdminBookingPage() {
 			width: "20%",
 
 			render: (price: number) => <span>{price}</span>,
-			sorter: (a, b) => a.difficult - b.difficult,
+			sorter: (a: Recipe, b: Recipe) => a.difficult - b.difficult,
 		},
 		{
 			title: "",

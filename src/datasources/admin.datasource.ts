@@ -1,4 +1,4 @@
-import { VerifyRecipeDTO } from "@/types/admin";
+import { LockAccountDTO, VerifyRecipeDTO, VerifyRequestDTO } from "@/types/admin";
 import { CreateNotificationDTO } from "@/types/notification";
 import { HandleReportDTO } from "@/types/report";
 import Response from "@/usecases/auth.usecase/responses/response";
@@ -15,9 +15,60 @@ export abstract class AdminDatasource {
 	abstract handleReport(data: HandleReportDTO): Promise<Response>;
 	abstract getAllRecipes(): Promise<Response>;
 	abstract handleVerifyPublicRecipe(data: VerifyRecipeDTO): Promise<Response>;
+	abstract getAllAccounts(): Promise<Response>;
+	abstract lockAccount(data: LockAccountDTO): Promise<Response>;
+	abstract unlockAccount(userId: string): Promise<Response>;
+	abstract getAllBecomeChefRequests(): Promise<Response>;
+	abstract verifyBecomeChefRequests(data: VerifyRequestDTO): Promise<Response>;
 }
 
 export class AdminDatasourceImpl implements AdminDatasource {
+	async verifyBecomeChefRequests(data: VerifyRequestDTO): Promise<Response> {
+		const response = await apiService.put(`${API_Admin}/requests/verify`, data);
+		if (response.status !== 200) {
+			return new Response(false, null, AppString.getDataErrorMessage);
+		}
+		const resJson = await response.json();
+		return new Response(true, resJson.result, AppString.success);
+	}
+	async getAllBecomeChefRequests(): Promise<Response> {
+		const response = await apiService.get(`${API_Admin}/requests`);
+		if (response.status !== 200) {
+			return new Response(false, null, AppString.getDataErrorMessage);
+		}
+		const resJson = await response.json();
+		return new Response(true, resJson.result, AppString.success);
+	}
+	async lockAccount(data: LockAccountDTO): Promise<Response> {
+		const response = await apiService.put(`${API_Admin}/user/lock`, data);
+		const isSuccess = response.status === 200;
+		if (!isSuccess) return new Response(false, null, AppString.getDataErrorMessage);
+
+		const resJson = await response.json();
+		const message = resJson.message;
+
+		return new Response(true, resJson.result, message);
+	}
+	async unlockAccount(userId: string): Promise<Response> {
+		const response = await apiService.put(`${API_Admin}/user/unlock/${userId}`, {});
+		const isSuccess = response.status === 200;
+		if (!isSuccess) return new Response(false, null, AppString.getDataErrorMessage);
+
+		const resJson = await response.json();
+		const message = resJson.message;
+
+		return new Response(true, resJson.result, message);
+	}
+	async getAllAccounts(): Promise<Response> {
+		const response = await apiService.get(`${API_Admin}/user`);
+		const isSuccess = response.status === 200;
+		if (!isSuccess) return new Response(false, null, AppString.getDataErrorMessage);
+
+		const resJson = await response.json();
+		const message = resJson.message;
+
+		return new Response(true, resJson.result, message);
+	}
 	async handleVerifyPublicRecipe(data: VerifyRecipeDTO): Promise<Response> {
 		const response = await apiService.put(`${API_Admin}/recipes/verify`, data);
 		const isSuccess = response.status === 200;

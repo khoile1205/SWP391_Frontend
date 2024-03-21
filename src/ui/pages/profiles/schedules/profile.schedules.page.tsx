@@ -105,21 +105,23 @@ export default function ProfileChefSchedulesHistory() {
 				{ text: "Canceled", value: ActionStatus.CANCELED },
 				{ text: "Completed", value: ActionStatus.COMPLETED },
 			],
-			onFilter: (value: string, record: Booking) => record.status === value,
+			onFilter: (value: any, record: Booking) => record.status === value,
 		},
 		{
 			title: "Time Start",
 			dataIndex: "timeStart",
 			align: "center",
 			render: (tiemStart: Date) => <span>{new Date(tiemStart).toLocaleString("vi-VN")}</span>,
-			sorter: (a, b) => new Date(a.timeStart).getTime() - new Date(b.timeStart).getTime(),
+			sorter: (a: Booking, b: Booking) =>
+				new Date(a.timeStart).getTime() - new Date(b.timeStart).getTime(),
 		},
 		{
 			title: "Time Start",
 			dataIndex: "timeEnd",
 			align: "center",
 			render: (timeEnd: Date) => <span>{new Date(timeEnd).toLocaleString("vi-VN")}</span>,
-			sorter: (a, b) => new Date(a.timeEnd).getTime() - new Date(b.timeEnd).getTime(),
+			sorter: (a: Booking, b: Booking) =>
+				new Date(a.timeEnd).getTime() - new Date(b.timeEnd).getTime(),
 		},
 		{
 			title: "Actions",

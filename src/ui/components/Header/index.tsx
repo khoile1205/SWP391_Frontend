@@ -8,7 +8,6 @@ import AppString from "@/utils/app-string";
 import { LoginOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import { NotificationComponent, SearchBox } from "..";
-import { useLoadingCallback } from "@/hooks/common";
 import { Roles } from "@/enums";
 
 const navigation = [
@@ -24,15 +23,19 @@ function classNames(...classes: unknown[]) {
 
 export function Header() {
 	const [openSearchBox, setOpenSearchBox] = useState<boolean>(false);
-	const { user, logOut } = userStore();
 	const [visibleNotification, setVisibleNotification] = useState<boolean>(false);
 
-	const handleLogout = useLoadingCallback(async () => {
+	const { user, logOut } = userStore();
+
+	const handleLogout = async () => {
 		const isLogout = logOut();
 		if (isLogout) {
 			showToast("success", AppString.logoutSuccessMessage);
+			setTimeout(() => {
+				window.location.pathname = "/";
+			}, 500);
 		}
-	}, 500);
+	};
 
 	return (
 		<>

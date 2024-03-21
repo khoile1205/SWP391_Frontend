@@ -29,3 +29,43 @@ export function getTimeDifferenceString(inputDate: Date): string {
 	const years = Math.floor(days / 365);
 	return `${years} years ago`;
 }
+
+export function getFormattedDateString(inputDate: Date): string {
+	return new Date(inputDate).toLocaleDateString("vi-VN");
+}
+
+export function getFormattedDateTimeString(inputDate: Date): string {
+	return new Date(inputDate).toLocaleString("vi-VN");
+}
+
+export function isBetween({
+	startDate,
+	currentDate,
+	endDate,
+}: {
+	startDate: Date;
+	currentDate: Date;
+	endDate: Date;
+}): boolean {
+	return (
+		new Date(startDate).getTime() <= new Date(currentDate).getTime() &&
+		new Date(endDate).getTime() >= new Date(currentDate).getTime()
+	);
+}
+
+export function isInRange({
+	startDateCheck,
+	startRangeDate,
+	endDateCheck,
+	endRangeDate,
+}: {
+	startRangeDate: Date;
+	endRangeDate: Date;
+	startDateCheck: Date;
+	endDateCheck: Date;
+}): boolean {
+	return (
+		new Date(startDateCheck).getTime() >= new Date(startRangeDate).getTime() &&
+		new Date(endDateCheck).getTime() <= new Date(endRangeDate).getTime()
+	);
+}

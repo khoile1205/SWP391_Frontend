@@ -4,7 +4,7 @@ import { adminUsecase } from "@/usecases";
 import { handleUseCase } from "./commons/handle.usecase";
 import { HandleReportDTO } from "@/types/report";
 import { CreateNotificationDTO } from "@/types/notification";
-import { VerifyRecipeDTO } from "@/types/admin";
+import { LockAccountDTO, VerifyRecipeDTO, VerifyRequestDTO } from "@/types/admin";
 
 type Action = {
 	getDashboardStatistics(): Promise<Result>;
@@ -14,9 +14,25 @@ type Action = {
 	createSystemNotification(data: CreateNotificationDTO): Promise<Result>;
 	getAllRecipes(): Promise<Result>;
 	handleVerifyPublicRecipe(data: VerifyRecipeDTO): Promise<Result>;
+	getAllAccounts(): Promise<Result>;
+	lockAccount(data: LockAccountDTO): Promise<Result>;
+	unlockAccount(userId: string): Promise<Result>;
+	getAllBecomeChefRequests(): Promise<Result>;
+	verifyBecomeChefRequests(data: VerifyRequestDTO): Promise<Result>;
 };
 
 export const adminStore = create<Action>(() => ({
+	getAllBecomeChefRequests: async () => {
+		return await handleUseCase(adminUsecase.getAllBecomeChefRequests());
+	},
+	verifyBecomeChefRequests: async (data: VerifyRequestDTO) => {
+		return await handleUseCase(adminUsecase.verifyBecomeChefRequests(data));
+	},
+	unlockAccount: async (userId: string) => await handleUseCase(adminUsecase.unlockAccount(userId)),
+	lockAccount: async (data: LockAccountDTO) => await handleUseCase(adminUsecase.lockAccount(data)),
+	getAllAccounts: async () => {
+		return await handleUseCase(adminUsecase.getAllAccounts());
+	},
 	handleVerifyPublicRecipe: async (data: VerifyRecipeDTO) =>
 		await handleUseCase(adminUsecase.handleVerifyPublicRecipe(data)),
 	getAllRecipes: async () => {

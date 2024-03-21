@@ -91,13 +91,18 @@ export default function AdminReportPage() {
 			dataIndex: "content",
 			render: (_text: string, record: Report) => <Typography>{record.content}</Typography>,
 			align: "center",
-			sorter: (a, b) => a.type.localeCompare(b.type),
+			sorter: (a: Report, b: Report) => a.type.localeCompare(b.type),
 		},
 		{
 			title: "Type",
 			dataIndex: "type",
 			render: (type: Report["type"]) => renderReportTypeIcon(type),
 			align: "center",
+			filters: [
+				{ text: "User", value: ReportType.USER },
+				{ text: "Recipe", value: ReportType.RECIPE },
+			],
+			onFilter: (value: any, record: Report) => record.type === value,
 		},
 		{
 			title: "Target",
@@ -123,14 +128,15 @@ export default function AdminReportPage() {
 				{ text: "Pending", value: ActionStatus.PENDING },
 				{ text: "Rejected", value: ActionStatus.REJECTED },
 			],
-			onFilter: (value: string, record: Report) => record.status === value,
+			onFilter: (value: any, record: Report) => record.status === value,
 		},
 		{
 			title: "Created At",
 			dataIndex: "createdAt",
 			align: "center",
 			render: (createdAt: Date) => <span>{new Date(createdAt).toLocaleDateString("en-US")}</span>,
-			sorter: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+			sorter: (a: Report, b: Report) =>
+				new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
 		},
 		{
 			title: "",
@@ -163,8 +169,8 @@ export default function AdminReportPage() {
 	];
 
 	return (
-		<div className="w-100vh flex flex-col items-center justify-center px-4 py-8 lg:px-8">
-			<h2 className="mb-4 text-2xl font-bold text-gray-900">Admin Recipe Management</h2>
+		<div className="w-full  px-4 py-8">
+			<h2 className="mb-4 text-center text-2xl font-bold text-gray-900">Admin Report Management</h2>
 
 			<div className="mb-4 ms-4 w-full text-start">
 				<PaginationPageSize options={[5, 10, 15]} pageSize={pageSize} setPageSize={setPageSize} />

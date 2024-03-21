@@ -102,12 +102,25 @@ const MainRoutes: RouteObject[] = [
 		],
 	},
 	{
-		path: "/booking",
-		element: <BookingPage></BookingPage>,
-	},
-	{
-		path: "/booking-checkout",
-		element: <BookingCheckoutPage></BookingCheckoutPage>,
+		path: "booking",
+		children: [
+			{
+				path: "",
+				element: (
+					<RBACRoutes allowedRoles={[Roles.USER, Roles.CHEF, Roles.ADMIN]}>
+						<BookingPage></BookingPage>
+					</RBACRoutes>
+				),
+			},
+			{
+				path: "checkout",
+				element: (
+					<RBACRoutes allowedRoles={[Roles.USER, Roles.CHEF, Roles.ADMIN]}>
+						<BookingCheckoutPage></BookingCheckoutPage>
+					</RBACRoutes>
+				),
+			},
+		],
 	},
 	{
 		path: "category",

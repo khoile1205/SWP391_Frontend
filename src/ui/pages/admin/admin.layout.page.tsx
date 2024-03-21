@@ -16,6 +16,10 @@ const adminTabs = [
 		key: "recipe",
 	},
 	{
+		tab: "Account Management",
+		key: "account",
+	},
+	{
 		tab: "Reports Management",
 		key: "report",
 	},
@@ -23,6 +27,7 @@ const adminTabs = [
 		tab: "Transaction History Management",
 		key: "transaction",
 	},
+
 	// {
 	// 	tab: "Booking",
 	// 	key: "booking",

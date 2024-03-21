@@ -35,13 +35,13 @@ export default function ProfileUserBookingHistory() {
 			title: "ID",
 			dataIndex: "id",
 			align: "center",
-			width: "0.1",
-			sorter: (a, b) => a.id.localeCompare(b.id),
+			width: "30%",
 		},
 		{
 			title: "Chef",
 			dataIndex: "chef",
 			align: "center",
+			width: "15%",
 			render: (_text: string, record: Booking) => {
 				const chefFullName = record.chef.firstName + " " + record.chef.lastName;
 				return <Tooltip title={chefFullName}>{chefFullName}</Tooltip>;
@@ -65,21 +65,21 @@ export default function ProfileUserBookingHistory() {
 				{ text: "Pending", value: ActionStatus.PENDING },
 				{ text: "Rejected", value: ActionStatus.REJECTED },
 			],
-			onFilter: (value: string, record: Booking) => record.status === value,
+			onFilter: (value: any, record: Booking) => record.status === value,
 		},
 		{
 			title: "Time Start",
 			dataIndex: "timeStart",
 			align: "center",
 			render: (tiemStart: Date) => <span>{new Date(tiemStart).toLocaleString("vi-VN")}</span>,
-			sorter: (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+			sorter: (a: Booking, b: Booking) => a.createdAt.getTime() - b.createdAt.getTime(),
 		},
 		{
 			title: "Time Start",
 			dataIndex: "timeEnd",
 			align: "center",
 			render: (timeEnd: Date) => <span>{new Date(timeEnd).toLocaleString("vi-VN")}</span>,
-			sorter: (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+			sorter: (a: Booking, b: Booking) => a.createdAt.getTime() - b.createdAt.getTime(),
 		},
 		{
 			title: "Actions",
@@ -96,14 +96,9 @@ export default function ProfileUserBookingHistory() {
 
 	return (
 		<>
-			<div className="flex flex-col items-center justify-center px-4 py-8 lg:px-8">
-				<h2 className="mb-4 text-2xl font-bold text-gray-900">View Bookings</h2>
+			<div className="w-full px-4 py-8 lg:px-8">
+				<h2 className="mb-4 text-center text-2xl font-bold text-gray-900">View Bookings</h2>
 				<Flex className="mb-4 w-full" align="center" justify="space-between">
-					{/* <Input
-					type="text"
-					placeholder="Search Bookings..."
-					className="focus:border-blue-500 rounded-md border-gray-300 px-3 py-2 focus:outline-none"
-				/> */}
 					<PaginationPageSize options={[5, 10, 15]} pageSize={pageSize} setPageSize={setPageSize} />
 				</Flex>
 				<PaginationTable columns={columns} dataSource={listBookings} pageSize={pageSize} />
