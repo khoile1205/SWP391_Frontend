@@ -89,28 +89,35 @@ export default function UpdateRecipesPage() {
 					setFieldValue,
 					isValid,
 				}) => (
-					<Form onFinish={handleSubmit} className="space-y-2 sm:w-2/3">
+					<Form onFinish={handleSubmit} className="space-y-2 sm:w-2/3" layout="vertical">
 						<div className="mb-5">
 							<Form.Item name={"thumbnailUrl"}>
 								{!values.thumbnailUrl ? (
-									<DraggerUpload
-										icon={<CameraOutlined className="text-5xl text-gray-400" />}
-										title={"Upload recipe photo"}
-										showUploadList={false}
-										description="After investing time and creativity in your dish, show it off. Let others admire your culinary skills and the delicious dish you've created. You might inspire them to cook too!"
-										onChange={async (info) => {
-											if (info.file.status === "done") {
-												const imageURL = info.file.response;
-												if (imageURL != null) {
-													setFieldValue(`thumbnailUrl`, imageURL);
+									<>
+										<DraggerUpload
+											icon={<CameraOutlined className="text-5xl text-gray-400" />}
+											title={"Upload recipe photo"}
+											showUploadList={false}
+											description="After investing time and creativity in your dish, show it off. Let others admire your culinary skills and the delicious dish you've created. You might inspire them to cook too!"
+											onChange={async (info) => {
+												if (info.file.status === "done") {
+													const imageURL = info.file.response;
+													if (imageURL != null) {
+														setFieldValue(`thumbnailUrl`, imageURL);
+													}
 												}
-											}
-										}}
-									></DraggerUpload>
+											}}
+										></DraggerUpload>
+										{errors.thumbnailUrl && (
+											<Typography className="ms-1 mt-2 text-red-500">
+												{errors.thumbnailUrl}
+											</Typography>
+										)}
+									</>
 								) : (
 									<>
 										<div className="relative text-center">
-											<img className="" src={values.thumbnailUrl}></img>
+											<img className="w-full object-cover" src={values.thumbnailUrl}></img>
 											<div className="absolute bottom-0 right-0 bg-gray-500 px-1 text-3xl text-white">
 												<EyeOutlined
 													className="border-r-1 border border-b-0 border-l-0 border-t-0 p-1 hover:cursor-pointer"
@@ -187,8 +194,7 @@ export default function UpdateRecipesPage() {
 							</Form.Item>
 							<Form.Item
 								name="cookingTime"
-								extra="How long does it take to prepare this recipe? (time is minutes)
-"
+								extra="How long does it take to prepare this recipe? (time is minutes)"
 							>
 								<div className="flex items-center">
 									<Typography.Title level={5} className="basis-1/2">
@@ -245,6 +251,9 @@ export default function UpdateRecipesPage() {
 												label: category.name,
 												value: category.id,
 											}))}
+											filterOption={(input, option) =>
+												option!.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+											}
 										/>
 										{errors.categories && touched.categories && (
 											<Typography className="ms-1 mt-2 text-red-500">
@@ -365,7 +374,7 @@ export default function UpdateRecipesPage() {
 													{() => (
 														<>
 															<div className="flex items-start space-x-2">
-																<div className="mt-3 flex flex-col">
+																<div className="mt-10 flex flex-col">
 																	{index > 0 && (
 																		<CaretUpFilled
 																			size={4}
@@ -382,43 +391,18 @@ export default function UpdateRecipesPage() {
 																	)}
 																</div>
 																<div className="basis-1/2">
-																	<Input
-																		className="w-full rounded-md border border-gray-300 px-4"
-																		type="text"
-																		{...getFieldProps(`ingredients.${index}.name`)}
-																		placeholder="100ml"
-																	/>
-																	{errors.ingredients &&
-																		errors.ingredients[index] &&
-																		touched.ingredients &&
-																		touched.ingredients[index] &&
-																		(errors.ingredients[index] as FormikErrors<Ingredients>)
-																			.name && (
-																			<Typography className="ms-1 ms-7 mt-2 text-red-500">
-																				{
-																					(errors.ingredients[index] as FormikErrors<Ingredients>)
-																						.name
-																				}
-																			</Typography>
-																		)}
-																</div>
-
-																<div className="basis-1/2">
-																	<Flex align="center">
+																	<Form.Item
+																		label="Ingredient amount: "
+																		required
+																		className="mb-0 w-full"
+																	>
 																		<Input
 																			className="w-full rounded-md border border-gray-300 px-4"
 																			type="text"
 																			{...getFieldProps(`ingredients.${index}.amount`)}
-																			placeholder="Title: My eggs!"
+																			placeholder="100 ml"
 																		/>
-																		<DeleteOutlined
-																			size={4}
-																			className="px-2 py-1"
-																			onClick={() => {
-																				if (values.ingredients.length) remove(index);
-																			}}
-																		></DeleteOutlined>
-																	</Flex>
+																	</Form.Item>
 																	{errors.ingredients &&
 																		errors.ingredients[index] &&
 																		touched.ingredients &&
@@ -429,6 +413,44 @@ export default function UpdateRecipesPage() {
 																				{
 																					(errors.ingredients[index] as FormikErrors<Ingredients>)
 																						.amount
+																				}
+																			</Typography>
+																		)}
+																</div>
+
+																<div className="basis-1/2">
+																	<Flex align="center">
+																		<Form.Item
+																			label="Ingredient name: "
+																			required
+																			className="mb-0 w-full"
+																		>
+																			<Input
+																				className="w-full rounded-md border border-gray-300 px-4"
+																				type="text"
+																				{...getFieldProps(`ingredients.${index}.name`)}
+																				placeholder="water"
+																			/>
+																		</Form.Item>
+																		<DeleteOutlined
+																			size={4}
+																			className="px-2 py-1"
+																			onClick={() => {
+																				if (values.ingredients.length) remove(index);
+																			}}
+																		></DeleteOutlined>
+																	</Flex>
+																	{errors.ingredients &&
+																		(errors.ingredients[index] as FormikErrors<Ingredients>) &&
+																		touched.ingredients &&
+																		(touched.ingredients[index] as FormikErrors<Ingredients>) &&
+																		(errors.ingredients[index] as FormikErrors<Ingredients>).name &&
+																		(touched.ingredients[index] as FormikErrors<Ingredients>)
+																			.name && (
+																			<Typography className="ms-1 ms-7 mt-2 text-red-500">
+																				{
+																					(errors.ingredients[index] as FormikErrors<Ingredients>)
+																						.name
 																				}
 																			</Typography>
 																		)}
@@ -482,7 +504,7 @@ export default function UpdateRecipesPage() {
 															)}
 														</div>
 
-														<div className="!ml-10  w-11/12">
+														<div className="!ml-10  w-full">
 															<div className="flex items-center justify-between">
 																<TextArea
 																	className="rounded-md border border-gray-300 px-4 py-2"
@@ -560,7 +582,7 @@ export default function UpdateRecipesPage() {
 								)}
 							</FieldArray>
 						</div>
-						<div>
+						<div className="pt-4 text-center">
 							<Form.Item>
 								<button
 									className="bg-primary w-1/2 rounded-lg p-2 text-white"

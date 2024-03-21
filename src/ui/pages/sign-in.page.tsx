@@ -78,7 +78,7 @@ export default function SignInPage() {
 									name="username"
 									className="mt-2"
 									required
-									validateStatus={errors.username ? "error" : "success"}
+									validateStatus={errors.username && touched.username ? "error" : "success"}
 									help={
 										errors.username &&
 										touched.username && <div className="my-3">{errors.username}</div>
@@ -102,7 +102,7 @@ export default function SignInPage() {
 									name="password"
 									className="mt-2"
 									required
-									validateStatus={errors.password ? "error" : "success"}
+									validateStatus={errors.password && touched.password ? "error" : "success"}
 									help={
 										errors.password &&
 										touched.password && <div className="my-3">{errors.password}</div>

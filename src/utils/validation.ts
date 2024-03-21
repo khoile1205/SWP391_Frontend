@@ -26,6 +26,7 @@ const signUpValidationSchema = Yup.object().shape({
 
 const createRecipeValidationSchema = (user: User) =>
 	Yup.object().shape({
+		thumbnailUrl: Yup.string().required("Thumbnail is required"),
 		title: Yup.string().required("Title is required"),
 		description: Yup.string().required("Description is required"),
 		portion: Yup.number()
