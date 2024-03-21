@@ -15,21 +15,24 @@ export const PaginationTable = <T,>({
 	paginationOptions,
 }: Props<T>) => {
 	return (
-		<div className="" style={{ maxWidth: "100%", minWidth: "100%", overflowX: "auto" }}>
-			<Table
-				columns={columns}
-				dataSource={dataSource as any[]}
-				pagination={{
-					defaultPageSize: 5,
-					showSizeChanger: false,
-					pageSize: pageSize,
-					...paginationOptions,
-				}}
-				bordered
-				className="rounded-lg shadow-md"
-				rowClassName={(_, index) => (index % 2 === 0 ? "even-row" : "odd-row")}
-				style={{ width: "100%" }}
-			/>
-		</div>
+		dataSource && (
+			<div>
+				<Table
+					columns={columns}
+					dataSource={dataSource as any[]}
+					pagination={{
+						responsive: true,
+						defaultPageSize: 5,
+						showSizeChanger: false,
+						pageSize: pageSize,
+						...paginationOptions,
+					}}
+					bordered
+					className="rounded-lg shadow-md "
+					rowClassName={(_, index) => (index % 2 === 0 ? "even-row" : "odd-row")}
+					style={{ maxWidth: "100%", minWidth: "100%", overflowX: "auto" }}
+				/>
+			</div>
+		)
 	);
 };

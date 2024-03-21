@@ -57,7 +57,8 @@ export default function AdminReportPage() {
 			dataIndex: "createdAt",
 			align: "center",
 			width: "30%",
-			sorter: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+			sorter: (a: Recipe, b: Recipe) =>
+				new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
 			render: (_text: string, record: Recipe) => (
 				<Typography>{new Date(record.createdAt).toLocaleDateString("vi-VN")}</Typography>
 			),
@@ -90,10 +91,11 @@ export default function AdminReportPage() {
 	];
 
 	return (
-		<div className="w-100vh flex flex-col items-center justify-center px-4 py-8 lg:px-8">
-			<h2 className="mb-4 text-2xl font-bold text-gray-900">Favourite Recipes</h2>
-
-			<PaginationPageSize options={[5, 10, 15]} pageSize={pageSize} setPageSize={setPageSize} />
+		<div className="px-4 py-8 lg:px-8">
+			<h2 className="mb-4 text-center text-2xl font-bold text-gray-900">Favourite Recipes</h2>
+			<div className="mb-4">
+				<PaginationPageSize options={[5, 10, 15]} pageSize={pageSize} setPageSize={setPageSize} />
+			</div>
 			<PaginationTable columns={columns} dataSource={listRecipes} pageSize={pageSize} />
 		</div>
 	);

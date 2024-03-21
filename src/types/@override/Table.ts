@@ -1,4 +1,6 @@
-export type Column<T> = {
+import { ColumnProps } from "antd/es/table";
+
+export type Column<T> = ColumnProps<T> & {
 	title: string;
 	dataIndex?: keyof T;
 	align?: "center" | "left" | "right";

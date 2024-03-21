@@ -123,6 +123,7 @@ const userStore = create<UserStore>()((set, get) => ({
 				user: null,
 				userNotification: [],
 				listUserPurcharseRecipe: [],
+				userRecipeReaction: null,
 			}));
 
 		return result;

@@ -16,6 +16,7 @@ interface User {
 	role: Roles;
 	followers: User[];
 	followings: User[];
+	lockOutEnd: Date | null;
 }
 
 export type { User };

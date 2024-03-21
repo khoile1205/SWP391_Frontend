@@ -15,7 +15,9 @@ const AdminBookingPage = Loadable(lazy(() => import("@/ui/pages/admin/admin.book
 const AdminRequestPage = Loadable(
 	lazy(() => import("@/ui/pages/admin/admin.become-chef-request.page"))
 );
-const AdminUserPage = Loadable(lazy(() => import("@/ui/pages/admin/admin.user.page")));
+const AdminAccountManagementPage = Loadable(
+	lazy(() => import("@/ui/pages/admin/admin.account.page"))
+);
 const AdminChangePasswordPage = Loadable(
 	lazy(() => import("@/ui/pages/admin/admin.change-password.page"))
 );
@@ -42,8 +44,8 @@ const AdminRoutes: RouteObject[] = [
 				element: <AdminChangePasswordPage />,
 			},
 			{
-				path: "user",
-				element: <AdminUserPage />,
+				path: "account",
+				element: <AdminAccountManagementPage />,
 			},
 			{
 				path: "recipe",

@@ -18,6 +18,7 @@ const renderTransactionType = (type: Transaction["type"]) => {
 };
 export default function ProfileTransactionHistory() {
 	const { data } = useGetTransactionHistory();
+
 	const [transactionHistory, setTransactionHistory] = useState<Transaction[]>(
 		data as Transaction[]
 	);
@@ -32,20 +33,24 @@ export default function ProfileTransactionHistory() {
 		{
 			title: "ID",
 			dataIndex: "id",
+			width: "20%",
 			align: "center",
 		},
+
 		{
 			title: "Price",
 			dataIndex: "amount",
 			align: "center",
+			width: "10%",
 			render: (_text: string, record: Transaction) => (
-				<Tooltip title={record.amount}>{record.amount}</Tooltip>
+				<Tooltip title={Math.abs(record.amount)}>{Math.abs(record.amount)}</Tooltip>
 			),
-			sorter: (a, b) => a.amount - b.amount,
+			sorter: (a: Transaction, b: Transaction) => a.amount - b.amount,
 		},
 		{
 			title: "Type",
 			dataIndex: "type",
+			width: "20%",
 			render: (_text: string, record: Transaction) => (
 				<Tooltip title={renderTransactionType(record.type)}>
 					{renderTransactionType(record.type)}
@@ -65,6 +70,10 @@ export default function ProfileTransactionHistory() {
 					value: TransactionType.WITHDRAW,
 					text: "Withdraw",
 				},
+				{
+					value: TransactionType.BOOKING,
+					text: "Booking",
+				},
 			],
 			onFilter: (value, record) => record.type == value,
 		},
@@ -72,6 +81,7 @@ export default function ProfileTransactionHistory() {
 			title: "Currency",
 			dataIndex: "currency",
 			align: "center",
+			width: "20%",
 			render: (_text: string, record: Transaction) => {
 				return <Tooltip title={record.currency}>{record.currency}</Tooltip>;
 			},
@@ -80,21 +90,35 @@ export default function ProfileTransactionHistory() {
 			title: "Payment",
 			dataIndex: "payment",
 			align: "center",
+			width: "20%",
 			render: (_text: string, record: Transaction) => {
 				return <Tooltip title={record.payment}>{record.payment}</Tooltip>;
 			},
+			filters: [
+				{
+					value: "VnPay",
+					text: "VnPay",
+				},
+				{
+					value: "Wallet",
+					text: "Wallet",
+				},
+			],
+			onFilter: (value, record) => record.payment == value,
 		},
 		{
 			title: "Created At",
 			dataIndex: "createdAt",
 			align: "center",
-			render: (createdAt: Date) => <span>{new Date(createdAt).toLocaleDateString("en-US")}</span>,
-			sorter: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+			width: "20%",
+			render: (createdAt: Date) => <span>{new Date(createdAt).toLocaleString("vi-VN")}</span>,
+			sorter: (a: Transaction, b: Transaction) =>
+				new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
 		},
 	];
 
 	return (
-		<div className="flex flex-col items-center justify-center px-4 py-8 lg:px-8">
+		<div className="w-full px-4 py-8 lg:px-8">
 			<h2 className="mb-4 text-2xl font-bold text-gray-900">View Transaction History</h2>
 			<PaginationPageSize options={[5, 10, 15]} pageSize={pageSize} setPageSize={setPageSize} />
 			<PaginationTable columns={columns} dataSource={transactionHistory} pageSize={pageSize} />

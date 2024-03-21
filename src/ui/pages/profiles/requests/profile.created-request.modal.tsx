@@ -181,28 +181,6 @@ export default function CreateRequestModal({ open, onClick, request }: CreateReq
 						<Typography.Title level={5}>
 							<Typography.Text style={{ color: "red" }}>*</Typography.Text> Identity Image
 						</Typography.Title>
-						{/* <Upload
-							name="identityImageUrl"
-							listType="picture-card"
-							className="avatar-uploader mt-2 text-center"
-							showUploadList={false}
-							accept="image/*"
-							customRequest={customRequest}
-							beforeUpload={handleBeforeUploadFile}
-							onChange={async (info) => {
-								const imageURL = info.file.response;
-								if (imageURL !== null) {
-									formik.setFieldValue("identityImageUrl", imageURL);
-								}
-							}}
-						>
-							{formik.values.identityImageUrl ? (
-								<img src={formik.values.identityImageUrl} alt="avatar" style={{ width: "100%" }} />
-							) : (
-								<UploadButton loading={loading}></UploadButton>
-							)}
-						</Upload> */}
-
 						<SingleImageUploadComponent
 							className="text-center"
 							loading={loading}

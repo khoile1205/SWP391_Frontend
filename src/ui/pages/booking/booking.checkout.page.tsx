@@ -22,15 +22,15 @@ const BookingScreen: React.FC = () => {
 
 	const [agreed, setAgreed] = useState(false);
 
-	const fees = React.useMemo(
-		() => bookingInLocalStorage.total * 0.2,
-		[bookingInLocalStorage.total]
-	);
+	// const fees = React.useMemo(
+	// 	() => bookingInLocalStorage.total * 0.2,
+	// 	[bookingInLocalStorage.total]
+	// );
 
-	const totalMoney = React.useMemo(
-		() => bookingInLocalStorage.total + fees,
-		[bookingInLocalStorage.total, fees]
-	);
+	// const totalMoney = React.useMemo(
+	// 	() => bookingInLocalStorage.total + fees,
+	// 	[bookingInLocalStorage.total, fees]
+	// );
 
 	const handleBooking = useAuthenticateFeature(async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -116,8 +116,8 @@ const BookingScreen: React.FC = () => {
 						Date Time Start:
 					</Typography>
 					<input
-						type="datetime-local"
-						value={dayjs(bookingInLocalStorage.timeStart).format("YYYY-MM-DDTHH:mm")}
+						type="datetime"
+						value={dayjs(bookingInLocalStorage.timeStart).format("HH:mm A - DD-MM-YYYY")}
 						readOnly
 						style={{
 							width: "100%",
@@ -132,8 +132,8 @@ const BookingScreen: React.FC = () => {
 					<Typography style={{ fontWeight: "bold", display: "block" }}>Date Time End: :</Typography>
 
 					<input
-						type="datetime-local"
-						value={dayjs(bookingInLocalStorage.timeEnd).format("YYYY-MM-DDTHH:mm")}
+						type="datetime"
+						value={dayjs(bookingInLocalStorage.timeEnd).format("HH:mm A - DD-MM-YYYY")}
 						readOnly
 						style={{
 							width: "100%",
@@ -181,11 +181,11 @@ const BookingScreen: React.FC = () => {
 						style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}
 					>
 						<Typography.Text className="label" style={{ fontWeight: "bold" }}>
-							Dishes Price:
+							Total Price:
 						</Typography.Text>
 						<Typography>$ {bookingInLocalStorage.total.toFixed(2)}</Typography>
 					</div>
-					<div
+					{/* <div
 						className="summary-item"
 						style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}
 					>
@@ -204,7 +204,7 @@ const BookingScreen: React.FC = () => {
 						<Typography>
 							<b>$ {totalMoney.toFixed(2)}</b>
 						</Typography>
-					</div>
+					</div> */}
 				</div>
 
 				<div

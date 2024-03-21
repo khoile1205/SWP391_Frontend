@@ -22,3 +22,13 @@ export type VerifyRecipeDTO = {
 	recipeId: string;
 	status: ActionStatus;
 };
+
+export type VerifyRequestDTO = {
+	requestId: string;
+	status: ActionStatus;
+};
+
+export type LockAccountDTO = {
+	userId: string;
+	minute: number;
+};
