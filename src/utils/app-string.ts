@@ -17,6 +17,7 @@ export default class AppString {
 	static readonly resetPasswordErrorMessage =
 		"Sorry, but you are not allowed to reset your password. Please try again later.";
 	static readonly authorizeRequiredErrorMessage = "You need to sign in to access this page";
+	static readonly authorizeFeatureRequiredErrorMessage = "You need to sign in to use this feature";
 	static readonly passwordChangedSuccessMessage = "Password changed successfully";
 	static readonly passwordChangedErorrMessage =
 		"Sorry,your current password is incorrect. Please try again";
