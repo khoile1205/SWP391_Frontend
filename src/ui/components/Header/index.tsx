@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import userStore from "@/zustand/user.store";
@@ -22,10 +22,19 @@ function classNames(...classes: unknown[]) {
 }
 
 export function Header() {
+	const { user, logOut } = userStore();
+
 	const [openSearchBox, setOpenSearchBox] = useState<boolean>(false);
 	const [visibleNotification, setVisibleNotification] = useState<boolean>(false);
+	const [activeNavItem, setActiveNavItem] = useState<string>(""); // State to store the active navigation item
 
-	const { user, logOut } = userStore();
+	useEffect(() => {
+		const pathName = window.location.pathname;
+		const navItem = navigation.find((item) => item.href === pathName);
+		if (navItem) {
+			setActiveNavItem(navItem.name);
+		}
+	}, []);
 
 	const handleLogout = async () => {
 		const isLogout = logOut();
@@ -33,7 +42,7 @@ export function Header() {
 			showToast("success", AppString.logoutSuccessMessage);
 			setTimeout(() => {
 				window.location.pathname = "/";
-			}, 500);
+			}, 300);
 		}
 	};
 
@@ -70,10 +79,10 @@ export function Header() {
 													key={item.name}
 													href={item.href}
 													className={classNames(
-														item.current ? "text-gray-500" : "hover:text-gray-500",
+														activeNavItem === item.name ? "text-gray-500" : "hover:text-gray-500",
 														"text-medium rounded-md px-3 py-2 font-medium capitalize"
 													)}
-													aria-current={item.current ? "page" : undefined}
+													aria-current={activeNavItem === item.name ? "page" : undefined}
 												>
 													{item.name}
 												</a>

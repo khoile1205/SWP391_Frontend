@@ -19,20 +19,10 @@ import { Recipe } from "@/models/recipe.model";
 import AppColor from "@/utils/appColor";
 import { Counter } from "@/ui/components";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { useGetChefRecipes, useGetChefWorkingSchedule } from "@/hooks/booking";
 import { isBetween, isInRange } from "@/utils/date_exts";
 import { showToast } from "@/utils/notify";
-
-const bookingInformationValidationSchema = Yup.object().shape({
-	address: Yup.string().required("Address is required"),
-	timeStart: Yup.date()
-		.min(dayjs().add(2, "day").toDate(), "Time start should be at least 2 days from now")
-		.required("Start time is required"),
-	timeEnd: Yup.date()
-		.min(Yup.ref("timeStart"), "End time should be after start time")
-		.required("End time is required"),
-});
+import { bookingInformationValidationSchema } from "@/utils/validation";
 
 interface Props {
 	chefInformation: Omit<ChefBookingEntity, "listRecipes">;
@@ -52,17 +42,22 @@ const BookingCart: React.FC<Props> = ({
 			address: bookingData.address,
 			timeStart: bookingData.timeStart,
 			timeEnd: bookingData.timeEnd,
+			phoneNumber: bookingData.phoneNumber,
 		},
 		onSubmit: () => {
 			setBookingData({
 				address: bookingData.address,
 				timeStart: bookingData.timeStart,
 				timeEnd: bookingData.timeEnd,
+				phoneNumber: bookingData.phoneNumber,
 			});
+			window.location.pathname = "/booking/checkout";
 		},
 		validationSchema: bookingInformationValidationSchema,
 		enableReinitialize: true,
+		validateOnMount: true,
 	});
+
 	const { recipes, refetchListRecipes } = useGetChefRecipes(bookingData.chefId);
 	React.useEffect(() => {
 		if (bookingData.chefId) refetchListRecipes();
@@ -72,6 +67,14 @@ const BookingCart: React.FC<Props> = ({
 	React.useEffect(() => {
 		if (bookingData.chefId) refetchListChefSchedules();
 	}, [bookingData.chefId, refetchListChefSchedules]);
+
+	const [startDate, setStartDate] = React.useState<Dayjs | undefined>(dayjs(bookingData.timeStart));
+	const [endDate, setEndDate] = React.useState<Dayjs | undefined>(dayjs(bookingData.timeEnd));
+
+	React.useEffect(() => {
+		setStartDate(dayjs(bookingData.timeStart));
+		setEndDate(dayjs(bookingData.timeEnd));
+	}, [bookingData]);
 
 	const [listRecipes, setListRecipes] = React.useState<Recipe[]>(recipes ?? []);
 	const [listChefBookingSchedules, setListChefBookingSchedules] = React.useState<
@@ -89,12 +92,16 @@ const BookingCart: React.FC<Props> = ({
 	const [showAllDishes, setShowAllDishes] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
 
+	const isValidButton = React.useMemo(() => {
+		return formik.isValid && bookingData.bookingDishes && bookingData.bookingDishes.length > 0;
+	}, [bookingData.bookingDishes, formik.isValid]);
+
 	const disabledTime = (current: Dayjs, type: "start" | "end"): any => {
 		// Initialize the disabled state
 		const disabledHoursObj: Record<string, any> = {};
 
 		if (!listChefBookingSchedules || listChefBookingSchedules.length === 0) {
-			return disabledHoursObj;
+			return {};
 		}
 
 		const timeStart = dayjs(bookingData.timeStart);
@@ -106,13 +113,22 @@ const BookingCart: React.FC<Props> = ({
 			const startDate = timeStart.startOf("day").valueOf();
 			if (selectedDate === startDate) {
 				// If the selected date is the same as the start date, disable times before the start time
+
+				// return {
+				// 	disabledHours: () => Array.from({ length: 24 }, (_, hour) => hour < startHour),
+				// 	disabledMinutes: (hour: number) =>
+				// 		hour === startHour
+				// 			? Array.from({ length: 60 }, (_, minute) => minute <= startMinute)
+				// 			: [],
+				// };
+				// })
 				disabledHoursObj.disabledHours = () =>
 					Array.from({ length: 24 }, (_, hour) => (hour < startHour + 1 ? hour : null));
 
 				disabledHoursObj.disabledMinutes = (hour: number) =>
 					hour <= startHour + 1
 						? Array.from({ length: 60 }, (_, minute) => {
-								return minute <= startMinute ? minute : null;
+								return minute < startMinute ? minute : null;
 							})
 						: [];
 			}
@@ -132,6 +148,26 @@ const BookingCart: React.FC<Props> = ({
 
 				const endMinute = dayjs(schedule.timeEnd).minute();
 				const endHour = dayjs(schedule.timeEnd).hour();
+
+				// return {
+				// 	disabledHours: () =>
+				// 		Array.from({ length: 24 }, (_, hour) => startHour < hour && hour < endHour),
+				// 	disabledMinutes: (hour: number) => {
+				// 		if (hour == startHour) {
+				// 			return Array.from({ length: 60 }, (_, minute) =>
+				// 				startMinute <= minute ? minute : null
+				// 			);
+				// 		}
+				// 		if (hour == endHour) {
+				// 			return Array.from({ length: 60 }, (_, minute) =>
+				// 				endMinute >= minute ? minute : null
+				// 			);
+				// 		}
+				// 		if (hour > startHour && hour < endHour) {
+				// 			return Array.from({ length: 60 }, (_, minute) => minute);
+				// 		}
+				// 	},
+				// };
 
 				disabledHoursObj.disabledHours = () =>
 					Array.from({ length: 24 }, (_, hour) => startHour < hour && hour < endHour);
@@ -160,8 +196,11 @@ const BookingCart: React.FC<Props> = ({
 			alert("Please select start and end date & time before checking out.");
 			return;
 		}
-
-		window.location.pathname = "/booking/checkout";
+		if (formik.isValid) {
+			formik.handleSubmit();
+		} else {
+			showToast("error", "Please input all field");
+		}
 	};
 
 	const handleAddNote = (recipeId: string, note: string) => {
@@ -174,10 +213,20 @@ const BookingCart: React.FC<Props> = ({
 	};
 
 	const handleChangeTimeStart = (value: DatePickerProps["value"]) => {
+		if (!value) {
+			setStartDate(undefined);
+			return;
+		}
+
 		setBookingData({ timeStart: value?.toDate() });
 
-		if (value && bookingData.timeEnd && value.toDate() > bookingData.timeEnd) {
-			setBookingData({ timeEnd: new Date(value.toDate().getTime() + 60 * 60 * 1000) });
+		if (
+			value &&
+			bookingData.timeEnd &&
+			value.toDate().getTime() > new Date(bookingData.timeEnd).getTime()
+		) {
+			const newDateEnd = new Date(value.toDate().getTime() + 60 * 60 * 1000);
+			setBookingData({ timeEnd: newDateEnd });
 		}
 	};
 
@@ -186,23 +235,12 @@ const BookingCart: React.FC<Props> = ({
 		let errorOccurred = false; // Flag to track if an error occurred
 
 		listChefBookingSchedules.forEach((schedule) => {
-			console.log(new Date(schedule.timeStart).toLocaleString("vi-VN"));
 			if (
 				isBetween({
 					startDate: schedule.timeStart,
 					endDate: schedule.timeEnd,
 					currentDate: timeEnd!,
-				})
-			) {
-				console.log(schedule.timeStart, schedule.timeEnd, timeEnd);
-
-				showToast("error", "Booking time must not be within the chef's schedule");
-				errorOccurred = true; // Set flag to true if an error occurs
-				return; // Exit the loop if an error occurs
-			}
-
-			// Check the range of time is between schedules
-			if (
+				}) ||
 				isInRange({
 					startRangeDate: bookingData.timeStart,
 					endRangeDate: timeEnd!,
@@ -210,18 +248,30 @@ const BookingCart: React.FC<Props> = ({
 					endDateCheck: schedule.timeEnd,
 				})
 			) {
-				console.log(2);
-
 				showToast("error", "Booking time must not be within the chef's schedule");
 				errorOccurred = true; // Set flag to true if an error occurs
 				return; // Exit the loop if an error occurs
 			}
+
+			// // Check the range of time is between schedules
+			// if (
+			// 	isInRange({
+			// 		startRangeDate: bookingData.timeStart,
+			// 		endRangeDate: timeEnd!,
+			// 		startDateCheck: schedule.timeStart,
+			// 		endDateCheck: schedule.timeEnd,
+			// 	})
+			// ) {
+			// 	showToast("error", "Booking time must not be within the chef's schedule");
+			// 	errorOccurred = true; // Set flag to true if an error occurs
+			// 	return; // Exit the loop if an error occurs
+			// }
 		});
 
 		if (!errorOccurred) {
 			setBookingData({ timeEnd: timeEnd });
 		} else {
-			value = dayjs(bookingData.timeEnd);
+			setEndDate(undefined);
 		}
 		return;
 	};
@@ -280,6 +330,10 @@ const BookingCart: React.FC<Props> = ({
 	const handleChangeAddress = (address: string) => {
 		setBookingData({ address });
 	};
+
+	const handleChangePhoneNumber = (phoneNumber: string) => {
+		setBookingData({ phoneNumber });
+	};
 	const handleMoreRecipes = () => {
 		setShowAllDishes(true);
 	};
@@ -335,47 +389,93 @@ const BookingCart: React.FC<Props> = ({
 					</div>
 				</div>
 				<Form className="mt-3 space-y-2" layout="vertical">
-					<Form.Item
-						validateStatus={formik.errors.address ? "error" : undefined}
-						help={
-							formik.errors.address &&
-							formik.touched.address && <div className="my-3">{formik.errors.address}</div>
-						}
-						label={
-							<Typography
-								style={{
-									fontSize: "16px",
-									fontWeight: "bold",
-									color: formik.errors.address ? "red" : "inherit",
-								}}
-								className="mb-1"
-							>
-								Your Address
-							</Typography>
-						}
-					>
-						<Input
-							type="text"
-							id="address"
-							value={formik.values.address}
-							placeholder="Your Address"
-							onBlur={formik.handleBlur}
-							onChange={(e) => {
-								formik.setFieldValue("address", e.target.value);
-								handleChangeAddress(e.target.value);
-							}}
+					<div className="md:flex  md:flex-row md:space-x-2">
+						<Form.Item
+							className="w-full md:w-1/2"
+							validateStatus={formik.errors.address ? "error" : undefined}
 							required
-							style={{
-								width: "100%",
-								border: `1px solid ${formik.errors.address ? "red" : "#ccc"}`,
-								borderRadius: "4px",
-							}}
-							className="input px-5 py-1 !ring-0 focus:outline-0"
-						/>
-					</Form.Item>
+							help={
+								formik.errors.address &&
+								formik.touched.address && <div className="my-3 ms-3">{formik.errors.address}</div>
+							}
+							label={
+								<Typography
+									style={{
+										fontSize: "16px",
+										fontWeight: "bold",
+										color: formik.errors.address && formik.touched.address ? "red" : "inherit",
+									}}
+									className="mb-1"
+								>
+									Address
+								</Typography>
+							}
+						>
+							<Input
+								type="text"
+								id="address"
+								value={formik.values.address}
+								onBlur={formik.handleBlur}
+								onChange={(e) => {
+									formik.setFieldValue("address", e.target.value);
+									handleChangeAddress(e.target.value);
+								}}
+								required
+								style={{
+									border: `1px solid ${formik.errors.address && formik.touched.address ? "red" : "#ccc"}`,
+									borderRadius: "4px",
+								}}
+								className="input w-full px-5 py-1 !ring-0 focus:outline-0"
+							/>
+						</Form.Item>
+						<Form.Item
+							validateStatus={formik.errors.phoneNumber ? "error" : undefined}
+							help={
+								formik.errors.phoneNumber &&
+								formik.touched.phoneNumber && (
+									<div className="my-3 ms-3">{formik.errors.phoneNumber}</div>
+								)
+							}
+							required
+							className="w-full md:w-1/2"
+							label={
+								<Typography
+									style={{
+										fontSize: "16px",
+										fontWeight: "bold",
+										color:
+											formik.errors.phoneNumber && formik.touched.phoneNumber ? "red" : "inherit",
+									}}
+									className="mb-1"
+								>
+									Phone number
+								</Typography>
+							}
+						>
+							<Input
+								type="text"
+								id="phoneNumber"
+								value={formik.values.phoneNumber}
+								onBlur={formik.handleBlur}
+								onChange={(e) => {
+									formik.setFieldValue("phoneNumber", e.target.value);
+									handleChangePhoneNumber(e.target.value);
+								}}
+								required
+								style={{
+									width: "100%",
+									border: `1px solid ${
+										formik.errors.phoneNumber && formik.touched.phoneNumber ? "red" : "#ccc"
+									}`,
+									borderRadius: "4px",
+								}}
+								className="input px-5 py-1 !ring-0 focus:outline-0"
+							/>
+						</Form.Item>
+					</div>
 
-					<Flex className="space-x-3">
-						<div className="w-1/4">
+					<div className="space-y-4 md:flex md:flex-row md:space-x-2 md:space-y-0">
+						<div className="w-full md:w-1/2">
 							<Typography
 								style={{
 									fontSize: "16px",
@@ -384,15 +484,17 @@ const BookingCart: React.FC<Props> = ({
 								}}
 								className="mb-1"
 							>
-								Date Time Start:
+								<span className="text-[#ff4d4f]">* </span>Date Time Start:
 							</Typography>
 							<DatePicker
 								size="large"
 								superNextIcon={<BiNotepad />}
 								showTime={{
+									hideDisabledOptions: true,
 									format: "HH:mm",
 								}}
 								// needConfirm={false}
+								value={startDate}
 								name="timeStart"
 								className="w-full ps-4"
 								minDate={dayjs(new Date()).add(2, "day")}
@@ -404,7 +506,7 @@ const BookingCart: React.FC<Props> = ({
 								onChange={handleChangeTimeStart}
 							></DatePicker>
 						</div>
-						<div className="!w-1/4">
+						<div className="w-full md:w-1/2">
 							<Typography
 								style={{
 									fontSize: "16px",
@@ -413,25 +515,29 @@ const BookingCart: React.FC<Props> = ({
 								}}
 								className="mb-1"
 							>
-								Date Time End:
+								<span className="text-[#ff4d4f]">* </span>Date Time End:
 							</Typography>
 							<DatePicker
 								size="large"
 								className="w-full ps-4"
 								name="timeEnd"
 								// needConfirm={false}
+								value={endDate}
 								minDate={bookingData.timeStart ? dayjs(bookingData.timeStart) : undefined}
 								disabled={!bookingData.timeStart}
 								defaultValue={dayjs(bookingData.timeEnd)}
 								disabledTime={(current: Dayjs) => disabledTime(current, "end")}
-								showTime={{ format: "HH:mm" }}
+								showTime={{
+									hideDisabledOptions: true,
+									format: "HH:mm",
+								}}
 								format="YYYY-MM-DD HH:mm"
 								onBlur={formik.handleBlur}
 								onOk={handleChangeTimeEnd}
 								onChange={handleChangeTimeEnd}
 							></DatePicker>
 						</div>
-					</Flex>
+					</div>
 					<List header="Please check:">
 						<div className="ms-4">
 							<List.Item>
@@ -514,7 +620,7 @@ const BookingCart: React.FC<Props> = ({
 						/>
 					</Flex>
 				</div>
-				<div className="block sm:grid sm:grid-cols-2 lg:grid-cols-3">
+				<div className="block gap-x-3 sm:grid sm:grid-cols-2 lg:grid-cols-3">
 					{listRecipes &&
 						getFilteredDishes().map((dish) => (
 							<div
@@ -523,7 +629,7 @@ const BookingCart: React.FC<Props> = ({
 								style={{
 									backgroundColor: "#fff",
 									boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-									borderRadius: "4px",
+									borderRadius: "8px",
 									padding: "20px",
 								}}
 							>
@@ -533,7 +639,7 @@ const BookingCart: React.FC<Props> = ({
 									alt={dish.title}
 									style={{
 										width: "100%",
-										height: "auto",
+										height: "200px",
 										objectFit: "cover",
 										borderRadius: "4px",
 										cursor: "pointer",
@@ -678,16 +784,13 @@ const BookingCart: React.FC<Props> = ({
 				</Typography.Text>
 				<button
 					onClick={handleCheckout}
-					disabled={bookingData.bookingDishes && bookingData.bookingDishes.length <= 0}
+					disabled={!isValidButton}
 					style={{
-						backgroundColor:
-							bookingData.bookingDishes && bookingData.bookingDishes.length <= 0
-								? "#ccc"
-								: AppColor.deepOrangeColor,
+						backgroundColor: isValidButton ? AppColor.deepOrangeColor : "#ccc",
 						borderRadius: "4px",
 						border: "none",
 						marginTop: "10px",
-						cursor: bookingData.bookingDishes.length <= 0 ? "not-allowed" : "pointer",
+						cursor: isValidButton ? "pointer" : "not-allowed",
 						transition: "background-color 0.3s ease-in-out",
 					}}
 					className="px-5 py-2"

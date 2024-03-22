@@ -30,7 +30,7 @@ export const useGetAllRecipesWtihCategory = () => {
 
 			return data;
 		},
-		retry: false,
+		retry: true,
 		retryDelay: 0,
 	});
 

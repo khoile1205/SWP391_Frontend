@@ -14,6 +14,8 @@ const renderTransactionType = (type: Transaction["type"]) => {
 			return "Withdraw";
 		case TransactionType.PURCHASEDRECIPE:
 			return "Purchase Recipe";
+		case TransactionType.BOOKING:
+			return "Booking";
 	}
 };
 export default function ProfileTransactionHistory() {
@@ -81,6 +83,7 @@ export default function ProfileTransactionHistory() {
 			title: "Status",
 			dataIndex: "isSuccess",
 			align: "center",
+			width: "20%",
 			render: (_text: string, record: Transaction) => {
 				return (
 					<Typography.Text type={record.isSuccess ? "success" : "danger"}>

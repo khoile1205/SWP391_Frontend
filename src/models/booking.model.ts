@@ -7,6 +7,7 @@ export class Booking {
 	chef: ShortInfoUser;
 	address: string;
 	bookingDishes: BookingRecipes[];
+	phoneNumber: string;
 	timeStart: Date;
 	timeEnd: Date;
 	total: number;
@@ -18,6 +19,7 @@ export class Booking {
 		id: string,
 		user: ShortInfoUser,
 		chef: ShortInfoUser,
+		phoneNumber: string,
 		address: string,
 		bookingDishes: BookingRecipes[],
 		timeStart: Date,
@@ -31,6 +33,7 @@ export class Booking {
 		this.user = user;
 		this.chef = chef;
 		this.address = address;
+		this.phoneNumber = phoneNumber;
 		this.bookingDishes = bookingDishes;
 		this.timeStart = timeStart;
 		this.timeEnd = timeEnd;

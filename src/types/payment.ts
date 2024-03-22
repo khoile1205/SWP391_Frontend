@@ -7,4 +7,8 @@ export type CreatePaymentDTO = {
 	name: string;
 };
 
+export type WithdrawPaymentDTO = {
+	description: string;
+	amount: number;
+};
 export type PurchaseRecipePaymentType = "Wallet" | "VnPay";

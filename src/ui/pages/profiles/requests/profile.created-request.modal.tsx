@@ -25,7 +25,9 @@ interface CreateRequestModalProps {
 }
 const becomeChefRequestValidator = Yup.object().shape({
 	identityImageUrl: Yup.string().required("This field is required"),
-	certificateImageUrls: Yup.array().required("This field is required"),
+	certificateImageUrls: Yup.array()
+		.min(1, "At least one certificate image is required")
+		.required("This field is required"),
 	fullName: Yup.string().required("This field is required"),
 	phoneNumber: Yup.string()
 		.matches(/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/, "Phone number is invalid")

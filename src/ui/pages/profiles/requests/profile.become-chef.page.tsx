@@ -235,31 +235,33 @@ export default function ProfileBecomeChefPage() {
 								</div>
 							</Col>
 						</div>
-						<div className="flex justify-end space-x-4">
-							<div className="text-end">
-								<Button
-									type="default"
-									className=" rounded-md !border-0 !text-white"
-									style={{
-										backgroundColor: AppColor.greenColor,
-									}}
-									onClick={() => setOpenModal(true)}
-								>
-									Edit the request
-								</Button>
+						{request.status != ActionStatus.ACCEPTED && (
+							<div className="flex justify-end space-x-4">
+								<div className="text-end">
+									<Button
+										type="default"
+										className=" rounded-md !border-0 !text-white"
+										style={{
+											backgroundColor: AppColor.greenColor,
+										}}
+										onClick={() => setOpenModal(true)}
+									>
+										Edit the request
+									</Button>
+								</div>
+								<div className="text-end">
+									<Button
+										className="rounded-md !border-0 !text-white"
+										style={{
+											backgroundColor: AppColor.deepOrangeColor,
+										}}
+										onClick={() => showDeleteConfirm(handleDeleleRequest)}
+									>
+										Delete the request
+									</Button>
+								</div>
 							</div>
-							<div className="text-end">
-								<Button
-									className="rounded-md !border-0 !text-white"
-									style={{
-										backgroundColor: AppColor.deepOrangeColor,
-									}}
-									onClick={() => showDeleteConfirm(handleDeleleRequest)}
-								>
-									Delete the request
-								</Button>
-							</div>
-						</div>
+						)}
 					</div>
 				</>
 			)}

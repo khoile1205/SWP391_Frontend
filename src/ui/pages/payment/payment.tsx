@@ -6,20 +6,16 @@ import { useValidatePayment } from "@/hooks/payment";
 import { AppConstant } from "@/utils/constant";
 
 export default function TransactionDetailsPage() {
-	const [formattedAmount, setAmount] = useState<string>("");
+	const [formattedAmount, setAmount] = useState<number>(0);
 	const { isLoading } = useLoadingStore((state) => state);
 
 	const { transactionData } = useValidatePayment();
 
 	useEffect(() => {
-		if (transactionData && transactionData.data.success) {
-			const formattedAmount = (
-				parseInt(transactionData.data.amount) /
-				(100 * AppConstant.USDtoVND)
-			).toLocaleString(undefined, {
-				minimumFractionDigits: 2,
-				maximumFractionDigits: 2,
-			});
+		if (transactionData) {
+			const formattedAmount =
+				transactionData.data.amount / 100 / parseInt(AppConstant.USDtoVND.toString());
+
 			setAmount(formattedAmount);
 		}
 	}, [transactionData]);

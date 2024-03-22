@@ -1,4 +1,4 @@
-import { CreatePaymentDTO, PurchaseRecipePaymentType } from "@/types/payment";
+import { CreatePaymentDTO, PurchaseRecipePaymentType, WithdrawPaymentDTO } from "@/types/payment";
 import Result from "./commons/result";
 import { create } from "zustand";
 import { paymentUsecase } from "@/usecases";
@@ -15,9 +15,18 @@ type Action = {
 		typeTransaction: string;
 		recipeId: string;
 	}): Promise<Result>;
+	withDraw: (data: WithdrawPaymentDTO) => Promise<Result>;
 };
 
 export const paymentStore = create<Action>(() => ({
+	withDraw: async (data: WithdrawPaymentDTO) => {
+		const response = await paymentUsecase.withDraw(data);
+		if (response.isSuccess) {
+			return Result.success(response.message, response.data);
+		} else {
+			return Result.failed(response.message);
+		}
+	},
 	payRecipe: async ({
 		data,
 		typeTransaction,
@@ -51,7 +60,7 @@ export const paymentStore = create<Action>(() => ({
 		if (response.isSuccess) {
 			return Result.success(response.message, response.data);
 		} else {
-			return Result.failed(response.message);
+			return Result.failed(response.message, response.data);
 		}
 	},
 }));

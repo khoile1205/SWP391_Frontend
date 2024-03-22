@@ -7,6 +7,7 @@ export type CreateBookingDTO = {
 	address: string;
 	timeStart: Date;
 	timeEnd: Date;
+	phoneNumber: string;
 	bookingDishes: {
 		recipeId: string | Recipe;
 		quantity: number;

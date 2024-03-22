@@ -20,7 +20,7 @@ export default function ProfileWalletPage() {
 	const [topUpModalVisible, setTopUpModalVisible] = useState(false);
 	const { setLoading } = useLoadingStore((state) => state);
 	const { user } = userStore((state) => state);
-	const { topUp } = paymentStore((state) => state);
+	const { topUp, withDraw } = paymentStore((state) => state);
 
 	const handleWithdraw = () => {
 		setWithdrawModalVisible(true);
@@ -33,6 +33,7 @@ export default function ProfileWalletPage() {
 	const handleTopUpSubmit = useAuthenticateFeature(async (values: any) => {
 		let response;
 		setLoading(true);
+		console.log(values.amount * AppConstant.USDtoVND);
 		try {
 			response = await topUp({
 				amount: values.amount * AppConstant.USDtoVND,
@@ -41,7 +42,6 @@ export default function ProfileWalletPage() {
 				orderType: PaymentType.DEPOSIT,
 			});
 			if (response.isSuccess) {
-				// console.log(response);
 				window.location.href = response.data;
 			}
 		} catch (error) {
@@ -52,11 +52,27 @@ export default function ProfileWalletPage() {
 			setWithdrawModalVisible(false);
 		}
 	});
-	const handleWithdrawSubmit = (values: any) => {
+	const handleWithdrawSubmit = useAuthenticateFeature(async (values: any) => {
+		const userBalance = user!.balance ?? 0;
+
+		if (values.amount > userBalance) {
+			showToast("error", "You don't have enough balance to withdraw");
+			return;
+		}
 		// Add your logic to handle top-up
-		console.log("Top-Up Amount:", values.amount);
-		setTopUpModalVisible(false);
-	};
+		const response = await withDraw({
+			amount: values.amount,
+			description: ` ${user?.firstName} ${user?.lastName} withdraw ${values.amount} from wallet`,
+		});
+
+		if (response.isSuccess) {
+			showToast("success", response.message as string);
+			setTimeout(() => (window.location.pathname = "profile/wallet"), 500);
+			setTopUpModalVisible(false);
+		} else {
+			showToast("error", response.message as string);
+		}
+	});
 
 	return user ? (
 		<Row justify="center" align="middle" style={{ minHeight: "100vh", backgroundColor: "#f0f2f5" }}>
@@ -107,14 +123,20 @@ export default function ProfileWalletPage() {
 						label="Amount"
 						rules={[{ required: true, message: "Please enter the withdrawal amount!" }]}
 					>
-						<Input
-							prefix={<DollarOutlined />}
-							type="number"
-							min={1}
-							step={1}
-							placeholder="Enter withdrawal amount"
-							style={{ width: "100%" }}
-						/>
+						<div className="space-y-3">
+							<Input
+								prefix={<DollarOutlined />}
+								type="number"
+								min={1}
+								step={1}
+								max={500}
+								placeholder="Enter withdrawal amount"
+								style={{ width: "100%" }}
+							/>
+							<Typography className="mt-2 text-sm">
+								* Note: 1$ = {AppConstant.USDtoVND} vnd
+							</Typography>
+						</div>
 					</Form.Item>
 					<Button className="bg-primary text-white" htmlType="submit" style={{ width: "100%" }}>
 						Withdraw
@@ -136,14 +158,20 @@ export default function ProfileWalletPage() {
 						label="Amount"
 						rules={[{ required: true, message: "Please enter the top-up amount!" }]}
 					>
-						<Input
-							prefix={<DollarOutlined />}
-							min={1}
-							step={1}
-							type="number"
-							placeholder="Enter top-up amount"
-							style={{ width: "100%" }}
-						/>
+						<div className="space-y-3">
+							<Input
+								prefix={<DollarOutlined />}
+								min={1}
+								max={500}
+								step={1}
+								type="number"
+								placeholder="Enter top-up amount"
+								style={{ width: "100%" }}
+							/>
+							<Typography className="mt-2 text-sm">
+								* Note: 1$ = {AppConstant.USDtoVND} vnd
+							</Typography>
+						</div>
 					</Form.Item>
 					<Button className="bg-primary text-white" htmlType="submit" style={{ width: "100%" }}>
 						Top Up

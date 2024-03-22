@@ -22,16 +22,6 @@ const BookingScreen: React.FC = () => {
 
 	const [agreed, setAgreed] = useState(false);
 
-	// const fees = React.useMemo(
-	// 	() => bookingInLocalStorage.total * 0.2,
-	// 	[bookingInLocalStorage.total]
-	// );
-
-	// const totalMoney = React.useMemo(
-	// 	() => bookingInLocalStorage.total + fees,
-	// 	[bookingInLocalStorage.total, fees]
-	// );
-
 	const handleBooking = useAuthenticateFeature(async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
@@ -110,7 +100,24 @@ const BookingScreen: React.FC = () => {
 						className="input px-5 py-2"
 					/>
 				</div>
-
+				<div className="form-group" style={{ marginBottom: "20px" }}>
+					<Typography className="mb-2" style={{ fontWeight: "bold", display: "block" }}>
+						Delivery Phone number:
+					</Typography>
+					<input
+						type="text"
+						id="address"
+						value={bookingInLocalStorage.phoneNumber}
+						required
+						readOnly
+						style={{
+							width: "100%",
+							border: "1px solid #ccc",
+							borderRadius: "4px",
+						}}
+						className="input px-5 py-2"
+					/>
+				</div>
 				<div className="form-group" style={{ marginBottom: "20px" }}>
 					<Typography className="mb-2" style={{ fontWeight: "bold", display: "block" }}>
 						Date Time Start:
