@@ -13,6 +13,13 @@ import { VerifyRecipeDTO } from "@/types/admin";
 import { useAuthenticateFeature } from "@/hooks/common";
 import { ActionStatus } from "@/enums";
 
+const renderVerifiedRecipes = (recipe: Recipe) => {
+	return (
+		<Typography.Text type={recipe.isVerified && recipe.isPublic ? "success" : "danger"}>
+			{recipe.isVerified ? (recipe.isPublic ? "Verified" : "Rejected") : "Not Verified"}
+		</Typography.Text>
+	);
+};
 export default function AdminRecipePage() {
 	const { deleteRecipeById } = recipeStore((state) => state);
 	const { handleVerifyPublicRecipe } = adminStore((state) => state);
@@ -58,7 +65,9 @@ export default function AdminRecipePage() {
 				showToast("success", response.message as string);
 				setListRecipes((prev) =>
 					prev.map((item) =>
-						item.id === recipe.id ? { ...item, isVerified: status === ActionStatus.ACCEPTED } : item
+						item.id === recipe.id
+							? { ...item, isVerified: true, isPublic: status === ActionStatus.ACCEPTED }
+							: item
 					)
 				);
 			} else {
@@ -89,11 +98,7 @@ export default function AdminRecipePage() {
 			dataIndex: "isVerified",
 			align: "center",
 			width: "20%",
-			render: (isVerified: boolean) => (
-				<Typography.Text type={isVerified ? "success" : "danger"}>
-					{isVerified ? "Verified" : "Not Verified"}
-				</Typography.Text>
-			),
+			render: (_, record: Recipe) => renderVerifiedRecipes(record),
 			filters: [
 				{
 					text: "Verified",

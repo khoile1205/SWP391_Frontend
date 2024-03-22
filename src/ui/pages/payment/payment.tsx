@@ -3,6 +3,7 @@ import { Card, Table, Space, Button, Result } from "antd";
 import { SmileOutlined, FrownOutlined } from "@ant-design/icons";
 import { useLoadingStore } from "@/zustand/loading.store";
 import { useValidatePayment } from "@/hooks/payment";
+import { AppConstant } from "@/utils/constant";
 
 export default function TransactionDetailsPage() {
 	const [formattedAmount, setAmount] = useState<string>("");
@@ -12,13 +13,13 @@ export default function TransactionDetailsPage() {
 
 	useEffect(() => {
 		if (transactionData && transactionData.data.success) {
-			const formattedAmount = (parseInt(transactionData.data.amount) / 100).toLocaleString(
-				undefined,
-				{
-					minimumFractionDigits: 2,
-					maximumFractionDigits: 2,
-				}
-			);
+			const formattedAmount = (
+				parseInt(transactionData.data.amount) /
+				(100 * AppConstant.USDtoVND)
+			).toLocaleString(undefined, {
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2,
+			});
 			setAmount(formattedAmount);
 		}
 	}, [transactionData]);
@@ -43,7 +44,7 @@ export default function TransactionDetailsPage() {
 			value: transactionData ? transactionData.data.paymentId : "N/A",
 		},
 		{ key: "2", field: "Order ID", value: transactionData ? transactionData.data.orderId : "N/A" },
-		{ key: "3", field: "Amount", value: `$${formattedAmount}` },
+		{ key: "3", field: "Amount", value: `$ ${formattedAmount}` },
 		{
 			key: "4",
 			field: "Order Description",

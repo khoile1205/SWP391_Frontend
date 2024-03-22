@@ -67,6 +67,11 @@ const ProfileLayout: React.FC = () => {
 
 	const currentTab = location.pathname.split("/")[2];
 
+	React.useEffect(() => {
+		const title = profileTabs.find((tab) => tab.key === currentTab)?.tab;
+		document.title = `${title} - Nest Cooking`;
+	}, [currentTab]);
+
 	// Handle tab change
 	const handleChange = useCallback(
 		(key: string) => {
@@ -75,6 +80,7 @@ const ProfileLayout: React.FC = () => {
 		[navigate]
 	);
 
+	// Filter tabs based on user role
 	const filteredTabs = useMemo(
 		() => profileTabs.filter((tab) => tab.role.includes(user?.role ?? Roles.USER)),
 		[user?.role]

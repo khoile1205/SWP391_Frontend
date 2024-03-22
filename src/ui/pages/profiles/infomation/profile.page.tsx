@@ -2,7 +2,7 @@ import { UpdateUserInformationType } from "@/types/user";
 import AppColor from "@/utils/appColor";
 import { showToast } from "@/utils/notify";
 import userStore from "@/zustand/user.store";
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, LockOutlined, UserOutlined } from "@ant-design/icons";
 import {
 	Avatar,
 	Button,
@@ -12,6 +12,7 @@ import {
 	Input,
 	Radio,
 	Row,
+	Tooltip,
 	Typography,
 	Upload,
 	UploadFile,
@@ -22,7 +23,7 @@ import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { RcFile } from "antd/es/upload";
 import fileStore from "@/zustand/file.store";
-import { Gender } from "@/enums";
+import { Gender, Roles } from "@/enums";
 import { handleBeforeUploadFile } from "@/utils/file_exts";
 import { AppConstant } from "@/utils/constant";
 import { useLoadingCallbackWithFormik } from "@/hooks/common";
@@ -43,7 +44,6 @@ export default function ProfilePage() {
 	const { uploadImage } = fileStore((state) => state);
 	// React state
 	const [isEdit, setIsEdit] = useState<boolean>(false);
-	// const [isEditPhoneNumber, setIsEditPhoneNumber] = useState<boolean>(false);
 	const [avatarUrl, setAvatarUrl] = useState<string | null | undefined>(user?.avatarUrl);
 
 	// Controller
@@ -94,7 +94,7 @@ export default function ProfilePage() {
 		}
 	};
 
-	return (
+	return user ? (
 		<div className="">
 			<Formik
 				onSubmit={handleUpdateUser}
@@ -121,8 +121,9 @@ export default function ProfilePage() {
 					<>
 						<div className="flex items-center justify-between">
 							<Typography.Title className="!m-0 font-playfair" level={2}>
-								Profile
+								Profile{" "}
 							</Typography.Title>
+
 							{isEdit ? (
 								<button
 									className="px-10 py-2 font-inter text-lg uppercase text-white"
@@ -153,8 +154,13 @@ export default function ProfilePage() {
 							)}
 						</div>
 						<Divider></Divider>
-						<div className="flex flex-col items-center space-y-8 text-center sm:flex-row sm:space-x-8 sm:space-y-0">
+						<div className="flex flex-col items-center space-y-8 text-center sm:flex-row sm:space-x-2 sm:space-y-0">
 							<Avatar rootClassName="w-24 h-24" src={avatarUrl}></Avatar>
+							{user.role === Roles.CHEF && (
+								<Tooltip title="This is the chef">
+									<CheckCircleOutlined className="text-primary text-xl" />
+								</Tooltip>
+							)}
 							<Upload
 								customRequest={customRequest}
 								name="avatarUrl"
@@ -169,7 +175,7 @@ export default function ProfilePage() {
 								showUploadList={false}
 							>
 								<Button
-									className="text-md px-10 py-[4px] font-inter text-white hover:!border-white hover:!text-white"
+									className="text-md ms-4 px-10 py-[4px] font-inter text-white hover:!border-white hover:!text-white"
 									style={{
 										backgroundColor: AppColor.deepOrangeColor,
 										borderRadius: 4,
@@ -356,40 +362,9 @@ export default function ProfilePage() {
 				)}
 			</Formik>
 
-			{/* <Form className="mt-10">
-				<Row className="space-x-7">
-					<Form className="block items-start space-x-5 sm:flex">
-						<Form.Item label="Contact number" name="" rootClassName="flex items-center">
-							<Input
-								prefix={<div className="border-r-2 pe-2">+84</div>}
-								className={`border-b-1 border border-x-0 border-t-0 ps-3`}
-								disabled={!isEditPhoneNumber}
-								value={user?.phoneNumber || ""}
-							/>
-						</Form.Item>
-						<div className="flex items-start space-x-5">
-							<Typography
-								className={`mt-2 text-[${AppColor.deepOrangeColor}] hover:cursor-pointer`}
-								onClick={() => {
-									setIsEditPhoneNumber(!isEditPhoneNumber);
-								}}
-							>
-								Change
-							</Typography>
-							<button
-								className="p-2 text-white"
-								style={{
-									backgroundColor: AppColor.deepOrangeColor,
-								}}
-							>
-								<Typography className="text-white">Verify phone number</Typography>
-							</button>
-						</div>
-					</Form>
-				</Row>
-			</Form> */}
-
 			<Divider></Divider>
 		</div>
+	) : (
+		<></>
 	);
 }

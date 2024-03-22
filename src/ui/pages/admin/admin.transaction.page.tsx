@@ -97,6 +97,29 @@ export default function AdminTransactionPage() {
 			onFilter: (value, record) => record.type == value,
 		},
 		{
+			title: "Status",
+			dataIndex: "isSuccess",
+			align: "center",
+			render: (_text: string, record: Transaction) => {
+				return (
+					<Typography.Text type={record.isSuccess ? "success" : "danger"}>
+						{record.isSuccess ? "Success" : "Error"}
+					</Typography.Text>
+				);
+			},
+			filters: [
+				{
+					value: true,
+					text: "Success",
+				},
+				{
+					value: false,
+					text: "Error",
+				},
+			],
+			onFilter: (value, record) => record.isSuccess == value,
+		},
+		{
 			title: "Currency",
 			dataIndex: "currency",
 			align: "center",

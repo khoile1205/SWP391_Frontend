@@ -9,6 +9,7 @@ export class Transaction {
 	description: string;
 	currency: string;
 	payment: string;
+	isSuccess: boolean;
 	createdAt: Date;
 	constructor(
 		id: string,
@@ -17,6 +18,7 @@ export class Transaction {
 		amount: number,
 		description: string,
 		currency: string,
+		isSuccess: boolean,
 		payment: string,
 		createdAt: Date
 	) {
@@ -26,6 +28,7 @@ export class Transaction {
 		this.amount = amount;
 		this.description = description;
 		this.currency = currency;
+		this.isSuccess = isSuccess;
 		this.payment = payment;
 		this.createdAt = createdAt;
 	}

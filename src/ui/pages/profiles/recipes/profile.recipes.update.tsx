@@ -18,7 +18,7 @@ import {
 import { Button, Col, Flex, Form, Input, Modal, Radio, Rate, Row, Select, Typography } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { Field, FieldArray, Formik, FormikErrors } from "formik";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import NotFound from "../../not-found.page";
 import { User } from "@/models/user.model";
@@ -29,7 +29,11 @@ import { useGetRecipeById } from "@/hooks/recipes";
 export default function UpdateRecipesPage() {
 	// Hooks
 	const { recipeId } = useParams();
-	const { recipe } = useGetRecipeById(recipeId);
+	const { data } = useGetRecipeById(recipeId);
+	const [recipe, setRecipe] = React.useState(data);
+	React.useEffect(() => {
+		setRecipe(data);
+	}, [data]);
 	const navigate = useNavigate();
 
 	// State
@@ -297,6 +301,7 @@ export default function UpdateRecipesPage() {
 												</Typography.Title>
 												<div className="w-full">
 													<Input
+														prefix="$"
 														type="number"
 														{...getFieldProps("recipePrice")}
 														className="w-full rounded-md border border-gray-300"

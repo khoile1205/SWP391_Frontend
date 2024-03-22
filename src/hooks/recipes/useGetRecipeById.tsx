@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useEffectOnce } from "usehooks-ts";
 
 export const useGetRecipeById = (recipeId: string | undefined) => {
-	const [recipe, setRecipe] = useState<Recipe | null>(null);
+	const [data, setData] = useState<Recipe | null>(null);
 	const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>([]);
 	const { getRecipeById } = recipeStore((state) => state);
 	const { setLoading } = useLoadingStore((state) => state);
@@ -17,13 +17,14 @@ export const useGetRecipeById = (recipeId: string | undefined) => {
 		}
 
 		const response = await getRecipeById(recipeId);
+		console.log(response);
 		if (!response.isSuccess) {
 			setLoading(false);
 			return;
 		}
-		setRecipe(response.data);
+		setData(response.data);
 		setCheckedIngredients(
-			recipe?.ingredients ? Array(response.data.ingredients.length).fill(false) : []
+			data?.ingredients ? Array(response.data.ingredients.length).fill(false) : []
 		);
 		setLoading(false);
 	};
@@ -34,5 +35,5 @@ export const useGetRecipeById = (recipeId: string | undefined) => {
 		}
 	});
 
-	return { recipe, checkedIngredients, setCheckedIngredients };
+	return { data, checkedIngredients, setCheckedIngredients };
 };
