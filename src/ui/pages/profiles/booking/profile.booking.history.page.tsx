@@ -11,9 +11,10 @@ import { BookingDetailModal } from "@/ui/section";
 import { useAuthenticateFeature } from "@/hooks/common";
 import bookingStore from "@/zustand/booking.store";
 import { renderStatusColor } from "@/ui/utils/renderStatusColor";
+import { showToast } from "@/utils/notify";
 
 export default function ProfileUserBookingHistory() {
-	const { getBookingDetailById } = bookingStore((state) => state);
+	const { getBookingDetailById, updateBookingStatus } = bookingStore((state) => state);
 
 	const { data } = useGetUserBookings();
 	const [pageSize, setPageSize] = React.useState<number>(5);
@@ -29,6 +30,26 @@ export default function ProfileUserBookingHistory() {
 		const response = await getBookingDetailById(booking.id);
 		if (response.isSuccess) setBooking(response.data);
 		setOpenModal(true);
+	});
+
+	const handleUpdateBookingStatus = useAuthenticateFeature(async (status: ActionStatus) => {
+		const data = {
+			bookingId: booking?.id as string,
+			status: status,
+		};
+
+		const response = await updateBookingStatus(data);
+		if (response.isSuccess) {
+			showToast("success", response.message as string);
+			setOpenModal(false);
+			setListBookings((prev) =>
+				prev.map((booking) =>
+					booking.id === data.bookingId ? { ...booking, status: status } : booking
+				)
+			);
+		} else {
+			showToast("error", response.message as string);
+		}
 	});
 	const columns: Column<Booking>[] = [
 		{
@@ -64,6 +85,8 @@ export default function ProfileUserBookingHistory() {
 				{ text: "Accepted", value: ActionStatus.ACCEPTED },
 				{ text: "Pending", value: ActionStatus.PENDING },
 				{ text: "Rejected", value: ActionStatus.REJECTED },
+				{ text: "Canceled", value: ActionStatus.CANCELED },
+				{ text: "Completed", value: ActionStatus.COMPLETED },
 			],
 			onFilter: (value: any, record: Booking) => record.status === value,
 		},
@@ -75,7 +98,7 @@ export default function ProfileUserBookingHistory() {
 			sorter: (a: Booking, b: Booking) => a.createdAt.getTime() - b.createdAt.getTime(),
 		},
 		{
-			title: "Time Start",
+			title: "Time End",
 			dataIndex: "timeEnd",
 			align: "center",
 			render: (timeEnd: Date) => <span>{new Date(timeEnd).toLocaleString("vi-VN")}</span>,
@@ -97,8 +120,8 @@ export default function ProfileUserBookingHistory() {
 	return (
 		<>
 			<div className="w-full px-4 py-8 lg:px-8">
-				<h2 className="mb-4 text-center text-2xl font-bold text-gray-900">View Bookings</h2>
-				<Flex className="mb-4 w-full" align="center" justify="space-between">
+				<h2 className="mb-4 text-center text-2xl font-bold text-gray-900">View Booking History</h2>
+				<Flex className="mb-4 ms-4 w-full" align="center" justify="space-between">
 					<PaginationPageSize options={[5, 10, 15]} pageSize={pageSize} setPageSize={setPageSize} />
 				</Flex>
 				<PaginationTable columns={columns} dataSource={listBookings} pageSize={pageSize} />
@@ -109,6 +132,7 @@ export default function ProfileUserBookingHistory() {
 				setOpen={setOpenModal}
 				bookingData={booking}
 				role={Roles.USER}
+				handleUpdateBookingStatus={handleUpdateBookingStatus}
 			/>
 		</>
 	);

@@ -13,8 +13,8 @@ class Result {
 		return new Result(true, message, data);
 	}
 
-	static failed(message: string) {
-		return new Result(false, message);
+	static failed(message?: string, data?: any) {
+		return new Result(false, message, data);
 	}
 
 	get isSuccess() {

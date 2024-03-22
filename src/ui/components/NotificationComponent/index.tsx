@@ -25,12 +25,15 @@ const MarkAllAsRead: React.FC<MarkAllAsReadProps> = ({ markAllAsRead }) => (
 	</div>
 );
 export const NotificationComponent: React.FC<Props> = ({ visible, setVisible }) => {
+	// Zustand store
 	const { userNotification, user } = userStore((state) => state);
 	const { seenAllNotification } = notificationStore((state) => state);
+
 	const [notSeenNotification, setNotSeenNotification] = React.useState<Notification[]>([]);
 	const [cloneTotalUserNotification, setCloneTotalUserNotification] = React.useState<
 		Notification[]
 	>([]);
+
 	const [type, setType] = React.useState<NotificationType>("all");
 
 	const ref = useRef(null);
@@ -139,10 +142,7 @@ export const NotificationComponent: React.FC<Props> = ({ visible, setVisible }) 
 				width: 336,
 			}}
 		>
-			<Badge
-				count={userNotification.filter((element) => !element.isSeen).length}
-				overflowCount={10}
-			>
+			<Badge count={notSeenNotification.length} overflowCount={10}>
 				<BellOutlined className="h-6 w-6 text-xl" />
 			</Badge>
 		</Popover>

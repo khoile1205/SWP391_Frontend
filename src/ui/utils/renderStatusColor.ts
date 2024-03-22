@@ -6,8 +6,14 @@ export const renderStatusColor = (status: ActionStatus) => {
 		case ActionStatus.PENDING:
 			return AppColor.deepOrangeColor;
 		case ActionStatus.REJECTED:
-			return AppColor.redColor;
+			return AppColor.darkRedColor;
 		case ActionStatus.ACCEPTED:
-			return AppColor.greenColor;
+			return AppColor.darkGreenColor;
+		case ActionStatus.CANCELED:
+			return AppColor.grayColor;
+		case ActionStatus.COMPLETED:
+			return AppColor.darkBlueColor;
+		default:
+			return AppColor.deepOrangeColor;
 	}
 };

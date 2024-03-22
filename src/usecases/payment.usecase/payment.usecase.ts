@@ -1,4 +1,4 @@
-import { CreatePaymentDTO, PurchaseRecipePaymentType } from "@/types/payment";
+import { CreatePaymentDTO, PurchaseRecipePaymentType, WithdrawPaymentDTO } from "@/types/payment";
 import Response from "../auth.usecase/responses/response";
 import { PaymentDatasource } from "@/datasources/payment.datasource";
 
@@ -14,10 +14,14 @@ export abstract class PaymentUsecase {
 		recipeId: string;
 		typeTransactionId: string;
 	}): Promise<Response>;
+	abstract withDraw(data: WithdrawPaymentDTO): Promise<Response>;
 }
 
 export class PaymentUsecaseImpl implements PaymentUsecase {
 	constructor(private readonly paymentDatasource: PaymentDatasource) {}
+	async withDraw(data: WithdrawPaymentDTO): Promise<Response> {
+		return await this.paymentDatasource.withDraw(data);
+	}
 	async payRecipe({
 		data,
 		recipeId,

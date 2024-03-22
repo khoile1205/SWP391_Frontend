@@ -12,21 +12,22 @@ import { ActionStatus, Roles } from "@/enums";
 import { Column } from "@/types/@override/Table";
 import { BookingDetailModal } from "@/ui/section";
 import { showToast } from "@/utils/notify";
+import { renderStatusColor } from "@/ui/utils/renderStatusColor";
 
-const renderStatusColor = (status: ActionStatus) => {
-	switch (status) {
-		case ActionStatus.PENDING:
-			return AppColor.deepOrangeColor;
-		case ActionStatus.REJECTED:
-			return AppColor.redColor;
-		case ActionStatus.ACCEPTED:
-			return AppColor.greenColor;
-		case ActionStatus.CANCELED:
-			return AppColor.redColor;
-		case ActionStatus.COMPLETED:
-			return AppColor.greenColor;
-	}
-};
+// const renderStatusColor = (status: ActionStatus) => {
+// 	switch (status) {
+// 		case ActionStatus.PENDING:
+// 			return AppColor.deepOrangeColor;
+// 		case ActionStatus.REJECTED:
+// 			return AppColor.redColor;
+// 		case ActionStatus.ACCEPTED:
+// 			return AppColor.greenColor;
+// 		case ActionStatus.CANCELED:
+// 			return AppColor.redColor;
+// 		case ActionStatus.COMPLETED:
+// 			return AppColor.greenColor;
+// 	}
+// };
 
 export default function ProfileChefSchedulesHistory() {
 	const { getBookingDetailById } = bookingStore((state) => state);
@@ -116,7 +117,7 @@ export default function ProfileChefSchedulesHistory() {
 				new Date(a.timeStart).getTime() - new Date(b.timeStart).getTime(),
 		},
 		{
-			title: "Time Start",
+			title: "Time End",
 			dataIndex: "timeEnd",
 			align: "center",
 			render: (timeEnd: Date) => <span>{new Date(timeEnd).toLocaleString("vi-VN")}</span>,
@@ -140,8 +141,8 @@ export default function ProfileChefSchedulesHistory() {
 
 	return (
 		<>
-			<div className="flex flex-col items-center justify-center px-4 py-8 lg:px-8">
-				<h2 className="mb-4 text-2xl font-bold text-gray-900">View Schedule </h2>
+			<div className="px-4 py-8 lg:px-8">
+				<h2 className="mb-4 text-center text-2xl font-bold text-gray-900">View Schedule</h2>
 				<div className="mb-4 ms-4 w-full">
 					<PaginationPageSize options={[5, 10, 15]} pageSize={pageSize} setPageSize={setPageSize} />
 				</div>

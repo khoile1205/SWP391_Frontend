@@ -1,5 +1,6 @@
 import { Roles } from "@/enums";
 import { User } from "@/models/user.model";
+import dayjs from "dayjs";
 import * as Yup from "yup";
 
 const phoneRegExp =
@@ -85,4 +86,23 @@ const createRecipeValidationSchema = (user: User) =>
 		),
 	});
 
-export { phoneRegExp, signUpValidationSchema, loginSchema, createRecipeValidationSchema };
+const bookingInformationValidationSchema = Yup.object().shape({
+	address: Yup.string().required("Address is required"),
+	phoneNumber: Yup.string()
+		.required("Phone number is required")
+		.matches(phoneRegExp, "Phone number is not valid"),
+	timeStart: Yup.date()
+		.min(dayjs().add(2, "day").toDate(), "Time start should be at least 2 days from now")
+		.required("Start time is required"),
+	timeEnd: Yup.date()
+		.min(Yup.ref("timeStart"), "End time should be after start time")
+		.required("End time is required"),
+});
+
+export {
+	phoneRegExp,
+	signUpValidationSchema,
+	loginSchema,
+	createRecipeValidationSchema,
+	bookingInformationValidationSchema,
+};

@@ -59,7 +59,7 @@ const ChefBooking: React.FC<Props> = ({
 		changeStep(2);
 
 		if (bookingData.chefId != chef.id) {
-			setBookingData({ chefId: chef.id, bookingDishes: [] });
+			setBookingData({ chefId: chef.id, bookingDishes: [], total: 0 });
 		}
 		setChefInformation(chef);
 	};
@@ -149,16 +149,18 @@ const ChefBooking: React.FC<Props> = ({
 							// dataIndex=""
 							key="title"
 							render={(record: Recipe) => (
-								<Space direction="vertical">
-									<span style={{ fontWeight: "bold" }}>{"title"}</span>
-									<span style={{ fontSize: "12px", color: "#999" }}>{"text 50 chars"}</span>
+								<Space direction="vertical" className="max-w-xl">
+									<span style={{ fontWeight: "bold" }}>{record.title}</span>
+									<span style={{ fontSize: "12px", color: "#999" }} className="text-truncate">
+										{record.description}
+									</span>
 									<Space
 										direction="horizontal"
 										style={{ fontSize: "12px", marginTop: "5px", color: "#999" }}
 									>
 										<span>Serves: {record.portion || "-"}</span>
 										<span style={{ marginLeft: "10px" }}>
-											Price: $ {record.bookingPrice || "-"}
+											Price: {`${record.bookingPrice} $` || "-"}
 										</span>
 									</Space>
 								</Space>
@@ -172,7 +174,8 @@ const ChefBooking: React.FC<Props> = ({
 								<Image
 									src={record.thumbnailUrl || "https://via.placeholder.com/150x100"}
 									alt={record.title}
-									style={{ width: "100%", height: "80px", objectFit: "cover" }}
+									style={{ width: "200px", height: "80px", objectFit: "cover" }}
+									className="object-cover"
 								/>
 							)}
 						/>
