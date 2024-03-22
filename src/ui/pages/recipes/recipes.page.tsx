@@ -71,7 +71,7 @@ export default function RecipesPage() {
 						Maybe you like it
 					</Typography.Title>
 					<CarouselComponent
-						items={recipes}
+						items={pickRandomElements(recipes, recipes.length)}
 						renderItem={(recipe) => <RecipeCard key={recipe.id} recipe={recipe} />}
 					/>
 				</div>

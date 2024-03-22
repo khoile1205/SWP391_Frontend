@@ -303,6 +303,7 @@ export default function CreateRecipePage() {
 												</Typography.Title>
 												<div className="w-full">
 													<Input
+														prefix="$"
 														type="number"
 														{...getFieldProps("recipePrice")}
 														className="w-full rounded-md border border-gray-300"

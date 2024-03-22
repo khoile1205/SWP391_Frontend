@@ -13,6 +13,7 @@ import { showToast } from "@/utils/notify";
 import { useAuthenticateFeature } from "@/hooks/common";
 import { PaymentType } from "@/enums/payment.type.enum";
 import { useLoadingStore } from "@/zustand/loading.store";
+import { AppConstant } from "@/utils/constant";
 
 export default function ProfileWalletPage() {
 	const [withdrawModalVisible, setWithdrawModalVisible] = useState(false);
@@ -34,7 +35,7 @@ export default function ProfileWalletPage() {
 		setLoading(true);
 		try {
 			response = await topUp({
-				amount: values.amount,
+				amount: values.amount * AppConstant.USDtoVND,
 				name: user?.firstName + " " + user?.lastName,
 				orderDescription: `Top up`,
 				orderType: PaymentType.DEPOSIT,
@@ -109,8 +110,8 @@ export default function ProfileWalletPage() {
 						<Input
 							prefix={<DollarOutlined />}
 							type="number"
-							min={10000}
-							step={1000}
+							min={1}
+							step={1}
 							placeholder="Enter withdrawal amount"
 							style={{ width: "100%" }}
 						/>
@@ -137,8 +138,8 @@ export default function ProfileWalletPage() {
 					>
 						<Input
 							prefix={<DollarOutlined />}
-							min={10000}
-							step={1000}
+							min={1}
+							step={1}
 							type="number"
 							placeholder="Enter top-up amount"
 							style={{ width: "100%" }}

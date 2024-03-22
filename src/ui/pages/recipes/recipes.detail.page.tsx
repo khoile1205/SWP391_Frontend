@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
 	Avatar,
 	Divider,
@@ -54,6 +54,7 @@ import { CreatePaymentDTO, PurchaseRecipePaymentType } from "@/types/payment";
 import { User } from "@/models/user.model";
 import { PaymentType } from "@/enums/payment.type.enum";
 import Result from "@/zustand/commons/result";
+import { Roles } from "@/enums";
 
 // Content Component - Handles the main content of the recipe
 const RecipeContent: React.FC<{
@@ -374,8 +375,9 @@ const SelectPaymentMethodModal: React.FC<SelectPaymentMethodModalProps> = ({
 		}
 		const response = await handlePayment({ ...data });
 		if (response.isSuccess) {
-			showToast("success", response.message!);
 			setModalVisible(false);
+			showToast("success", response.message!);
+			window.location.reload();
 		} else {
 			showToast("error", response.message!);
 		}
@@ -489,9 +491,22 @@ export default function RecipeDetailPage() {
 	const { user, listUserPurcharseRecipe } = userStore((state) => state);
 	const { saveFavoriteRecipe, removeFavoriteRecipe } = recipeStore((state) => state);
 	const { postReaction, removeReaction } = reactionStore((state) => state);
+
 	// Hooks
 	const { recipeId } = useParams();
-	const { recipe, checkedIngredients, setCheckedIngredients } = useGetRecipeById(recipeId);
+	const { data, checkedIngredients, setCheckedIngredients } = useGetRecipeById(recipeId);
+	const [recipe, setRecipe] = useState<Recipe | null>(data);
+
+	React.useEffect(() => {
+		setRecipe(data);
+	}, [data]);
+
+	const [listPurchaseRecipes, setListPurchaseRecipes] = useState<string[]>(listUserPurcharseRecipe);
+
+	React.useEffect(() => {
+		setListPurchaseRecipes(listUserPurcharseRecipe);
+	}, [listUserPurcharseRecipe]);
+
 	const { bookmarked, setBookmarked } = useRecipeBookmark(recipeId);
 	const { relatedRecipes } = useGetRelatedRecipes(recipe!);
 	const { payRecipe } = paymentStore((state) => state);
@@ -612,7 +627,9 @@ export default function RecipeDetailPage() {
 			{/* Divider */}
 			<Divider style={{ marginTop: "20px", marginBottom: "20px" }} />
 
-			{!recipe.isPrivate || (recipe.isPrivate && listUserPurcharseRecipe.includes(recipe.id)) ? (
+			{user?.role == Roles.ADMIN ||
+			!recipe.isPrivate ||
+			(recipe.isPrivate && listPurchaseRecipes.includes(recipe.id)) ? (
 				<>
 					{/* Render RecipeIngredients and RecipeInstructions components */}
 					<div className="block space-y-3 sm:flex sm:space-y-0">

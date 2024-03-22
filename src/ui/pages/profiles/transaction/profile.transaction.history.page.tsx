@@ -3,7 +3,7 @@ import { Transaction } from "@/models/transaction.model";
 import { TransactionType } from "@/enums/transaction.enum";
 import { Column } from "@/types/@override/Table";
 import React, { useState } from "react";
-import { Tooltip } from "antd";
+import { Tooltip, Typography } from "antd";
 import { PaginationPageSize, PaginationTable } from "@/ui/components";
 
 const renderTransactionType = (type: Transaction["type"]) => {
@@ -78,6 +78,29 @@ export default function ProfileTransactionHistory() {
 			onFilter: (value, record) => record.type == value,
 		},
 		{
+			title: "Status",
+			dataIndex: "isSuccess",
+			align: "center",
+			render: (_text: string, record: Transaction) => {
+				return (
+					<Typography.Text type={record.isSuccess ? "success" : "danger"}>
+						{record.isSuccess ? "Success" : "Error"}
+					</Typography.Text>
+				);
+			},
+			filters: [
+				{
+					value: true,
+					text: "Success",
+				},
+				{
+					value: false,
+					text: "Error",
+				},
+			],
+			onFilter: (value, record) => record.isSuccess == value,
+		},
+		{
 			title: "Currency",
 			dataIndex: "currency",
 			align: "center",
@@ -119,8 +142,12 @@ export default function ProfileTransactionHistory() {
 
 	return (
 		<div className="w-full px-4 py-8 lg:px-8">
-			<h2 className="mb-4 text-2xl font-bold text-gray-900">View Transaction History</h2>
-			<PaginationPageSize options={[5, 10, 15]} pageSize={pageSize} setPageSize={setPageSize} />
+			<h2 className="mb-4 text-center text-2xl font-bold text-gray-900">
+				View Transaction History
+			</h2>
+			<div className="mb-4 ms-4">
+				<PaginationPageSize options={[5, 10, 15]} pageSize={pageSize} setPageSize={setPageSize} />
+			</div>
 			<PaginationTable columns={columns} dataSource={transactionHistory} pageSize={pageSize} />
 		</div>
 	);

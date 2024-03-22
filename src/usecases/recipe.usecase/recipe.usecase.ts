@@ -70,7 +70,6 @@ export class RecipeUseCase implements IRecipeUseCase {
 					const reactions = (
 						await this.reactionDatasource.getReactionsByTargetId("comment", comment.commentId)
 					).data;
-					console.log(reactions);
 					const userData = (await this.userDatasource.getUserById(comment.userId as string)).data;
 					const newRootComments: CommentEntity = {
 						...comment,

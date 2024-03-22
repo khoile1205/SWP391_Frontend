@@ -8,11 +8,15 @@ import { Loading } from "./ui/components/Loading";
 import MainRoutes from "./routes/index";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import CreateReportModal from "./ui/section/ReportModal";
+import React from "react";
 
 i18nInit();
 
 function App() {
 	const { isLoading } = useLoadingStore((state) => state);
+	React.useEffect(() => {
+		document.title = "Nest Cooking";
+	}, []);
 	return (
 		<GoogleOAuthProvider clientId={import.meta.env.VITE_APP_GOOGLE_CLIENT_ID}>
 			{isLoading && <Loading></Loading>}
@@ -34,7 +38,6 @@ function App() {
 				<Footer></Footer>
 			</div>
 		</GoogleOAuthProvider>
-		// </div>
 	);
 }
 

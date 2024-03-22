@@ -15,6 +15,7 @@ export class Recipe {
 	recipePrice: number;
 	isAvailableForBooking: boolean;
 	bookingPrice: number;
+	isPublic: boolean;
 	difficult: number;
 	instructors: Instructors[];
 	ingredients: Ingredients[];
@@ -32,13 +33,14 @@ export class Recipe {
 		thumbnailUrl: string,
 		isPrivate: boolean,
 		recipePrice: number,
+		isPublic: boolean,
+
 		portion: number,
 		isAvailableForBooking: boolean,
 		bookingPrice: number,
 		cookingTime: number,
 		difficult: number,
 		isVerified: boolean,
-
 		instructors: Instructors[],
 		ingredients: Ingredients[],
 		categories: Category[],
@@ -50,6 +52,7 @@ export class Recipe {
 		this.id = id;
 		this.user = user;
 		this.title = title;
+		this.isPublic = isPublic;
 		this.description = description;
 		this.thumbnailUrl = thumbnailUrl;
 		this.isPrivate = isPrivate;

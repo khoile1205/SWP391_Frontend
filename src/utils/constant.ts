@@ -3,4 +3,5 @@ export class AppConstant {
 	static avatarFolder = "avatar";
 	static becomeChefFolder = "become-chef-request";
 	static recipeFolder = "recipe";
+	static USDtoVND = 23000;
 }

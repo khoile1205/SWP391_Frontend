@@ -186,6 +186,7 @@ const BookingCart: React.FC<Props> = ({
 		let errorOccurred = false; // Flag to track if an error occurred
 
 		listChefBookingSchedules.forEach((schedule) => {
+			console.log(new Date(schedule.timeStart).toLocaleString("vi-VN"));
 			if (
 				isBetween({
 					startDate: schedule.timeStart,
