@@ -378,7 +378,7 @@ const SelectPaymentMethodModal: React.FC<SelectPaymentMethodModalProps> = ({
 		if (response.isSuccess) {
 			setModalVisible(false);
 			showToast("success", response.message!);
-			window.location.reload();
+			window.location.pathname = `/recipes/${recipe.id}`;
 		} else {
 			showToast("error", response.message!);
 		}
