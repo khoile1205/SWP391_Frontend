@@ -55,6 +55,7 @@ import { User } from "@/models/user.model";
 import { PaymentType } from "@/enums/payment.type.enum";
 import Result from "@/zustand/commons/result";
 import { Roles } from "@/enums";
+import { AppConstant } from "@/utils/constant";
 
 // Content Component - Handles the main content of the recipe
 const RecipeContent: React.FC<{
@@ -393,7 +394,7 @@ const SelectPaymentMethodModal: React.FC<SelectPaymentMethodModalProps> = ({
 	const handlePaymentMethod = useAuthenticateFeature(async (method: "Wallet" | "VnPay") => {
 		const data = {
 			data: {
-				amount: recipe.recipePrice,
+				amount: recipe.recipePrice * AppConstant.USDtoVND,
 				name: user?.firstName + " " + user?.lastName,
 				orderDescription: "Purchase recipe",
 				orderType: PaymentType.PURCHASEDRECIPE,
